@@ -214,6 +214,10 @@ class _UpdateOdometerDialogState extends ConsumerState<UpdateOdometerDialog> {
                       suffixStyle: AppTypography.labelMd(
                         color: AppColors.onSurfaceVariant,
                       ).copyWith(fontWeight: FontWeight.w700),
+                      errorMaxLines: 3,
+                      errorStyle: AppTypography.bodySm(
+                        color: AppColors.error,
+                      ),
                       border: const OutlineInputBorder(
                         borderRadius: AppShapes.roundedDefault,
                         borderSide: BorderSide.none,
