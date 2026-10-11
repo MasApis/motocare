@@ -240,4 +240,17 @@ class VehicleRepository {
       return null;
     }
   }
+
+  /// Mengambil seluruh komponen untuk suatu motor
+  Future<List<VehicleComponent>> getComponents(String vehicleId) async {
+    try {
+      final uid = _getRequiredUid();
+      final snap = await _componentsRef(vehicleId, uid).get();
+      return snap.docs
+          .map((doc) => VehicleComponent.fromFirestore(doc))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
 }

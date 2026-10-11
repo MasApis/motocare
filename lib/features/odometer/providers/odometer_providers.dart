@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/odometer_calculator.dart';
+import '../../notifications/providers/notification_providers.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
 import '../data/models/odometer_log_model.dart';
 import '../data/odometer_repository.dart';
@@ -44,16 +45,40 @@ class OdometerController {
   OdometerRepository get _repository => _ref.read(odometerRepositoryProvider);
 
   /// Menyimpan log odometer baru dan memperbarui currentKm kendaraan
+  /// serta memicu penjadwalan ulang notifikasi F6 sesuai docs/SPEC.md
   Future<String> updateOdometer({
     required String vehicleId,
     required int km,
     required DateTime date,
   }) async {
-    return _repository.addOdometerLog(
+    final logId = await _repository.addOdometerLog(
       vehicleId: vehicleId,
       km: km,
       date: date,
     );
+
+    // Memicu perhitungan ulang notifikasi di background secara aman
+    try {
+      final vehicleRepo = _ref.read(vehicleRepositoryProvider);
+      final vehicle = await vehicleRepo.getVehicle(vehicleId);
+      if (vehicle != null) {
+        final components = await vehicleRepo.getComponents(vehicleId);
+        final logs = await _repository.getOdometerLogs(vehicleId);
+        final entries = logs.map((l) => l.toOdometerEntry()).toList();
+        final dailyAvg = calculateDailyAverageKm(entries);
+
+        final scheduler = _ref.read(notificationSchedulerProvider);
+        await scheduler.syncNotificationsForVehicle(
+          vehicle: vehicle,
+          components: components,
+          dailyAverageKm: dailyAvg,
+        );
+      }
+    } catch (_) {
+      // Kegagalan penjadwalan notifikasi tidak boleh membatalkan penyimpanan odometer
+    }
+
+    return logId;
   }
 }
 

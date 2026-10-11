@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../notifications/providers/notification_providers.dart';
 import '../data/models/vehicle_component_model.dart';
 import '../data/models/vehicle_model.dart';
 import '../data/vehicle_repository.dart';
@@ -123,6 +124,9 @@ class VehicleController {
 
   Future<void> deleteVehicle(String vehicleId) async {
     await _repository.deleteVehicle(vehicleId);
+    try {
+      await _ref.read(notificationSchedulerProvider).cancelForVehicle(vehicleId);
+    } catch (_) {}
   }
 
   Future<void> updateComponentInterval({

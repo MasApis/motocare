@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'features/auth/providers/auth_providers.dart';
 import 'features/auth/ui/login_screen.dart';
 import 'features/dashboard/ui/dashboard_screen.dart';
+import 'features/notifications/data/notification_service.dart';
 import 'features/vehicles/ui/vehicle_form_screen.dart';
 import 'firebase_options.dart';
 import 'shared/theme/app_theme.dart';
@@ -15,6 +16,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  try {
+    await NotificationService().initialize();
+  } catch (e) {
+    debugPrint('Inisialisasi NotificationService dilewati/gagal: $e');
+  }
 
   runApp(
     const ProviderScope(

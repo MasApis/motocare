@@ -15,6 +15,9 @@ import '../../auth/providers/auth_providers.dart';
 import '../../vehicles/data/models/vehicle_component_model.dart';
 import '../../vehicles/data/models/vehicle_model.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
+import '../../notifications/providers/notification_providers.dart';
+import '../../notifications/ui/notification_permission_banner.dart';
+import '../../notifications/ui/notification_test_card.dart';
 import 'widgets/component_health_card.dart';
 import 'widgets/vehicle_hero_card.dart';
 
@@ -37,6 +40,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   void initState() {
     super.initState();
     _pageController = PageController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notificationSchedulerProvider).syncSelectedVehicleNotifications();
+    });
   }
 
   @override
@@ -360,6 +366,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       children: [
+        // Banner Izin Notifikasi (F6) jika belum diizinkan
+        const NotificationPermissionBanner(),
+
         // Header Carousel & Indikator
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -486,6 +495,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ),
         ),
+
+        // Section Mode Uji Coba Notifikasi F6 (Bertanda Jelas)
+        if (activeVehicle != null) ...[
+          const SizedBox(height: AppSpacing.md),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: NotificationTestCard(vehicle: activeVehicle),
+          ),
+        ],
       ],
     );
   }
