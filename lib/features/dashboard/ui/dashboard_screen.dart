@@ -205,8 +205,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ref.listen<String?>(selectedVehicleIdProvider, (prev, next) {
       if (_isUserSwiping) return;
       if (next == null) return;
-      final vehicles = vehiclesAsync.valueOrNull ?? [];
-      final targetIndex = vehicles.indexWhere((v) => v.id == next);
+      final vehicles = vehiclesAsync.asData?.value ?? [];
+      final targetIndex = vehicles.indexWhere((Vehicle v) => v.id == next);
       if (targetIndex != -1 &&
           targetIndex != _currentPageIndex &&
           _pageController.hasClients) {
@@ -497,7 +497,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     BuildContext context,
     Vehicle activeVehicle,
   ) {
-    final componentsAsync = ref.watch(selectedVehicleComponentsProvider);
+    final componentsAsync =
+        ref.watch(vehicleComponentsStreamProvider(activeVehicle.id));
+    final components = componentsAsync.asData?.value ?? [];
+
+    final orderedTypes = ComponentType.values; // [engine_oil, gear_oil, v_belt]
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -512,41 +516,21 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ],
         ),
         const SizedBox(height: AppSpacing.sm),
-        componentsAsync.when(
-          data: (components) {
-            final orderedTypes = ComponentType.values; // [engine_oil, gear_oil, v_belt]
-            return Column(
-              children: orderedTypes.map((type) {
-                final comp = components.firstWhere(
-                  (c) => c.type == type,
-                  orElse: () => VehicleComponent(
-                    type: type,
-                    intervalKm: DefaultIntervals.forType(type),
-                    lastServiceKm: activeVehicle.currentKm,
-                  ),
+        Column(
+          children: orderedTypes.map((type) {
+            final comp = components.where((c) => c.type == type).firstOrNull ??
+                VehicleComponent(
+                  type: type,
+                  intervalKm: DefaultIntervals.forType(type),
+                  lastServiceKm: activeVehicle.currentKm,
                 );
-                return ComponentHealthCard(
-                  componentType: comp.type,
-                  intervalKm: comp.intervalKm,
-                  lastServiceKm: comp.lastServiceKm,
-                  currentKm: activeVehicle.currentKm,
-                );
-              }).toList(),
+            return ComponentHealthCard(
+              componentType: comp.type,
+              intervalKm: comp.intervalKm,
+              lastServiceKm: comp.lastServiceKm,
+              currentKm: activeVehicle.currentKm,
             );
-          },
-          loading: () => const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSpacing.md),
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          error: (err, _) => Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Text(
-              'Gagal memuat status komponen: $err',
-              style: AppTypography.bodySm(color: AppColors.error),
-            ),
-          ),
+          }).toList(),
         ),
       ],
     );
@@ -559,9 +543,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     BuildContext context,
     Vehicle activeVehicle,
   ) {
-    final componentsAsync = ref.watch(selectedVehicleComponentsProvider);
-    final components = componentsAsync.value ?? [];
-    final engineOil = components.where((c) => c.type == ComponentType.engineOil).firstOrNull;
+    final componentsAsync =
+        ref.watch(vehicleComponentsStreamProvider(activeVehicle.id));
+    final components = componentsAsync.asData?.value ?? [];
+    final engineOil =
+        components.where((c) => c.type == ComponentType.engineOil).firstOrNull;
     final baseKm = engineOil?.lastServiceKm ?? activeVehicle.currentKm;
 
     return Container(
