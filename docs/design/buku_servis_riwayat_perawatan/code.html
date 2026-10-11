@@ -1,0 +1,351 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_tab" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "tertiary-container": "#00855b", "surface-container-highest": "#dae2fd", "surface-variant": "#dae2fd", "on-tertiary-container": "#f5fff6", "on-secondary-fixed-variant": "#004c6e", "on-primary-container": "#fdfcff", "on-tertiary-fixed-variant": "#005236", "on-error-container": "#93000a", "secondary-fixed-dim": "#89ceff", "on-secondary-fixed": "#001e2f", "on-tertiary": "#ffffff", "on-secondary": "#ffffff", "secondary": "#006591", "primary-fixed-dim": "#93ccff", "surface-container-high": "#e2e7ff", "secondary-fixed": "#c9e6ff", "inverse-surface": "#283044", "surface-container-lowest": "#ffffff", "surface-tint": "#006398", "surface": "#faf8ff", "surface-bright": "#faf8ff", "outline": "#707881", "on-background": "#131b2e", "primary-fixed": "#cce5ff", "error-container": "#ffdad6", "error": "#ba1a1a", "on-primary-fixed-variant": "#004b73", "primary": "#006194", "on-error": "#ffffff", "tertiary": "#006947", "background": "#faf8ff", "on-primary-fixed": "#001d31", "outline-variant": "#bfc7d2", "primary-container": "#007bb9", "inverse-on-surface": "#eef0ff", "on-primary": "#ffffff", "on-secondary-container": "#004666", "surface-container-low": "#f2f3ff", "surface-dim": "#d2d9f4", "surface-container": "#eaedff", "secondary-container": "#39b8fd", "on-surface": "#131b2e", "tertiary-fixed": "#6ffbbe", "on-surface-variant": "#3f4850", "on-tertiary-fixed": "#002113", "inverse-primary": "#93ccff", "tertiary-fixed-dim": "#4edea3" }, borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, spacing: { "space-md": "1rem", "gutter": "1rem", "space-xs": "0.25rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "space-2xl": "3rem", "margin": "1rem", "gutter-desktop": "1.5rem", "space-xl": "2rem", "margin-desktop": "2.5rem" }, fontFamily: { "label-caps": ["Inter"], "body-sm": ["Inter"], "display-lg": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "headline-md": ["Plus Jakarta Sans"], "metric-val": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "body-md": ["Inter"], "display-md": ["Plus Jakarta Sans"], "label-md": ["Inter"], "headline-lg": ["Plus Jakarta Sans"] }, fontSize: { "label-caps": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }], "display-lg": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" }], "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "metric-val": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "display-md": ["36px", { "lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-md": ["13px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } };</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="MotoSense Logo" class="h-8 w-auto object-contain shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1WLT1P81pH4gr_BuFAadfZ8gUTIGffIr3dWwIz6NBCilnodySh6uCx5l9WI9RIakP2RJDxKOfa06udw-e4_u0r0rw-dYVzokazMnE4F2-QVRVH7spv3p8IDcBnEOVFeec8vUW5FUBAaEmIaZ3sS1POniQl5bw32UrwYzGmG43JLkwFXJHZPmtrHbdSuHAL0_dgGwWfUtP6lKPyBX45mkUI8IiSyDJVEsOXTYhLIht5tEFYe6QCsDbDT8gk"><div class="flex flex-col min-w-0"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight truncate leading-none">MotoSense</span><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider truncate mt-0.5">Honda Vario 160</span></div></div><div class="flex items-center gap-space-xs shrink-0"><button aria-label="Pengaturan &amp; Profil" class="w-11 h-11 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container active:scale-95 transition-all"><span class="material-symbols-outlined text-[24px]">settings</span></button><div class="w-11 h-11 rounded-full p-0.5 bg-surface-container flex items-center justify-center"><img alt="Foto Pemilik" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvjDpa-aPYtuJ_DRyqCfawHjWXS1IpNfOGEy0TsD5KKA9EnB6nq8akyB-ekiFawToL-DPqJMiEk7guWqG9v1OUSSyeqUHhhO8hKiaBgmwL9T0YRulM8fFTZiyVsCwFyGbAdWxkcoEtzcAQstNvqwLpwKOwxJ7m1oSLjYI4O9zl19CLkNq2d0Y3M1jQUYqrTu7jYR5WVLryPC1Q9RvNGRUpL4lmi4pe9ALeVsgMMVDKyijZ8fqBOkjz"></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-20 bg-surface min-h-screen"><div class="flex flex-col w-full px-margin py-space-md gap-space-lg">
+<!-- Ringkasan Finansial Motor -->
+<section class="flex flex-col bg-surface-container-lowest rounded-lg p-space-md shadow-sm gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Riwayat Servis Motor</span>
+<span class="font-display-md text-display-md text-on-surface tracking-tight mt-0.5">8 Kali Servis</span>
+</div>
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[26px]">build_circle</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs bg-surface-container-low rounded-DEFAULT p-space-sm">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-primary">event_available</span>
+<span class="text-on-surface-variant font-body-sm text-body-sm">Servis Terakhir:</span>
+<span class="font-label-md text-label-md">15 Jan 2025</span>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-tertiary">verified</span>
+<span class="text-tertiary font-label-md text-label-md">Rutin &amp; Resmi</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pt-0.5 border-t border-surface-container">
+<span class="">Odometer Terakhir: 12.500 km</span>
+<span class="">AHASS Mitra Jaya</span>
+</div>
+</div>
+<button class="w-full h-12 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center gap-space-xs shadow-md active:scale-[0.98] transition-all" id="btnOpenModal">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+<span class="">+ Tambah Riwayat Servis Baru</span>
+</button>
+</section>
+<!-- Kartu Target & Interval Servis Terdekat -->
+<section class="flex flex-col bg-surface-container-lowest rounded-lg p-space-md shadow-sm gap-space-md relative overflow-hidden">
+<!-- Header Status -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">schedule</span>
+<span class="font-label-caps text-label-caps uppercase text-primary tracking-wider">Jadwal Servis Terdekat</span>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-label-caps text-label-caps font-bold">
+        Sisa 420 km
+      </span>
+</div>
+<!-- Detail Servis -->
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Servis Berkala &amp; Ganti Oli Mesin</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Disarankan sebelum 15 Maret 2025</p>
+</div>
+<!-- Odometer Gauge Card -->
+<div class="flex flex-col bg-surface-container-low rounded-DEFAULT p-space-sm gap-space-xs">
+<div class="flex justify-between items-baseline">
+<span class="font-label-caps text-label-caps text-on-surface-variant">ODOMETER SAAT INI</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">TARGET SERVIS</span>
+</div>
+<div class="flex justify-between items-baseline font-headline-sm text-headline-sm text-on-surface">
+<span class="">14.280 <span class="font-body-sm text-body-sm text-on-surface-variant">km</span></span>
+<span class="text-primary font-bold">14.700 <span class="font-body-sm text-body-sm text-on-surface-variant">km</span></span>
+</div>
+<!-- Track Meter -->
+<div class="w-full h-2.5 rounded-full bg-surface-container-highest overflow-hidden p-0.5 mt-1">
+<div class="h-full rounded-full bg-primary" style="width: 86%"></div>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant font-body-sm text-body-sm pt-1">
+<span class="">Interval 2.000 km</span>
+<span class="text-primary font-label-md text-label-md">86% Terpakai</span>
+</div>
+</div>
+<!-- Estimasi Biaya & Checklist -->
+<div class="flex flex-col gap-space-sm pt-1">
+<div class="flex items-center justify-between p-2.5 rounded-DEFAULT bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">payments</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Estimasi Biaya</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Rp 120.000 - Rp 150.000</span>
+</div>
+<!-- Rekomendasi Pengerjaan -->
+<div class="flex flex-col gap-1.5 mt-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Item Disarankan:</span>
+<div class="flex flex-col gap-1.5 font-body-sm text-body-sm text-on-surface">
+<label class="flex items-center gap-2 cursor-pointer p-1.5 rounded hover:bg-surface-container-low transition-colors">
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-0 cursor-pointer" type="checkbox">
+<span class="">Ganti Oli Mesin MPX2 / SPX2 (0.8 L)</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer p-1.5 rounded hover:bg-surface-container-low transition-colors">
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-0 cursor-pointer" type="checkbox">
+<span class="">Pemeriksaan Busi &amp; Celah Katup</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer p-1.5 rounded hover:bg-surface-container-low transition-colors">
+<input class="w-4 h-4 rounded text-primary focus:ring-0 cursor-pointer" type="checkbox">
+<span class="">Pembersihan Filter CVT &amp; Roller</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Quick Action Update Odo -->
+<button class="w-full h-10 rounded-full bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1 hover:bg-surface-container-high active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">edit_road</span>
+<span class="">Perbarui Odometer Manual</span>
+</button>
+</section>
+<!-- Riwayat Perawatan & Nota Servis -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">Riwayat &amp; Nota</span>
+<span class="font-label-caps text-label-caps px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-bold">18 Log</span>
+</div>
+<!-- Tombol Ekspor Data Buku Servis -->
+<button class="flex items-center gap-1 font-label-md text-label-md text-primary hover:underline" title="Download Riwayat">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span class="">Ekspor</span>
+</button>
+</div>
+<!-- Tab Filter -->
+<div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" id="filterTabs">
+<button class="filter-tab px-4 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md whitespace-nowrap active:scale-95 transition-all" data-filter="all">
+        Semua
+      </button>
+<button class="filter-tab px-4 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md whitespace-nowrap active:scale-95 transition-all" data-filter="servis">
+        Servis
+      </button>
+<button class="filter-tab px-4 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md whitespace-nowrap active:scale-95 transition-all" data-filter="bensin">
+        Bensin
+      </button>
+<button class="filter-tab px-4 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md whitespace-nowrap active:scale-95 transition-all" data-filter="sparepart">
+        Sparepart
+      </button>
+</div>
+<!-- List Riwayat -->
+<div class="flex flex-col gap-space-sm mt-1" id="historyList">
+<!-- Item 1: Servis Berkala -->
+<article class="history-item flex flex-col bg-surface-container-lowest rounded-DEFAULT p-space-md shadow-sm gap-space-sm" data-category="servis">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[22px]">construction</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Ganti Oli Mesin &amp; Gardan</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">15 Jan 2025 • 12.500 km</span>
+</div>
+</div>
+<span class="font-label-md text-label-md text-on-surface font-bold">Rp 145.000</span>
+</div>
+<div class="flex flex-col gap-1 text-on-surface-variant font-body-sm text-body-sm pl-12">
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">store</span>
+<span class="">Bengkel AHASS Mitra Jaya</span>
+</div>
+<p class="text-on-surface-variant line-clamp-1">Item: SPX2 0.8L, Oli Transmisi Scooter, Setel Celah Rem Belakang</p>
+</div>
+<!-- Foto Struk Preview Micro Card -->
+<div class="flex items-center justify-between bg-surface-container-low rounded-DEFAULT px-3 py-2 mt-1">
+<div class="flex items-center gap-2 min-w-0">
+<img class="w-8 h-8 rounded object-cover shrink-0" data-alt="Close up printed mechanic receipt paper with official red stamp and clear workshop pricing breakdown on wooden workshop desk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYN1AKOmf8Sdh522Q3jxi464nVCEw0xZ1M9caGOjaHm6UzimjbFXRJSilRNI-2wXXL3tAN3i8tElNPXt1les8gy9-yyk75X29Hp4FQzskGupyORnIkKhCFOYZyNbmEjLhD2N64WUnX3s33AkCc3BmQayRWulF19gVmULQkyRfirSIXfT4NRvHA-HGteEs8OCcdhty1TEGFRbqSSg6KLjXiTu49ux4dl7Zr1IZIEMI">
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Struk_AHASS_150125.jpg</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tersimpan rapi di cloud</span>
+</div>
+</div>
+<button class="font-label-md text-label-md text-primary shrink-0 px-2 py-1 rounded hover:bg-surface-container transition-colors">
+            Lihat Nota
+          </button>
+</div>
+</article>
+<!-- Item 2: Pengisian Bensin -->
+<article class="history-item flex flex-col bg-surface-container-lowest rounded-DEFAULT p-space-md shadow-sm gap-space-sm" data-category="bensin">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[22px]">local_gas_station</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Isi Bensin Pertamax 92</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">28 Des 2024 • 11.800 km</span>
+</div>
+</div>
+<span class="font-label-md text-label-md text-on-surface font-bold">Rp 54.000</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pl-12">
+<span class="">SPBU Pertamina 34-12401</span>
+<span class="font-label-md text-label-md text-on-surface">4.2 Liter (Full Tank)</span>
+</div>
+</article>
+<!-- Item 3: Ganti Sparepart -->
+<article class="history-item flex flex-col bg-surface-container-lowest rounded-DEFAULT p-space-md shadow-sm gap-space-sm" data-category="sparepart">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[22px]">settings_input_component</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Ganti Busi &amp; Filter Udara</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">10 Nov 2024 • 10.000 km</span>
+</div>
+</div>
+<span class="font-label-md text-label-md text-on-surface font-bold">Rp 95.000</span>
+</div>
+<div class="flex flex-col gap-1 text-on-surface-variant font-body-sm text-body-sm pl-12">
+<span class="">Toko Onderdil Berkah Motor</span>
+<p class="text-on-surface-variant">Busi NGK CPR9EA-9 + Saringan Hawa Element Comp</p>
+</div>
+</article>
+</div>
+</section>
+<!-- Banner Ekspor Rekam Jejak / Nilai Jual -->
+<section class="flex flex-col bg-surface-container-high rounded-lg p-space-md gap-space-sm">
+<div class="flex items-start gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">verified</span>
+</div>
+<div class="flex flex-col">
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Buku Servis Terverifikasi</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+          Rekam jejak perawatan rapi meningkatkan harga jual kembali motor hingga 15%. Ekspor log berkala dalam format dokumen resmi.
+        </p>
+</div>
+</div>
+<div class="flex gap-2 pt-1">
+<button class="flex-1 h-10 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 hover:bg-surface active:scale-95 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-error">picture_as_pdf</span>
+<span class="">Unduh PDF</span>
+</button>
+<button class="flex-1 h-10 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 hover:bg-surface active:scale-95 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary">table_chart</span>
+<span class="">Format Excel</span>
+</button>
+</div>
+</section>
+<!-- Bottom Spacer for Floating Tab Bar clearance -->
+<div class="h-6"></div>
+<!-- Modal Bottom Sheet: Tambah Catatan Cepat (Hidden by Default) -->
+<div class="fixed inset-0 bg-on-surface/40 z-50 backdrop-blur-sm hidden flex items-end justify-center" id="modalBackdrop">
+<div class="w-full max-w-lg bg-surface-container-lowest rounded-t-xl p-space-lg flex flex-col gap-space-md shadow-2xl transition-transform transform translate-y-full" id="modalSheet">
+<div class="w-12 h-1 rounded-full bg-surface-container-highest mx-auto"></div>
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Catat Transaksi Manual</h3>
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant" id="btnCloseModal">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Jenis Transaksi -->
+<label class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Kategori</span>
+<div class="grid grid-cols-3 gap-2">
+<button class="h-10 rounded-full bg-primary text-on-primary font-label-md text-label-md" type="button">Servis</button>
+<button class="h-10 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md" type="button">Bensin</button>
+<button class="h-10 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md" type="button">Sparepart</button>
+</div>
+</label>
+<!-- Nominal -->
+<label class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Biaya (Rp)</span>
+<input class="h-12 px-4 rounded-DEFAULT bg-surface-container-low text-on-surface font-headline-sm text-headline-sm outline-none focus:bg-surface-container" placeholder="Contoh: 150000" type="number">
+</label>
+<!-- Odometer Saat Transaksi -->
+<label class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Odometer Saat Ini (km)</span>
+<input class="h-11 px-4 rounded-DEFAULT bg-surface-container-low text-on-surface font-body-md text-body-md outline-none focus:bg-surface-container" type="number" value="14280">
+</label>
+<!-- Catatan Singkat -->
+<label class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Keterangan / Bengkel</span>
+<input class="h-11 px-4 rounded-DEFAULT bg-surface-container-low text-on-surface font-body-md text-body-md outline-none focus:bg-surface-container" placeholder="Ganti oli samping / Bensin Shell" type="text">
+</label>
+<!-- Tombol Foto Struk -->
+<div class="flex items-center gap-2 p-3 rounded-DEFAULT bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary text-[22px]">add_a_photo</span>
+<span class="font-label-md text-label-md text-on-surface">Lampirkan Foto Nota / Struk Fisik</span>
+</div>
+</div>
+<button class="w-full h-12 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center mt-2 shadow-md active:scale-95 transition-all" id="btnSaveTransaction">
+        Simpan ke Buku Servis
+      </button>
+</div>
+</div>
+</div>
+<script>
+  // Tab Filter Interaction
+  const filterTabs = document.querySelectorAll('.filter-tab');
+  const historyItems = document.querySelectorAll('.history-item');
+
+  filterTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      filterTabs.forEach(t => {
+        t.classList.remove('bg-primary', 'text-on-primary');
+        t.classList.add('bg-surface-container', 'text-on-surface-variant');
+      });
+      tab.classList.remove('bg-surface-container', 'text-on-surface-variant');
+      tab.classList.add('bg-primary', 'text-on-primary');
+
+      const filterVal = tab.getAttribute('data-filter');
+      historyItems.forEach(item => {
+        if (filterVal === 'all' || item.getAttribute('data-category') === filterVal) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // Bottom Sheet Modal Toggle
+  const btnOpen = document.getElementById('btnOpenModal');
+  const btnClose = document.getElementById('btnCloseModal');
+  const btnSave = document.getElementById('btnSaveTransaction');
+  const backdrop = document.getElementById('modalBackdrop');
+  const sheet = document.getElementById('modalSheet');
+
+  function openSheet() {
+    backdrop.classList.remove('hidden');
+    setTimeout(() => {
+      sheet.classList.remove('translate-y-full');
+    }, 10);
+  }
+
+  function closeSheet() {
+    sheet.classList.add('translate-y-full');
+    setTimeout(() => {
+      backdrop.classList.add('hidden');
+    }, 250);
+  }
+
+  if (btnOpen) btnOpen.addEventListener('click', openSheet);
+  if (btnClose) btnClose.addEventListener('click', closeSheet);
+  if (btnSave) btnSave.addEventListener('click', closeSheet);
+  if (backdrop) {
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) closeSheet();
+    });
+  }
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)]" data-active-classes="text-primary font-bold"><div class="flex justify-around items-center h-20 px-space-md"><a class="flex flex-col items-center justify-center gap-1 min-w-0 flex-1 min-h-[48px] text-on-surface-variant hover:text-on-surface active:scale-95 transition-all" data-path="beranda" href="#"><span class="material-symbols-outlined text-[24px]">home</span><span class="font-label-md text-label-md truncate">Beranda</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-0 flex-1 min-h-[48px] text-on-surface-variant hover:text-on-surface active:scale-95 transition-all" data-path="catat-form" href="#"><span class="material-symbols-outlined text-[24px]">edit_note</span><span class="font-label-md text-label-md truncate">Catat</span></a><a aria-current="page" class="flex flex-col items-center justify-center gap-1 min-w-0 flex-1 min-h-[48px] active:scale-95 transition-all relative text-primary font-bold" data-path="buku-servis" href="#"><span class="material-symbols-outlined text-[24px]">build</span><span class="font-label-md text-label-md truncate">Buku Servis</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-0 flex-1 min-h-[48px] text-on-surface-variant hover:text-on-surface active:scale-95 transition-all" data-path="chat-ai" href="#"><span class="material-symbols-outlined text-[24px]">smart_toy</span><span class="font-label-md text-label-md truncate">Chat AI</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-0 flex-1 min-h-[48px] text-on-surface-variant hover:text-on-surface active:scale-95 transition-all" data-path="riwayat" href="#"><span class="material-symbols-outlined text-[24px]">history</span><span class="font-label-md text-label-md truncate">Riwayat</span></a></div></nav>
+
+</body></html>

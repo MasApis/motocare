@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Setup Motor Baru - MotoSense</title>
+<!-- Google Fonts: Plus Jakarta Sans & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-low": "#f2f3ff",
+            "surface-bright": "#faf8ff",
+            "inverse-primary": "#93ccff",
+            "primary-container": "#007bb9",
+            "surface-variant": "#dae2fd",
+            "on-tertiary-fixed": "#002113",
+            "outline": "#707881",
+            "on-secondary": "#ffffff",
+            "surface-dim": "#d2d9f4",
+            "primary": "#006194",
+            "inverse-on-surface": "#eef0ff",
+            "on-primary": "#ffffff",
+            "secondary": "#006591",
+            "surface-container-lowest": "#ffffff",
+            "on-error": "#ffffff",
+            "on-secondary-fixed-variant": "#004c6e",
+            "error": "#ba1a1a",
+            "on-surface-variant": "#3f4850",
+            "secondary-fixed-dim": "#89ceff",
+            "tertiary-container": "#00855b",
+            "tertiary": "#006947",
+            "secondary-fixed": "#c9e6ff",
+            "surface-container-highest": "#dae2fd",
+            "inverse-surface": "#283044",
+            "secondary-container": "#39b8fd",
+            "error-container": "#ffdad6",
+            "on-tertiary-fixed-variant": "#005236",
+            "on-primary-fixed-variant": "#004b73",
+            "background": "#faf8ff",
+            "on-tertiary": "#ffffff",
+            "surface-container-high": "#e2e7ff",
+            "primary-fixed-dim": "#93ccff",
+            "surface-tint": "#006398",
+            "on-secondary-fixed": "#001e2f",
+            "on-primary-container": "#fdfcff",
+            "primary-fixed": "#cce5ff",
+            "surface": "#faf8ff",
+            "surface-container": "#eaedff",
+            "on-background": "#131b2e",
+            "on-error-container": "#93000a",
+            "on-tertiary-container": "#f5fff6",
+            "tertiary-fixed-dim": "#4edea3",
+            "tertiary-fixed": "#6ffbbe",
+            "on-surface": "#131b2e",
+            "outline-variant": "#bfc7d2",
+            "on-secondary-container": "#004666",
+            "on-primary-fixed": "#001d31"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "margin": "1rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "gutter-desktop": "1.5rem",
+            "space-sm": "0.5rem",
+            "margin-desktop": "2.5rem",
+            "space-lg": "1.5rem",
+            "space-2xl": "3rem",
+            "space-md": "1rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "metric-val": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "display-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"],
+            "display-md": ["Plus Jakarta Sans"],
+            "label-caps": ["Inter"],
+            "label-md": ["Inter"]
+          },
+          "fontSize": {
+            "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "metric-val": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "display-lg": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "800" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "display-md": ["36px", { "lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-caps": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "700" }],
+            "label-md": ["13px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen pb-12 selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Container max-w-md centered for authentic mobile cockpit feel -->
+<div class="max-w-md mx-auto min-h-screen flex flex-col bg-surface shadow-sm">
+<!-- Top Navigation Header / Progress (Semantic Shell: suppressed full app nav for focused onboarding journey) -->
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-margin py-space-sm shadow-sm">
+<div class="flex items-center justify-between h-12">
+<button aria-label="Kembali" class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container-lowest text-on-surface border border-outline-variant/40 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+</button>
+<div class="flex items-center gap-space-xs text-primary font-headline-sm text-headline-sm">
+<span class="material-symbols-outlined text-primary text-[22px]">two_wheeler</span>
+<span class="font-headline-sm font-bold tracking-tight">MotoSense</span>
+</div>
+<button class="text-label-md font-label-md text-primary font-bold hover:underline px-space-xs py-1" type="button">
+          Bantuan
+        </button>
+</div>
+<!-- Step Indicator & Bar -->
+<div class="mt-space-xs pb-space-xs">
+<div class="flex items-center justify-between mb-1.5">
+<span class="text-label-caps font-label-caps text-primary uppercase tracking-wider font-bold">Langkah 1 dari 2: Setup Motor Kamu</span>
+<span class="text-label-caps font-label-caps text-on-surface-variant font-bold">50%</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-300 w-1/2"></div>
+</div>
+</div>
+</header>
+<!-- Main Content Form Area -->
+<main class="flex-1 px-margin pt-space-md pb-space-xl space-y-space-lg">
+<!-- Screen Heading -->
+<section class="space-y-space-xs">
+<div class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-primary-fixed/40 text-on-primary-fixed-variant text-label-caps font-label-caps">
+<span class="material-symbols-outlined text-[14px]">tune</span>
+          ONBOARDING TELEMETRI
+        </div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">Daftarkan Motor Pertamamu</h1>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed">
+          Masukkan detail motor agar MotoSense dapat menghitung interval servis dan skor kesehatan mesin dengan akurat.
+        </p>
+</section>
+<!-- SEKSI 1: Jenis & Tipe Motor -->
+<section class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-space-md space-y-space-md shadow-sm">
+<div class="flex items-center justify-between border-b border-surface-container pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">sports_motorsports</span>
+<h2 class="text-label-caps font-label-caps text-on-surface-variant tracking-wider uppercase font-bold">1. Spesifikasi Pabrikan</h2>
+</div>
+<span class="text-label-caps font-label-caps text-tertiary bg-tertiary-container/20 px-2 py-0.5 rounded-full font-bold">Wajib</span>
+</div>
+<!-- Merk Selector -->
+<div class="space-y-1.5">
+<label class="block text-label-md font-label-md text-on-surface">Merk Pabrikan</label>
+<div class="relative">
+<div class="w-full h-12 px-4 rounded-xl border border-outline-variant/60 bg-surface-container-low flex items-center justify-between cursor-pointer hover:border-primary transition-colors">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-full bg-error/15 text-error flex items-center justify-center font-headline-sm text-[12px] font-bold">H</span>
+<span class="text-body-lg font-body-lg font-semibold text-on-surface">Honda</span>
+<span class="bg-surface-container text-on-surface-variant text-label-caps font-label-caps px-2 py-0.5 rounded-full text-[10px]">Astra Honda Motor</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Model & Tipe Selector -->
+<div class="space-y-1.5">
+<label class="block text-label-md font-label-md text-on-surface">Model &amp; Tipe Lengkap</label>
+<div class="relative">
+<div class="w-full h-12 px-4 rounded-xl border border-outline-variant/60 bg-surface-container-low flex items-center justify-between cursor-pointer hover:border-primary transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">moped</span>
+<span class="text-body-md font-body-md font-semibold text-on-surface truncate">Vario 160 eSP+ ABS</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">unfold_more</span>
+</div>
+</div>
+</div>
+<!-- Tahun Pembuatan & Kapasitas Mesin -->
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="space-y-1.5">
+<label class="block text-label-md font-label-md text-on-surface">Tahun Produksi</label>
+<div class="h-12 px-3.5 rounded-xl border border-outline-variant/60 bg-surface-container-low flex items-center justify-between">
+<span class="text-body-md font-body-md font-semibold text-on-surface">2023</span>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">calendar_today</span>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="block text-label-md font-label-md text-on-surface">Kapasitas Mesin</label>
+<div class="h-12 px-3.5 rounded-xl border border-outline-variant/40 bg-surface-container/60 flex items-center justify-between text-on-surface-variant">
+<span class="text-body-md font-body-md font-semibold">156.9 cc</span>
+<span class="text-label-caps font-label-caps text-outline">AUTO</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SEKSI 2: Identitas Kendaraan -->
+<section class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-space-md space-y-space-md shadow-sm">
+<div class="flex items-center justify-between border-b border-surface-container pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">badge</span>
+<h2 class="text-label-caps font-label-caps text-on-surface-variant tracking-wider uppercase font-bold">2. Identitas Kendaraan</h2>
+</div>
+<span class="text-label-caps font-label-caps text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">Opsional</span>
+</div>
+<!-- Plat Nomor Indonesia Authentic Visual Box -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<label class="block text-label-md font-label-md text-on-surface">Nomor Polisi (Plat)</label>
+<span class="text-label-caps font-label-caps text-primary">Format Samsat</span>
+</div>
+<div class="p-3 bg-inverse-surface rounded-xl flex items-center justify-between shadow-inner">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface/10 flex items-center justify-center border border-white/20">
+<span class="material-symbols-outlined text-white text-[18px]">pin</span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono text-headline-sm font-headline-sm font-bold tracking-widest text-white leading-none">B 4821 KLS</span>
+<span class="text-[10px] font-mono text-outline-variant tracking-wider mt-1">08 • 28</span>
+</div>
+</div>
+<button class="text-label-caps font-label-caps text-secondary-fixed bg-secondary-fixed/20 hover:bg-secondary-fixed/30 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1 font-bold" type="button">
+<span class="material-symbols-outlined text-[14px]">edit</span>
+              Ubah
+            </button>
+</div>
+</div>
+<!-- Nama Panggilan Motor -->
+<div class="space-y-1.5">
+<label class="block text-label-md font-label-md text-on-surface">Nama Panggilan Motor</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-[20px]">tag</span>
+<input class="w-full h-12 pl-11 pr-4 rounded-xl border border-outline-variant/60 bg-surface-container-low text-body-md font-body-md font-semibold text-on-surface focus:border-primary focus:ring-4 focus:ring-primary/15 transition-all outline-none" placeholder="Contoh: Si Merah, Black Panther" type="text" value="Si Hitam Gesit"/>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Memudahkan membedakan jika kamu memantau lebih dari 1 motor.</p>
+</div>
+</section>
+<!-- SEKSI 3: Status Odometer & Riwayat Terkini -->
+<section class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-space-md space-y-space-md shadow-sm">
+<div class="flex items-center justify-between border-b border-surface-container pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">speed</span>
+<h2 class="text-label-caps font-label-caps text-on-surface-variant tracking-wider uppercase font-bold">3. Telemetri Odometer</h2>
+</div>
+<span class="text-label-caps font-label-caps text-tertiary bg-tertiary-container/20 px-2 py-0.5 rounded-full font-bold">Kritis</span>
+</div>
+<!-- Input Odometer Besar -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<label class="block text-label-md font-label-md text-on-surface font-semibold">Kilometer Speedometer Saat Ini</label>
+<span class="text-label-caps font-label-caps text-on-surface-variant">Lihat di Dashboard</span>
+</div>
+<div class="relative flex items-center bg-surface-container-low rounded-xl border-2 border-primary/40 focus-within:border-primary p-2 transition-all">
+<div class="w-10 h-10 rounded-lg bg-primary-fixed/50 text-primary flex items-center justify-center mr-3">
+<span class="material-symbols-outlined text-[24px]">speed</span>
+</div>
+<div class="flex-1 flex items-baseline">
+<input class="w-full bg-transparent border-0 p-0 text-headline-lg font-metric-val font-extrabold text-on-surface focus:ring-0 tracking-tight" inputmode="numeric" type="text" value="14.280"/>
+<span class="text-body-md font-body-md font-bold text-on-surface-variant ml-2 pr-2">KM</span>
+</div>
+</div>
+</div>
+<!-- Estimasi Pemakaian Harian (Rider Segment Selection) -->
+<div class="space-y-2 pt-1">
+<label class="block text-label-md font-label-md text-on-surface">Estimasi Jarak Tempuh Harian</label>
+<div class="space-y-2">
+<!-- Opsi 1: Santai -->
+<label class="flex items-center justify-between p-3 rounded-xl border border-outline-variant/40 hover:bg-surface-container-low cursor-pointer transition-colors">
+<div class="flex items-center gap-3">
+<input class="w-4 h-4 text-primary focus:ring-primary border-outline-variant" name="usage" type="radio"/>
+<div>
+<p class="text-body-md font-body-md font-semibold text-on-surface">Santai</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">&lt; 15 km/hari (Jarak dekat &amp; akhir pekan)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[20px]">weekend</span>
+</label>
+<!-- Opsi 2: Harian / Komuter (Active Selected) -->
+<label class="flex items-center justify-between p-3 rounded-xl border-2 border-primary bg-primary-fixed/20 cursor-pointer shadow-sm">
+<div class="flex items-center gap-3">
+<input checked="" class="w-4 h-4 text-primary focus:ring-primary border-primary" name="usage" type="radio"/>
+<div>
+<div class="flex items-center gap-2">
+<p class="text-body-md font-body-md font-bold text-primary">Harian / Komuter</p>
+<span class="text-[10px] font-label-caps px-1.5 py-0.2 rounded-full bg-primary text-on-primary font-bold">Paling Pas</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant">~20 - 30 km/hari (Kantor / Kampus PP)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary text-[22px]">commute</span>
+</label>
+<!-- Opsi 3: Ojol / Kurir -->
+<label class="flex items-center justify-between p-3 rounded-xl border border-outline-variant/40 hover:bg-surface-container-low cursor-pointer transition-colors">
+<div class="flex items-center gap-3">
+<input class="w-4 h-4 text-primary focus:ring-primary border-outline-variant" name="usage" type="radio"/>
+<div>
+<p class="text-body-md font-body-md font-semibold text-on-surface">Mobilitas Tinggi / Ojol</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">&gt; 50 km/hari (Pekerja lapangan &amp; kurir)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[20px]">delivery_dining</span>
+</label>
+</div>
+</div>
+</section>
+<!-- SEKSI 4: Status Terakhir Oli Mesin -->
+<section class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-space-md space-y-space-md shadow-sm">
+<div class="flex items-center justify-between border-b border-surface-container pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">oil_barrel</span>
+<h2 class="text-label-caps font-label-caps text-on-surface-variant tracking-wider uppercase font-bold">4. Baseline Oli Mesin</h2>
+</div>
+<span class="material-symbols-outlined text-tertiary text-[18px]">verified</span>
+</div>
+<div class="space-y-1.5">
+<label class="block text-label-md font-label-md text-on-surface">Kapan terakhir kali ganti oli mesin?</label>
+<div class="h-12 px-4 rounded-xl border border-outline-variant/60 bg-surface-container-low flex items-center justify-between cursor-pointer hover:border-primary transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">history</span>
+<span class="text-body-md font-body-md font-semibold text-on-surface">Sekitar 1 bulan lalu (~12.500 KM)</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">expand_more</span>
+</div>
+<div class="flex items-center gap-1.5 pt-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<p class="text-body-sm font-body-sm text-tertiary font-medium">Estimasi oli saat ini terpakai ~1.780 KM (Kondisi Bagus).</p>
+</div>
+</div>
+</section>
+<!-- Quick Feature Value Preview Banner -->
+<section class="rounded-2xl p-space-md bg-gradient-to-br from-surface-container to-surface-variant/70 border border-outline-variant/40 space-y-2">
+<div class="flex items-start gap-3">
+<div class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+</div>
+<div class="space-y-1">
+<p class="text-label-md font-label-md font-bold text-on-surface flex items-center gap-1.5">
+              Prediksi Pintar Tanpa Sensor Tambahan
+              <span class="text-[10px] bg-primary-container text-on-primary-container px-1.5 py-0.2 rounded font-mono font-bold">MotoAI</span>
+</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+              MotoSense otomatis memprediksi sisa umur oli, filter, CVT, dan pajak STNK tanpa perlu pasang alat/sensor tambahan di motor.
+            </p>
+</div>
+</div>
+</section>
+<!-- Action Button Group -->
+<section class="space-y-space-sm pt-space-xs">
+<!-- CTA Utama (52px pill-shaped per design system) -->
+<button class="w-full h-[52px] rounded-full bg-primary hover:bg-primary-container text-on-primary font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-transform duration-150" type="button">
+<span>Simpan &amp; Mulai Pantau Motor</span>
+<span class="material-symbols-outlined text-[22px]">arrow_forward</span>
+</button>
+<!-- CTA Sekunder (Nanti Saja) -->
+<button class="w-full h-11 rounded-full bg-transparent hover:bg-surface-container text-on-surface-variant font-label-md text-label-md font-semibold flex items-center justify-center transition-colors" type="button">
+          Nanti Saja (Lewati)
+        </button>
+</section>
+<!-- Footer Privacy Assurance -->
+<p class="text-center text-body-sm font-body-sm text-outline flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+        Data motormu tersimpan aman &amp; terlindungi secara terenkripsi.
+      </p>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MotoSense - Masuk ke Akun</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Plus Jakarta Sans & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-low": "#f2f3ff",
+            "surface-bright": "#faf8ff",
+            "inverse-primary": "#93ccff",
+            "primary-container": "#007bb9",
+            "surface-variant": "#dae2fd",
+            "on-tertiary-fixed": "#002113",
+            "outline": "#707881",
+            "on-secondary": "#ffffff",
+            "surface-dim": "#d2d9f4",
+            "primary": "#006194",
+            "inverse-on-surface": "#eef0ff",
+            "on-primary": "#ffffff",
+            "secondary": "#006591",
+            "surface-container-lowest": "#ffffff",
+            "on-error": "#ffffff",
+            "on-secondary-fixed-variant": "#004c6e",
+            "error": "#ba1a1a",
+            "on-surface-variant": "#3f4850",
+            "secondary-fixed-dim": "#89ceff",
+            "tertiary-container": "#00855b",
+            "tertiary": "#006947",
+            "secondary-fixed": "#c9e6ff",
+            "surface-container-highest": "#dae2fd",
+            "inverse-surface": "#283044",
+            "secondary-container": "#39b8fd",
+            "error-container": "#ffdad6",
+            "on-tertiary-fixed-variant": "#005236",
+            "on-primary-fixed-variant": "#004b73",
+            "background": "#faf8ff",
+            "on-tertiary": "#ffffff",
+            "surface-container-high": "#e2e7ff",
+            "primary-fixed-dim": "#93ccff",
+            "surface-tint": "#006398",
+            "on-secondary-fixed": "#001e2f",
+            "on-primary-container": "#fdfcff",
+            "primary-fixed": "#cce5ff",
+            "surface": "#faf8ff",
+            "surface-container": "#eaedff",
+            "on-background": "#131b2e",
+            "on-error-container": "#93000a",
+            "on-tertiary-container": "#f5fff6",
+            "tertiary-fixed-dim": "#4edea3",
+            "tertiary-fixed": "#6ffbbe",
+            "on-surface": "#131b2e",
+            "outline-variant": "#bfc7d2",
+            "on-secondary-container": "#004666",
+            "on-primary-fixed": "#001d31"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "margin": "1rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "gutter-desktop": "1.5rem",
+            "space-sm": "0.5rem",
+            "margin-desktop": "2.5rem",
+            "space-lg": "1.5rem",
+            "space-2xl": "3rem",
+            "space-md": "1rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "metric-val": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "display-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Inter"],
+            "display-md": ["Plus Jakarta Sans"],
+            "label-caps": ["Inter"],
+            "label-md": ["Inter"]
+          },
+          "fontSize": {
+            "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "metric-val": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "display-lg": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "800" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "display-md": ["36px", { "lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-caps": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "700" }],
+            "label-md": ["13px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 22px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 97, 148, 0.18);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+<!-- Mobile Header Bar: Derived from Shared Components TopAppBar (Login context: trailing close/help) -->
+<header class="w-full bg-surface shadow-sm sticky top-0 z-40 px-margin h-14 flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="two_wheeler">two_wheeler</span>
+</div>
+<span class="text-headline-sm font-headline-sm font-bold text-primary tracking-tight">MotoSense</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button aria-label="Bantuan" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</header>
+<!-- Main Content Container: Mobile Optimized Viewport -->
+<main class="w-full max-w-md mx-auto px-margin pt-space-md pb-space-xl flex-grow flex flex-col justify-start">
+<!-- Welcoming Header & Brand Graphic Badge -->
+<section class="mt-space-xs mb-space-lg text-left">
+<div class="inline-flex items-center gap-space-xs px-space-sm py-space-xs rounded-full bg-surface-container-high text-primary mb-space-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="verified_user" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="text-label-caps font-label-caps tracking-wider">DIAGNOSTIK TELEMETRI IOT</span>
+</div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">
+        Selamat Datang di MotoSense
+      </h1>
+<p class="text-body-md font-body-md text-on-surface-variant mt-space-xs">
+        Pantau kesehatan dan rawat motormu dengan cerdas &amp; mandiri langsung dari smartphone.
+      </p>
+</section>
+<!-- Segmented Tab Switch: Masuk / Daftar Akun -->
+<div class="p-1 bg-surface-container rounded-full flex items-center mb-space-lg">
+<button class="flex-1 py-space-xs py-2 rounded-full text-label-md font-label-md text-on-primary bg-primary shadow-sm transition-all duration-150 flex items-center justify-center gap-1.5" id="tab-masuk" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="login">login</span>
+        Masuk
+      </button>
+<button class="flex-1 py-space-xs py-2 rounded-full text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-all duration-150 flex items-center justify-center gap-1.5" id="tab-daftar" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="person_add">person_add</span>
+        Daftar Akun
+      </button>
+</div>
+<!-- Login Form Card -->
+<div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/60 shadow-sm p-space-lg">
+<form class="space-y-space-md" id="loginForm" onsubmit="event.preventDefault();">
+<!-- Field 1: WhatsApp / Email -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1.5" for="username">
+            Nomor WhatsApp atau Email
+          </label>
+<div class="relative flex items-center">
+<span class="absolute left-4 text-on-surface-variant flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[20px]" data-icon="contact_phone">contact_phone</span>
+</span>
+<input class="w-full h-12 pl-11 pr-4 rounded-xl border border-outline-variant bg-surface text-on-surface text-body-md font-body-md placeholder:text-outline transition-colors" id="username" placeholder="0812xxxx atau nama@email.com" required="" type="text"/>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-tertiary" data-icon="lock">lock</span>
+            Terkoneksi langsung ke sistem OBD-II sepeda motor.
+          </p>
+</div>
+<!-- Field 2: Kata Sandi / PIN -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-1.5" for="passwordInput">
+            Kata Sandi atau 6-Digit PIN
+          </label>
+<div class="relative flex items-center">
+<span class="absolute left-4 text-on-surface-variant flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[20px]" data-icon="key">key</span>
+</span>
+<input class="w-full h-12 pl-11 pr-12 rounded-xl border border-outline-variant bg-surface text-on-surface text-body-md font-body-md placeholder:text-outline transition-colors" id="passwordInput" placeholder="Masukkan kata sandi atau PIN" required="" type="password"/>
+<button aria-label="Tampilkan atau sembunyikan kata sandi" class="absolute right-3 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all" id="togglePassword" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility" id="eyeIcon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Utilities Row: Ingat Saya & Lupa Sandi -->
+<div class="flex items-center justify-between pt-0.5">
+<label class="flex items-center gap-2 cursor-pointer select-none">
+<input checked="" class="w-4 h-4 rounded text-primary border-outline-variant focus:ring-primary focus:ring-offset-0" type="checkbox"/>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Ingat Saya</span>
+</label>
+<a class="text-body-sm font-body-sm text-primary font-semibold hover:underline" href="#">
+            Lupa Kata Sandi?
+          </a>
+</div>
+<!-- Primary Action CTA Button -->
+<button class="w-full h-[52px] rounded-full bg-primary hover:bg-primary-container text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all duration-150 mt-space-md" type="submit">
+<span>Masuk ke Akun</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<!-- Fast WhatsApp OTP Register Preview Banner -->
+<div class="mt-space-md p-space-sm bg-surface-container-low rounded-xl border border-outline-variant/40 flex items-start gap-space-xs">
+<div class="w-7 h-7 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[16px]" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div class="flex-1">
+<p class="text-label-caps font-label-caps text-tertiary uppercase">Pendaftaran Instan</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5 leading-snug">
+            Belum punya akun? Cukup masukkan nomor WhatsApp untuk aktivasi 30 detik tanpa ribet.
+          </p>
+</div>
+</div>
+</div>
+<!-- Social Sign In Divider -->
+<div class="my-space-lg flex items-center">
+<div class="flex-grow border-t border-outline-variant/60"></div>
+<span class="px-space-sm text-label-caps font-label-caps text-on-surface-variant tracking-wider uppercase">
+        atau masuk lebih cepat dengan
+      </span>
+<div class="flex-grow border-t border-outline-variant/60"></div>
+</div>
+<!-- Social Auth Buttons Cluster (Ergonomic 48px height) -->
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Google Sign In -->
+<button class="h-12 px-space-md rounded-full border border-outline-variant bg-surface hover:bg-surface-container active:scale-95 transition-transform flex items-center justify-center gap-2.5 shadow-sm text-on-surface font-label-md text-label-md" type="button">
+<svg class="w-5 h-5 shrink-0" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"></path>
+</svg>
+<span>Google</span>
+</button>
+<!-- Apple Sign In -->
+<button class="h-12 px-space-md rounded-full border border-outline-variant bg-surface hover:bg-surface-container active:scale-95 transition-transform flex items-center justify-center gap-2.5 shadow-sm text-on-surface font-label-md text-label-md" type="button">
+<svg class="w-5 h-5 shrink-0 fill-current text-on-surface" viewbox="0 0 170 170">
+<path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.04-7.64-7.85-11.87-14.43-6.23-9.69-11.2-20.91-14.91-33.67-3.71-12.76-5.57-24.81-5.57-36.16 0-16.73 4.1-29.89 12.3-39.48 8.2-9.59 18.25-14.47 30.15-14.65 4.36 0 9.29 1.13 14.78 3.39 5.5 2.26 9.4 3.44 11.71 3.53 1.8.08 5.66-1.12 11.59-3.61 5.92-2.49 10.89-3.62 14.91-3.39 12.04.72 21.6 4.9 28.69 12.53-10.45 6.35-15.6 15.11-15.44 26.27.17 8.7 3.44 15.93 9.82 21.68 6.38 5.76 13.97 9.15 22.77 10.18-2.35 7.46-5.46 15.13-9.33 23.01zM119.22 33.15c0-7.39 2.62-14.39 7.86-21 5.24-6.61 11.75-10.84 19.53-12.69.17 1.04.26 2.08.26 3.12 0 7.21-2.73 14.28-8.18 21.2-5.45 6.92-12.07 11.1-19.86 12.53-.17-1.04-.26-2.09-.26-3.16z"></path>
+</svg>
+<span>Apple ID</span>
+</button>
+</div>
+<!-- Quick Vehicle Demo Access Card -->
+<div class="mt-space-lg p-space-md rounded-2xl bg-surface-container-high/60 border border-outline-variant/50 flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]" data-icon="speed">speed</span>
+</div>
+<div>
+<h4 class="text-label-md font-label-md text-on-surface">Coba Demo Telemetri</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Jelajahi dashboard tanpa masuk</p>
+</div>
+</div>
+<button class="px-space-md py-1.5 rounded-full bg-surface hover:bg-surface-bright border border-outline-variant text-primary text-label-md font-label-md shadow-sm active:scale-95 transition-transform" type="button">
+        Buka Demo
+      </button>
+</div>
+</main>
+<!-- Legal & Terms Footer -->
+<footer class="w-full max-w-md mx-auto px-margin pb-space-lg pt-space-xs text-center">
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+      Dengan masuk, kamu menyetujui 
+      <a class="text-primary font-semibold hover:underline" href="#">Ketentuan Layanan</a> 
+      &amp; 
+      <a class="text-primary font-semibold hover:underline" href="#">Kebijakan Privasi</a> 
+      MotoSense.
+    </p>
+<div class="flex items-center justify-center gap-2 mt-space-sm text-body-sm font-body-sm text-outline">
+<span class="material-symbols-outlined text-[14px]" data-icon="security">security</span>
+<span>Enkripsi TLS 256-Bit • Kompatibel ISO-14229 KWP</span>
+</div>
+</footer>
+<!-- Inline Interaction Logic -->
+<script>
+    // Password Visibility Toggle
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('passwordInput');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    if (togglePasswordBtn && passwordInput && eyeIcon) {
+      togglePasswordBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        eyeIcon.textContent = isPassword ? 'visibility_off' : 'visibility';
+      });
+    }
+
+    // Segmented Tab Toggle Interactivity
+    const tabMasuk = document.getElementById('tab-masuk');
+    const tabDaftar = document.getElementById('tab-daftar');
+
+    if (tabMasuk && tabDaftar) {
+      tabDaftar.addEventListener('click', () => {
+        // Toggle active state classes
+        tabDaftar.className = "flex-1 py-space-xs py-2 rounded-full text-label-md font-label-md text-on-primary bg-primary shadow-sm transition-all duration-150 flex items-center justify-center gap-1.5";
+        tabMasuk.className = "flex-1 py-space-xs py-2 rounded-full text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-all duration-150 flex items-center justify-center gap-1.5";
+      });
+
+      tabMasuk.addEventListener('click', () => {
+        tabMasuk.className = "flex-1 py-space-xs py-2 rounded-full text-label-md font-label-md text-on-primary bg-primary shadow-sm transition-all duration-150 flex items-center justify-center gap-1.5";
+        tabDaftar.className = "flex-1 py-space-xs py-2 rounded-full text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-all duration-150 flex items-center justify-center gap-1.5";
+      });
+    }
+  </script>
+</body></html>
