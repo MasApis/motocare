@@ -11,9 +11,10 @@ void main() {
       ),
     );
 
-    // Verifikasi teks judul pratinjau di AppBar dan tab navigasi
-    expect(find.text('MotoCare UI Preview'), findsOneWidget);
-    expect(find.text('Beranda'), findsOneWidget);
-    expect(find.text('Catat'), findsOneWidget);
+    // Saat belum masuk, aplikasi otomatis menampilkan layar Login / Registrasi
+    await tester.pumpAndSettle();
+    expect(find.text('Selamat Datang\ndi MotoCare'), findsOneWidget);
+    expect(find.text('Masuk'), findsOneWidget);
+    expect(find.text('Daftar Akun'), findsOneWidget);
   });
 }
