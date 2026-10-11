@@ -87,6 +87,13 @@ class VehicleRepository {
         });
       }
 
+      // 3. Simpan log odometer awal saat pendaftaran motor
+      final initialOdoDoc = _vehiclesRef(uid).doc(vehicleId).collection('odometerLogs').doc();
+      batch.set(initialOdoDoc, {
+        'km': vehicle.currentKm,
+        'date': Timestamp.fromDate(now),
+      });
+
       await batch.commit();
       return vehicleId;
     } on FirebaseException catch (e) {

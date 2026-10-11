@@ -16,6 +16,7 @@ import '../../vehicles/data/models/vehicle_component_model.dart';
 import '../../vehicles/data/models/vehicle_model.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
 import 'widgets/component_health_card.dart';
+import 'widgets/vehicle_hero_card.dart';
 
 /// Layar Dashboard utama dengan Carousel Kendaraan sesuai docs/SPEC.md (F2)
 /// dan acuan visual docs/design/beranda_status_motor_2
@@ -384,7 +385,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
         // Carousel Kartu Motor (PageView)
         SizedBox(
-          height: 230,
+          height: 335,
           child: PageView.builder(
             controller: _pageController,
             itemCount: vehicles.length,
@@ -396,7 +397,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   horizontal: AppSpacing.md,
                   vertical: AppSpacing.xs,
                 ),
-                child: _buildVehicleHeroCard(context, vehicle, index + 1, vehicles.length),
+                child: VehicleHeroCard(
+                  vehicle: vehicle,
+                  itemNumber: index + 1,
+                  totalItems: vehicles.length,
+                ),
               );
             },
           ),
@@ -430,13 +435,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             child: _buildComponentHealthSection(context, activeVehicle),
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // Seksi DEBUG SEMENTARA: Pengubah KM untuk pengujian F3 (Akan dihapus di F4)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-            child: _buildF3DebugKmSection(context, activeVehicle),
           ),
           const SizedBox(height: AppSpacing.md),
         ],
@@ -534,346 +532,5 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
       ],
     );
-  }
-
-  /// Kontrol debug sementara untuk menguji perubahan KM pada tahap F3.
-  /// Membantu verifikasi status Aman, Peringatan, Batas habis, dan Lewat interval di HP asli.
-  /// PERHATIAN: Bagian ini akan dihapus setelah fitur F4 (Hybrid Odometer) diimplementasikan.
-  Widget _buildF3DebugKmSection(
-    BuildContext context,
-    Vehicle activeVehicle,
-  ) {
-    final componentsAsync =
-        ref.watch(vehicleComponentsStreamProvider(activeVehicle.id));
-    final components = componentsAsync.asData?.value ?? [];
-    final engineOil =
-        components.where((c) => c.type == ComponentType.engineOil).firstOrNull;
-    final baseKm = engineOil?.lastServiceKm ?? activeVehicle.currentKm;
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: AppShapes.roundedDefault,
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.35),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryFixed,
-                  borderRadius: AppShapes.roundedFull,
-                ),
-                child: Text(
-                  'DEBUG SEMENTARA (F3)',
-                  style: AppTypography.labelCaps(
-                    color: AppColors.onPrimaryFixedVariant,
-                  ),
-                ),
-              ),
-              const Spacer(),
-              Text(
-                'KM: ${_formatKm(activeVehicle.currentKm)}',
-                style: AppTypography.labelMd().copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Uji perubahan kartu kesehatan di HP (Aman / Peringatan / Batas habis / Lewat interval). Panel ini dihapus di tahap F4.',
-            style: AppTypography.bodySm(color: AppColors.onSurfaceVariant),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: AppSpacing.xs,
-            runSpacing: AppSpacing.xs,
-            children: [
-              ActionChip(
-                label: const Text('Reset 100%'),
-                labelStyle: AppTypography.labelCaps(color: AppColors.primary),
-                backgroundColor: AppColors.surfaceContainerLowest,
-                onPressed: () => _setVehicleKm(activeVehicle, baseKm),
-              ),
-              ActionChip(
-                label: const Text('+500 KM (Aman)'),
-                labelStyle: AppTypography.labelCaps(color: AppColors.statusSafeText),
-                backgroundColor: AppColors.statusSafeBg,
-                onPressed: () => _setVehicleKm(activeVehicle, baseKm + 500),
-              ),
-              ActionChip(
-                label: const Text('+1.500 KM (Kuning)'),
-                labelStyle: AppTypography.labelCaps(color: AppColors.statusWarningText),
-                backgroundColor: AppColors.statusWarningBg,
-                onPressed: () => _setVehicleKm(activeVehicle, baseKm + 1500),
-              ),
-              ActionChip(
-                label: const Text('+1.900 KM (Merah)'),
-                labelStyle: AppTypography.labelCaps(color: AppColors.statusCriticalText),
-                backgroundColor: AppColors.statusCriticalBg,
-                onPressed: () => _setVehicleKm(activeVehicle, baseKm + 1900),
-              ),
-              ActionChip(
-                label: const Text('+2.500 KM (Lewat)'),
-                labelStyle: AppTypography.labelCaps(color: AppColors.statusCriticalText),
-                backgroundColor: AppColors.statusCriticalBg,
-                onPressed: () => _setVehicleKm(activeVehicle, baseKm + 2500),
-              ),
-              ActionChip(
-                avatar: const Icon(Symbols.edit, size: 16, color: AppColors.primary),
-                label: const Text('Ketik KM...'),
-                labelStyle: AppTypography.labelCaps(color: AppColors.primary),
-                backgroundColor: AppColors.surfaceContainerLowest,
-                onPressed: () => _showDebugSetKmDialog(context, activeVehicle),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _setVehicleKm(Vehicle vehicle, int newKm) async {
-    try {
-      await ref.read(vehicleControllerProvider).updateVehicle(
-            vehicleId: vehicle.id,
-            brand: vehicle.brand,
-            model: vehicle.model,
-            name: vehicle.name,
-            plate: vehicle.plate,
-            currentKm: newKm,
-          );
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal mengubah KM: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> _showDebugSetKmDialog(BuildContext context, Vehicle vehicle) async {
-    final controller = TextEditingController(text: vehicle.currentKm.toString());
-    final result = await showDialog<int>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: const RoundedRectangleBorder(
-          borderRadius: AppShapes.roundedDefault,
-        ),
-        title: const Text('Ubah KM Sementara (Debug F3)'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Masukkan angka KM baru untuk motor "${vehicle.displayName}":',
-              style: AppTypography.bodyMd(),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              autofocus: true,
-              decoration: const InputDecoration(
-                labelText: 'Kilometer',
-                suffixText: 'KM',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => ctx.pop(),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final parsed = int.tryParse(controller.text.trim());
-              if (parsed != null && parsed >= 0) {
-                ctx.pop(parsed);
-              }
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
-      ),
-    );
-
-    if (result != null) {
-      await _setVehicleKm(vehicle, result);
-    }
-  }
-
-
-  /// Kartu Hero Motor sesuai desain beranda_status_motor_2
-  Widget _buildVehicleHeroCard(
-    BuildContext context,
-    Vehicle vehicle,
-    int itemNumber,
-    int totalItems,
-  ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: AppShapes.roundedDefault,
-        border: Border.all(
-          color: AppColors.outlineVariant.withValues(alpha: 0.6),
-          width: 1,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0F000000),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Baris Atas: Label & Tombol Edit
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: AppColors.tertiary,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.xs),
-                  Text(
-                    'MOTOR $itemNumber DARI $totalItems',
-                    style: AppTypography.labelCaps(
-                      color: AppColors.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-              IconButton(
-                visualDensity: VisualDensity.compact,
-                icon: const Icon(
-                  Symbols.edit,
-                  size: 20,
-                  color: AppColors.primary,
-                ),
-                tooltip: 'Ubah Data Motor',
-                onPressed: () => context.push('/vehicles/edit/${vehicle.id}'),
-              ),
-            ],
-          ),
-
-          // Nama Motor & Plat
-          Text(
-            vehicle.displayName,
-            style: AppTypography.headlineMd().copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            vehicle.plate != null && vehicle.plate!.isNotEmpty
-                ? '${vehicle.brand} ${vehicle.model} • ${vehicle.plate}'
-                : '${vehicle.brand} ${vehicle.model}',
-            style: AppTypography.bodySm(color: AppColors.onSurfaceVariant),
-          ),
-          const Spacer(),
-
-          // Box Odometer Tercatat
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceContainerLowest,
-              borderRadius: AppShapes.roundedDefault,
-              border: Border.all(
-                color: AppColors.outlineVariant.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'ODOMETER TERCATAT',
-                      style: AppTypography.labelCaps(
-                        color: AppColors.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          _formatKm(vehicle.currentKm),
-                          style: AppTypography.headlineLg().copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
-                        Text(
-                          'KM',
-                          style: AppTypography.labelMd(
-                            color: AppColors.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryFixed,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Symbols.speed,
-                    color: AppColors.primary,
-                    size: 22,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatKm(int km) {
-    // Format sederhana ribuan menggunakan titik
-    final str = km.toString();
-    final buffer = StringBuffer();
-    for (int i = 0; i < str.length; i++) {
-      if (i > 0 && (str.length - i) % 3 == 0) {
-        buffer.write('.');
-      }
-      buffer.write(str[i]);
-    }
-    return buffer.toString();
   }
 }

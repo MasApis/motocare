@@ -56,3 +56,32 @@ String? validateConfirmPassword(String? value, String password) {
 
   return null;
 }
+
+/// Validates odometer reading input according to docs/SPEC.md (F4 & 2.1).
+///
+/// Rules:
+/// - Must not be empty/null.
+/// - Must be a valid non-negative integer.
+/// - New KM must not be lower than [currentKm].
+String? validateOdometerInput(String? value, int currentKm) {
+  if (value == null || value.trim().isEmpty) {
+    return 'Kilometer tidak boleh kosong';
+  }
+
+  final cleaned = value.trim().replaceAll('.', '').replaceAll(',', '');
+  final parsed = int.tryParse(cleaned);
+
+  if (parsed == null) {
+    return 'Kilometer harus berupa angka yang valid';
+  }
+
+  if (parsed < 0) {
+    return 'Kilometer tidak boleh bernilai negatif';
+  }
+
+  if (parsed < currentKm) {
+    return 'KM baru tidak boleh lebih kecil dari KM terakhir ($currentKm KM)';
+  }
+
+  return null;
+}

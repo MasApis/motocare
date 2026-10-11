@@ -102,4 +102,49 @@ void main() {
       );
     });
   });
+
+  group('validateOdometerInput', () {
+    test('mengembalikan error jika null', () {
+      expect(validateOdometerInput(null, 10000), 'Kilometer tidak boleh kosong');
+    });
+
+    test('mengembalikan error jika kosong atau hanya spasi', () {
+      expect(validateOdometerInput('', 10000), 'Kilometer tidak boleh kosong');
+      expect(validateOdometerInput('   ', 10000), 'Kilometer tidak boleh kosong');
+    });
+
+    test('mengembalikan error jika bukan angka', () {
+      expect(validateOdometerInput('abc', 10000), 'Kilometer harus berupa angka yang valid');
+      expect(validateOdometerInput('12a34', 10000), 'Kilometer harus berupa angka yang valid');
+      expect(validateOdometerInput('12.34.ab', 10000), 'Kilometer harus berupa angka yang valid');
+    });
+
+    test('mengembalikan error jika negatif', () {
+      expect(validateOdometerInput('-500', 0), 'Kilometer tidak boleh bernilai negatif');
+    });
+
+    test('mengembalikan error jika KM baru lebih kecil dari KM saat ini (KM tidak boleh turun)', () {
+      expect(
+        validateOdometerInput('9999', 10000),
+        'KM baru tidak boleh lebih kecil dari KM terakhir (10000 KM)',
+      );
+      expect(
+        validateOdometerInput('5000', 14280),
+        'KM baru tidak boleh lebih kecil dari KM terakhir (14280 KM)',
+      );
+    });
+
+    test('mengembalikan null (valid) jika KM baru sama dengan KM saat ini', () {
+      expect(validateOdometerInput('10000', 10000), isNull);
+    });
+
+    test('mengembalikan null (valid) jika KM baru lebih besar dari KM saat ini', () {
+      expect(validateOdometerInput('10500', 10000), isNull);
+    });
+
+    test('mengembalikan null (valid) jika menggunakan titik pemisah ribuan', () {
+      expect(validateOdometerInput('10.500', 10000), isNull);
+      expect(validateOdometerInput('15.000', 14280), isNull);
+    });
+  });
 }
