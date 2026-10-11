@@ -18,6 +18,8 @@ import '../../vehicles/providers/vehicle_providers.dart';
 import '../../notifications/providers/notification_providers.dart';
 import '../../notifications/ui/notification_permission_banner.dart';
 import '../../notifications/ui/notification_test_card.dart';
+import '../../service/ui/service_form_screen.dart';
+import '../../service/ui/service_history_screen.dart';
 import 'widgets/component_health_card.dart';
 import 'widgets/vehicle_hero_card.dart';
 
@@ -226,10 +228,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       }
     });
 
-    return Scaffold(
+    Widget bodyWidget;
+    PreferredSizeWidget? appBarWidget;
 
-      backgroundColor: AppColors.surface,
-      appBar: AppBar(
+    if (_currentNavIndex == 1) {
+      bodyWidget = ServiceFormScreen(
+        vehicleId: activeVehicle?.id,
+        onSavedSuccess: () {
+          setState(() => _currentNavIndex = 4);
+        },
+      );
+    } else if (_currentNavIndex == 2) {
+      bodyWidget = _buildFeaturePlaceholder(
+        title: 'Buku Servis & Pengeluaran',
+        desc: 'Pantau riwayat pengeluaran servis dan unduh laporan bulanan PDF.',
+        icon: Symbols.menu_book,
+      );
+    } else if (_currentNavIndex == 3) {
+      bodyWidget = _buildFeaturePlaceholder(
+        title: 'Chat AI Ahli Mekanik',
+        desc: 'Diagnosa keluhan motor matic Anda bersama asisten AI ahli mekanik.',
+        icon: Symbols.smart_toy,
+      );
+    } else if (_currentNavIndex == 4) {
+      bodyWidget = const ServiceHistoryScreen();
+    } else {
+      appBarWidget = AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
         scrolledUnderElevation: 1,
@@ -238,7 +262,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             Container(
               width: 36,
               height: 36,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.primaryFixed,
                 shape: BoxShape.circle,
               ),
@@ -276,8 +300,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             onPressed: () => _showSettingsMenu(context, activeVehicle),
           ),
         ],
-      ),
-      body: vehiclesAsync.when(
+      );
+
+      bodyWidget = vehiclesAsync.when(
         data: (vehicles) {
           if (vehicles.isEmpty) {
             return _buildEmptyState(context);
@@ -295,12 +320,66 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ),
         ),
-      ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: AppColors.surface,
+      appBar: appBarWidget,
+      body: bodyWidget,
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentNavIndex,
         onTap: (index) {
           setState(() => _currentNavIndex = index);
         },
+      ),
+    );
+  }
+
+  /// Placeholder ramah untuk tab fitur yang belum aktif
+  Widget _buildFeaturePlaceholder({
+    required String title,
+    required String desc,
+    required IconData icon,
+  }) {
+    return SafeArea(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: const BoxDecoration(
+                  color: AppColors.surfaceContainerHigh,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 40, color: AppColors.primary),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                title,
+                style: AppTypography.headlineSm(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                desc,
+                style: AppTypography.bodyMd(color: AppColors.onSurfaceVariant),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              AppButton(
+                text: 'Kembali ke Beranda',
+                variant: AppButtonVariant.secondary,
+                isFullWidth: false,
+                onPressed: () => setState(() => _currentNavIndex = 0),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -545,6 +624,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               intervalKm: comp.intervalKm,
               lastServiceKm: comp.lastServiceKm,
               currentKm: activeVehicle.currentKm,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => ServiceFormScreen(
+                      vehicleId: activeVehicle.id,
+                      initialComponentType: comp.type,
+                    ),
+                  ),
+                );
+              },
             );
           }).toList(),
         ),

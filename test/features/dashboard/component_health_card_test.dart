@@ -105,5 +105,27 @@ void main() {
       expect(find.text('100% terpakai'), findsOneWidget);
       expect(find.text('Lewat 500 km'), findsOneWidget);
     });
+
+    testWidgets('memanggil callback onTap saat kartu komponen ditekan (SPEC F5)', (tester) async {
+      bool tapped = false;
+      await tester.pumpWidget(
+        buildTestableWidget(
+          ComponentHealthCard(
+            componentType: ComponentType.engineOil,
+            intervalKm: 2000,
+            lastServiceKm: 10000,
+            currentKm: 11000,
+            onTap: () {
+              tapped = true;
+            },
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(ComponentHealthCard));
+      await tester.pumpAndSettle();
+
+      expect(tapped, isTrue);
+    });
   });
 }

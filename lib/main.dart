@@ -7,6 +7,8 @@ import 'features/auth/providers/auth_providers.dart';
 import 'features/auth/ui/login_screen.dart';
 import 'features/dashboard/ui/dashboard_screen.dart';
 import 'features/notifications/data/notification_service.dart';
+import 'features/service/ui/service_form_screen.dart';
+import 'features/service/ui/service_history_screen.dart';
 import 'features/vehicles/ui/vehicle_form_screen.dart';
 import 'firebase_options.dart';
 import 'shared/theme/app_theme.dart';
@@ -83,6 +85,22 @@ class MotoCareApp extends ConsumerWidget {
             final vehicleId = state.pathParameters['id'];
             return VehicleFormScreen(vehicleId: vehicleId);
           },
+        ),
+        GoRoute(
+          path: '/service/add',
+          builder: (BuildContext context, GoRouterState state) {
+            final vehicleId = state.uri.queryParameters['vehicleId'];
+            final componentType = state.uri.queryParameters['componentType'];
+            return ServiceFormScreen(
+              vehicleId: vehicleId,
+              initialComponentType: componentType,
+            );
+          },
+        ),
+        GoRoute(
+          path: '/service/history',
+          builder: (BuildContext context, GoRouterState state) =>
+              const ServiceHistoryScreen(),
         ),
       ],
     );
