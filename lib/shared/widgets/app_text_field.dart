@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_shapes.dart';
 import '../theme/app_spacing.dart';
@@ -21,6 +22,7 @@ class AppTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffix,
     this.suffixIcon,
+    this.inputFormatters,
     this.onChanged,
     this.onTap,
     this.textInputAction,
@@ -39,6 +41,7 @@ class AppTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffix;
   final Widget? suffixIcon;
+  final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<String>? onChanged;
   final VoidCallback? onTap;
   final TextInputAction? textInputAction;
@@ -60,6 +63,7 @@ class AppTextField extends StatelessWidget {
         TextField(
           controller: controller,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           obscureText: obscureText,
           readOnly: readOnly,
           enabled: enabled,

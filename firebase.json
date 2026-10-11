@@ -1,1 +1,24 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"motocare-d902e","appId":"1:388061801728:android:706acb08c1472535b617e5","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"motocare-d902e","configurations":{"android":"1:388061801728:android:706acb08c1472535b617e5"}}}}}}
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "motocare-d902e",
+          "appId": "1:388061801728:android:706acb08c1472535b617e5",
+          "fileOutput": "android/app/google-services.json"
+        }
+      }
+    },
+    "dart": {
+      "lib/firebase_options.dart": {
+        "projectId": "motocare-d902e",
+        "configurations": {
+          "android": "1:388061801728:android:706acb08c1472535b617e5"
+        }
+      }
+    }
+  }
+}

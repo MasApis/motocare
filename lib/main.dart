@@ -5,8 +5,9 @@ import 'package:go_router/go_router.dart';
 
 import 'features/auth/providers/auth_providers.dart';
 import 'features/auth/ui/login_screen.dart';
+import 'features/dashboard/ui/dashboard_screen.dart';
+import 'features/vehicles/ui/vehicle_form_screen.dart';
 import 'firebase_options.dart';
-import 'shared/screens/home_placeholder_screen.dart';
 import 'shared/theme/app_theme.dart';
 
 void main() async {
@@ -57,12 +58,24 @@ class MotoCareApp extends ConsumerWidget {
         GoRoute(
           path: '/',
           builder: (BuildContext context, GoRouterState state) =>
-              const HomePlaceholderScreen(),
+              const DashboardScreen(),
         ),
         GoRoute(
           path: '/login',
           builder: (BuildContext context, GoRouterState state) =>
               const LoginScreen(),
+        ),
+        GoRoute(
+          path: '/vehicles/add',
+          builder: (BuildContext context, GoRouterState state) =>
+              const VehicleFormScreen(),
+        ),
+        GoRoute(
+          path: '/vehicles/edit/:id',
+          builder: (BuildContext context, GoRouterState state) {
+            final vehicleId = state.pathParameters['id'];
+            return VehicleFormScreen(vehicleId: vehicleId);
+          },
         ),
       ],
     );
