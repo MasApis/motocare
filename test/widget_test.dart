@@ -11,8 +11,9 @@ void main() {
       ),
     );
 
-    // Verifikasi teks judul di AppBar dan teks status di body
-    expect(find.text('MotoCare'), findsOneWidget);
-    expect(find.text('MotoCare Scaffolding Siap'), findsOneWidget);
+    // Verifikasi teks judul pratinjau di AppBar dan tab navigasi
+    expect(find.text('MotoCare UI Preview'), findsOneWidget);
+    expect(find.text('Beranda'), findsOneWidget);
+    expect(find.text('Catat'), findsOneWidget);
   });
 }

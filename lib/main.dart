@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'shared/demo/component_preview_screen.dart';
+import 'shared/theme/app_theme.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -25,7 +28,7 @@ final _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) =>
-          const HomeScreen(),
+          const ComponentPreviewScreen(),
     ),
   ],
 );
@@ -37,31 +40,9 @@ class MotoCareApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'MotoCare',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-      ),
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
       routerConfig: _router,
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('MotoCare'),
-        centerTitle: true,
-      ),
-      body: const Center(
-        child: Text(
-          'MotoCare Scaffolding Siap',
-          style: TextStyle(fontSize: 16),
-        ),
-      ),
     );
   }
 }

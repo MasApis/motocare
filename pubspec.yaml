@@ -40,6 +40,8 @@ dependencies:
   firebase_auth: ^6.7.0
   cloud_firestore: ^6.10.0
   intl: ^0.20.3
+  google_fonts: ^9.0.0
+  material_symbols_icons: ^4.2960.0
 
 dev_dependencies:
   flutter_test:
