@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/component_health.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_shapes.dart';
 import '../theme/app_spacing.dart';
@@ -19,6 +20,36 @@ class AppStatusBadge extends StatelessWidget {
     this.customLabel,
     this.showDot = true,
   });
+
+  /// Factory dari ComponentStatus (core)
+  factory AppStatusBadge.fromComponentStatus(
+    ComponentStatus status, {
+    Key? key,
+    String? customLabel,
+    bool showDot = true,
+  }) {
+    switch (status) {
+      case ComponentStatus.safe:
+        return AppStatusBadge.safe(
+          key: key,
+          label: customLabel,
+          showDot: showDot,
+        );
+      case ComponentStatus.warning:
+        return AppStatusBadge.warning(
+          key: key,
+          label: customLabel,
+          showDot: showDot,
+        );
+      case ComponentStatus.critical:
+        return AppStatusBadge.critical(
+          key: key,
+          label: customLabel,
+          showDot: showDot,
+        );
+    }
+  }
+
 
   /// Factory untuk status Aman (> 30% sesuai SPEC)
   factory AppStatusBadge.safe({Key? key, String? label, bool showDot = true}) =>

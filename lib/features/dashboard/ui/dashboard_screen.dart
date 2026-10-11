@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../core/vehicle_components.dart';
 import '../../../shared/theme/app_colors.dart';
 import '../../../shared/theme/app_shapes.dart';
 import '../../../shared/theme/app_spacing.dart';
@@ -11,8 +12,10 @@ import '../../../shared/widgets/app_bottom_nav_bar.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../auth/providers/auth_providers.dart';
+import '../../vehicles/data/models/vehicle_component_model.dart';
 import '../../vehicles/data/models/vehicle_model.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
+import 'widgets/component_health_card.dart';
 
 /// Layar Dashboard utama dengan Carousel Kendaraan sesuai docs/SPEC.md (F2)
 /// dan acuan visual docs/design/beranda_status_motor_2
@@ -27,6 +30,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   late PageController _pageController;
   int _currentPageIndex = 0;
   int _currentNavIndex = 0;
+  bool _isUserSwiping = false;
 
   @override
   void initState() {
@@ -41,10 +45,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   void _onPageChanged(int index, List<Vehicle> vehicles) {
+    _isUserSwiping = true;
     setState(() => _currentPageIndex = index);
     if (index >= 0 && index < vehicles.length) {
       ref.read(selectedVehicleIdProvider.notifier).select(vehicles[index].id);
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _isUserSwiping = false;
+    });
   }
 
   Future<void> _confirmDeleteVehicle(Vehicle vehicle) async {
@@ -193,7 +201,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final vehiclesAsync = ref.watch(vehiclesStreamProvider);
     final activeVehicle = ref.watch(selectedVehicleProvider);
 
+    // Sinkronkan halaman PageView hanya jika motor dipilih secara eksternal (bukan saat user swipe)
+    ref.listen<String?>(selectedVehicleIdProvider, (prev, next) {
+      if (_isUserSwiping) return;
+      if (next == null) return;
+      final vehicles = vehiclesAsync.valueOrNull ?? [];
+      final targetIndex = vehicles.indexWhere((v) => v.id == next);
+      if (targetIndex != -1 &&
+          targetIndex != _currentPageIndex &&
+          _pageController.hasClients) {
+        _pageController.animateToPage(
+          targetIndex,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+        _currentPageIndex = targetIndex;
+      }
+    });
+
     return Scaffold(
+
       backgroundColor: AppColors.surface,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
@@ -328,18 +355,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     List<Vehicle> vehicles,
     Vehicle? activeVehicle,
   ) {
-    // Sinkronisasi index carousel jika aktif berbeda
-    if (activeVehicle != null) {
-      final targetIndex = vehicles.indexWhere((v) => v.id == activeVehicle.id);
-      if (targetIndex != -1 &&
-          targetIndex != _currentPageIndex &&
-          _pageController.hasClients) {
-        _pageController.jumpToPage(targetIndex);
-        _currentPageIndex = targetIndex;
-      }
-    }
-
     return ListView(
+
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       children: [
         // Header Carousel & Indikator
@@ -408,6 +425,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
         const SizedBox(height: AppSpacing.lg),
 
+        // Seksi Status Masa Pakai Komponen (docs/SPEC.md F3)
+        if (activeVehicle != null) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: _buildComponentHealthSection(context, activeVehicle),
+          ),
+          const SizedBox(height: AppSpacing.md),
+
+          // Seksi DEBUG SEMENTARA: Pengubah KM untuk pengujian F3 (Akan dihapus di F4)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: _buildF3DebugKmSection(context, activeVehicle),
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
+
         // Section Petunjuk Fitur
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -458,6 +491,242 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ],
     );
   }
+
+  /// Seksi tiga kartu status kesehatan komponen motor (F3)
+  Widget _buildComponentHealthSection(
+    BuildContext context,
+    Vehicle activeVehicle,
+  ) {
+    final componentsAsync = ref.watch(selectedVehicleComponentsProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Status Masa Pakai Komponen',
+              style: AppTypography.headlineSm(),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        componentsAsync.when(
+          data: (components) {
+            final orderedTypes = ComponentType.values; // [engine_oil, gear_oil, v_belt]
+            return Column(
+              children: orderedTypes.map((type) {
+                final comp = components.firstWhere(
+                  (c) => c.type == type,
+                  orElse: () => VehicleComponent(
+                    type: type,
+                    intervalKm: DefaultIntervals.forType(type),
+                    lastServiceKm: activeVehicle.currentKm,
+                  ),
+                );
+                return ComponentHealthCard(
+                  componentType: comp.type,
+                  intervalKm: comp.intervalKm,
+                  lastServiceKm: comp.lastServiceKm,
+                  currentKm: activeVehicle.currentKm,
+                );
+              }).toList(),
+            );
+          },
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.md),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          error: (err, _) => Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Text(
+              'Gagal memuat status komponen: $err',
+              style: AppTypography.bodySm(color: AppColors.error),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Kontrol debug sementara untuk menguji perubahan KM pada tahap F3.
+  /// Membantu verifikasi status Aman, Peringatan, Batas habis, dan Lewat interval di HP asli.
+  /// PERHATIAN: Bagian ini akan dihapus setelah fitur F4 (Hybrid Odometer) diimplementasikan.
+  Widget _buildF3DebugKmSection(
+    BuildContext context,
+    Vehicle activeVehicle,
+  ) {
+    final componentsAsync = ref.watch(selectedVehicleComponentsProvider);
+    final components = componentsAsync.value ?? [];
+    final engineOil = components.where((c) => c.type == ComponentType.engineOil).firstOrNull;
+    final baseKm = engineOil?.lastServiceKm ?? activeVehicle.currentKm;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow,
+        borderRadius: AppShapes.roundedDefault,
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.35),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryFixed,
+                  borderRadius: AppShapes.roundedFull,
+                ),
+                child: Text(
+                  'DEBUG SEMENTARA (F3)',
+                  style: AppTypography.labelCaps(
+                    color: AppColors.onPrimaryFixedVariant,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                'KM: ${_formatKm(activeVehicle.currentKm)}',
+                style: AppTypography.labelMd().copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Uji perubahan kartu kesehatan di HP (Aman / Peringatan / Batas habis / Lewat interval). Panel ini dihapus di tahap F4.',
+            style: AppTypography.bodySm(color: AppColors.onSurfaceVariant),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            children: [
+              ActionChip(
+                label: const Text('Reset 100%'),
+                labelStyle: AppTypography.labelCaps(color: AppColors.primary),
+                backgroundColor: AppColors.surfaceContainerLowest,
+                onPressed: () => _setVehicleKm(activeVehicle, baseKm),
+              ),
+              ActionChip(
+                label: const Text('+500 KM (Aman)'),
+                labelStyle: AppTypography.labelCaps(color: AppColors.statusSafeText),
+                backgroundColor: AppColors.statusSafeBg,
+                onPressed: () => _setVehicleKm(activeVehicle, baseKm + 500),
+              ),
+              ActionChip(
+                label: const Text('+1.500 KM (Kuning)'),
+                labelStyle: AppTypography.labelCaps(color: AppColors.statusWarningText),
+                backgroundColor: AppColors.statusWarningBg,
+                onPressed: () => _setVehicleKm(activeVehicle, baseKm + 1500),
+              ),
+              ActionChip(
+                label: const Text('+1.900 KM (Merah)'),
+                labelStyle: AppTypography.labelCaps(color: AppColors.statusCriticalText),
+                backgroundColor: AppColors.statusCriticalBg,
+                onPressed: () => _setVehicleKm(activeVehicle, baseKm + 1900),
+              ),
+              ActionChip(
+                label: const Text('+2.500 KM (Lewat)'),
+                labelStyle: AppTypography.labelCaps(color: AppColors.statusCriticalText),
+                backgroundColor: AppColors.statusCriticalBg,
+                onPressed: () => _setVehicleKm(activeVehicle, baseKm + 2500),
+              ),
+              ActionChip(
+                avatar: const Icon(Symbols.edit, size: 16, color: AppColors.primary),
+                label: const Text('Ketik KM...'),
+                labelStyle: AppTypography.labelCaps(color: AppColors.primary),
+                backgroundColor: AppColors.surfaceContainerLowest,
+                onPressed: () => _showDebugSetKmDialog(context, activeVehicle),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _setVehicleKm(Vehicle vehicle, int newKm) async {
+    try {
+      await ref.read(vehicleControllerProvider).updateVehicle(
+            vehicleId: vehicle.id,
+            brand: vehicle.brand,
+            model: vehicle.model,
+            name: vehicle.name,
+            plate: vehicle.plate,
+            currentKm: newKm,
+          );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal mengubah KM: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _showDebugSetKmDialog(BuildContext context, Vehicle vehicle) async {
+    final controller = TextEditingController(text: vehicle.currentKm.toString());
+    final result = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppShapes.roundedDefault,
+        ),
+        title: const Text('Ubah KM Sementara (Debug F3)'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Masukkan angka KM baru untuk motor "${vehicle.displayName}":',
+              style: AppTypography.bodyMd(),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'Kilometer',
+                suffixText: 'KM',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => ctx.pop(),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final parsed = int.tryParse(controller.text.trim());
+              if (parsed != null && parsed >= 0) {
+                ctx.pop(parsed);
+              }
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+
+    if (result != null) {
+      await _setVehicleKm(vehicle, result);
+    }
+  }
+
 
   /// Kartu Hero Motor sesuai desain beranda_status_motor_2
   Widget _buildVehicleHeroCard(
