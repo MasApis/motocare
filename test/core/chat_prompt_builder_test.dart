@@ -83,5 +83,42 @@ void main() {
       expect(instruction, contains('TOLAK DENGAN RAMAH'));
       expect(instruction, contains('dugaan awal'));
     });
+
+    test('trimHistory mempertahankan seluruh pesan jika panjang <= 10', () {
+      final history = List.generate(5, (i) => 'Pesan $i');
+      final trimmed = ChatPromptBuilder.trimHistory(history);
+
+      expect(trimmed.length, 5);
+      expect(trimmed, equals(history));
+    });
+
+    test('trimHistory hanya mengambil 10 pesan terakhir jika panjang > 10', () {
+      final history = List.generate(20, (i) => 'Pesan $i');
+      final trimmed = ChatPromptBuilder.trimHistory(history);
+
+      expect(trimmed.length, 10);
+      expect(trimmed.first, 'Pesan 10');
+      expect(trimmed.last, 'Pesan 19');
+    });
+
+    test('cleanResponseText membersihkan simbol markdown tebal, miring, header, dan tabel', () {
+      const rawText = '''
+# Diagnosa Motor
+**Penyebab Utama:**
+* Roller peyang
+* Kampas kopling tipis
+| Komponen | Status |
+|---|---|
+| CVT | Kotor |
+''';
+
+      final cleaned = ChatPromptBuilder.cleanResponseText(rawText);
+
+      expect(cleaned, isNot(contains('**')));
+      expect(cleaned, isNot(contains('# ')));
+      expect(cleaned, isNot(contains('|---|')));
+      expect(cleaned, contains('Penyebab Utama:'));
+      expect(cleaned, contains('Roller peyang'));
+    });
   });
 }

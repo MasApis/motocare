@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:motocare/core/chat_prompt_builder.dart';
 import 'package:motocare/features/chatbot/data/chat_repository.dart';
 import 'package:motocare/features/chatbot/providers/chat_providers.dart';
@@ -114,5 +115,50 @@ void main() {
       find.text('Koneksi internet terputus. Mohon periksa sambungan internet Anda dan coba lagi.'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('Tombol kirim nonaktif saat input kosong dan tombol refresh membersihkan riwayat obrolan',
+      (WidgetTester tester) async {
+    final fakeRepo = FakeChatRepository();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          chatRepositoryProvider.overrideWithValue(fakeRepo),
+        ],
+        child: const MaterialApp(
+          home: ChatScreen(),
+        ),
+      ),
+    );
+
+    // Tombol kirim nonaktif saat input kosong
+    final sendButtonFinder = find.widgetWithIcon(IconButton, Symbols.send);
+    final iconButton = tester.widget<IconButton>(sendButtonFinder);
+    expect(iconButton.onPressed, isNull);
+
+    // Ketik pesan dan kirim
+    final inputFinder = find.byType(TextField);
+    await tester.enterText(inputFinder, 'V-belt bunyi decit');
+    await tester.pump();
+
+    final activeIconButton = tester.widget<IconButton>(sendButtonFinder);
+    expect(activeIconButton.onPressed, isNotNull);
+
+    await tester.tap(sendButtonFinder);
+    await tester.pumpAndSettle();
+
+    // Pesan muncul dan tombol refresh/mulai obrolan baru terlihat
+    expect(find.text('V-belt bunyi decit'), findsOneWidget);
+    final refreshButtonFinder = find.byTooltip('Mulai Obrolan Baru');
+    expect(refreshButtonFinder, findsOneWidget);
+
+    // Tekan tombol refresh
+    await tester.tap(refreshButtonFinder);
+    await tester.pumpAndSettle();
+
+    // Riwayat kembali kosong (empty state)
+    expect(find.text('Selamat Datang di MotoAI!'), findsOneWidget);
+    expect(find.text('V-belt bunyi decit'), findsNothing);
   });
 }

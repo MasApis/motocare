@@ -38,7 +38,7 @@ Pemilik motor matic harian: mahasiswa, pekerja, pengemudi ojek online.
 | State management | **Riverpod** (`flutter_riverpod`) |
 | Backend | **Firebase**: Authentication (email + password) dan Cloud Firestore (offline persistence aktif) |
 | Navigasi | `go_router` |
-| AI | Google Gemini lewat **Firebase AI Logic** (paket `firebase_ai`) dengan **Gemini Developer API** di paket **Spark (gratis, tanpa kartu kredit)**; **App Check** (`firebase_app_check`) melindungi panggilan. **Kunci API Gemini tidak boleh ada di kode aplikasi.** Cloud Functions dan Vertex AI/Agent Platform **tidak dipakai** karena butuh paket Blaze (berbayar) |
+| AI | LLM via **Groq Cloud API** (`llama-3.1-8b-instant`) gratis tanpa kartu kredit (fallback/opsi Firebase AI Logic tersedia); kunci API diinjeksi via `--dart-define=GROQ_API_KEY` saat menjalankan aplikasi. **Kunci API tidak disimpan di kode aplikasi maupun repositori.** Cloud Functions dan Vertex AI/Agent Platform berbayar **tidak dipakai** |
 | Notifikasi | `flutter_local_notifications`, notifikasi dijadwalkan pada tanggal tertentu (tanpa background service) |
 | PDF | `pdf` + `printing` (atau `share_plus`) |
 | UI/UX | Desain dari **Google Stitch** (export zip) di `docs/design/` (tiap layar: `screen.png` + `code.html`); peta layar ke fitur di `docs/design/SCREENS.md`; aturan visual di `docs/DESIGN.md` (MotoSense Design System). `code.html` hanya acuan nilai dan tata letak, bukan kode yang disalin ke Flutter |
@@ -200,16 +200,15 @@ Fitur dianggap **selesai** jika semua kriterianya terpenuhi, test terkait lulus,
 - Izin notifikasi diminta dengan sopan; jika ditolak, aplikasi tetap jalan dan menjelaskan dampaknya.
 - Logika penjadwalan (hitung tanggal) punya unit test.
 
-#### F7. Chatbot Diagnosa (Gemini)
+#### F7. Chatbot Diagnosa (AI Assistant)
 **Kriteria selesai:**
 - Tampilan seperti chat bubble; pengguna mengetik keluhan, AI membalas dugaan penyebab dan saran.
 - AI diberi peran ahli mekanik motor matic dan konteks motor aktif (model, KM sekarang, status komponen).
 - Setiap jawaban disertai pengingat singkat bahwa ini dugaan dan perlu dicek bengkel untuk masalah serius; pertanyaan di luar topik motor ditolak dengan sopan.
 - Ada status mengetik/loading, pesan gagal yang ramah saat offline atau API error, dan batas panjang pesan.
-- **Kunci API tidak ada di kode aplikasi maupun repositori.**
-- Berjalan di paket Firebase **Spark**: tidak ada layanan yang membutuhkan Blaze atau kartu kredit.
-- App Check aktif (debug provider saat pengembangan); panggilan tanpa App Check yang valid ditolak.
-- Hemat kuota gratis: batas panjang pesan, hanya beberapa pesan terakhir (mis. 10) yang dikirim sebagai konteks, tombol kirim nonaktif saat menunggu jawaban.
+- **Kunci API tidak ada di kode aplikasi maupun repositori** (dioper via `--dart-define=GROQ_API_KEY`).
+- Berjalan 100% gratis tanpa kartu kredit: tidak ada layanan yang membutuhkan Blaze atau langganan berbayar.
+- Hemat kuota gratis: batas panjang pesan (300 karakter), hanya beberapa pesan terakhir (10 pesan) yang dikirim sebagai konteks, tombol kirim nonaktif saat menunggu jawaban.
 - Saat kuota atau batas laju tercapai, tampil pesan ramah ("coba lagi nanti"), bukan error teknis.
 - Riwayat chat cukup di memori sesi (tidak disimpan permanen pada versi ini).
 

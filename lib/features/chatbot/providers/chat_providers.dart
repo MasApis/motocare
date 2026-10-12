@@ -6,9 +6,9 @@ import '../../vehicles/providers/vehicle_providers.dart';
 import '../data/chat_repository.dart';
 import '../data/models/chat_message_model.dart';
 
-/// Provider instance repository chatbot (default menggunakan Firebase AI)
+/// Provider instance repository chatbot (default menggunakan Groq API)
 final chatRepositoryProvider = Provider<ChatRepository>((ref) {
-  return FirebaseAIChatRepository();
+  return GroqChatRepository();
 });
 
 /// State untuk sesi obrolan chatbot
@@ -110,11 +110,12 @@ class ChatNotifier extends Notifier<ChatState> {
         components: componentSummaries,
       );
 
-      // Siapkan riwayat obrolan dalam sesi untuk konteks Gemini
-      final history = state.messages
+      // Siapkan riwayat obrolan dalam sesi untuk konteks Gemini (dibatasi 10 terakhir untuk hemat kuota)
+      final rawHistory = state.messages
           .where((m) => m.id != userMessageId && m.status == ChatMessageStatus.sent)
           .map((m) => (role: m.isUser ? 'user' : 'model', text: m.text))
           .toList();
+      final history = ChatPromptBuilder.trimHistory(rawHistory);
 
       final chatRepo = ref.read(chatRepositoryProvider);
       final responseText = await chatRepo.sendMessage(
@@ -125,7 +126,7 @@ class ChatNotifier extends Notifier<ChatState> {
 
       final aiMessage = ChatMessage(
         id: (DateTime.now().millisecondsSinceEpoch + 1).toString(),
-        text: responseText,
+        text: ChatPromptBuilder.cleanResponseText(responseText),
         isUser: false,
         timestamp: DateTime.now(),
         status: ChatMessageStatus.sent,
