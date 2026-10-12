@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'features/auth/providers/auth_providers.dart';
 import 'features/auth/ui/login_screen.dart';
+import 'features/chatbot/ui/chat_screen.dart';
 import 'features/dashboard/ui/dashboard_screen.dart';
 import 'features/notifications/data/notification_service.dart';
 import 'features/reports/ui/monthly_report_screen.dart';
@@ -107,6 +108,11 @@ class MotoCareApp extends ConsumerWidget {
           path: '/reports',
           builder: (BuildContext context, GoRouterState state) =>
               const MonthlyReportScreen(),
+        ),
+        GoRoute(
+          path: '/chat',
+          builder: (BuildContext context, GoRouterState state) =>
+              const ChatScreen(showBackButton: true),
         ),
       ],
     );

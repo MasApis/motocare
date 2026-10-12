@@ -18,6 +18,7 @@ import '../../vehicles/providers/vehicle_providers.dart';
 import '../../notifications/providers/notification_providers.dart';
 import '../../notifications/ui/notification_permission_banner.dart';
 import '../../notifications/ui/notification_test_card.dart';
+import '../../chatbot/ui/chat_screen.dart';
 import '../../reports/ui/monthly_report_screen.dart';
 import '../../service/ui/service_form_screen.dart';
 import '../../service/ui/service_history_screen.dart';
@@ -242,11 +243,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     } else if (_currentNavIndex == 2) {
       bodyWidget = const MonthlyReportScreen();
     } else if (_currentNavIndex == 3) {
-      bodyWidget = _buildFeaturePlaceholder(
-        title: 'Chat AI Ahli Mekanik',
-        desc: 'Diagnosa keluhan motor matic Anda bersama asisten AI ahli mekanik.',
-        icon: Symbols.smart_toy,
-      );
+      bodyWidget = const ChatScreen();
     } else if (_currentNavIndex == 4) {
       bodyWidget = const ServiceHistoryScreen();
     } else {
@@ -333,53 +330,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  /// Placeholder ramah untuk tab fitur yang belum aktif
-  Widget _buildFeaturePlaceholder({
-    required String title,
-    required String desc,
-    required IconData icon,
-  }) {
-    return SafeArea(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: const BoxDecoration(
-                  color: AppColors.surfaceContainerHigh,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, size: 40, color: AppColors.primary),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                title,
-                style: AppTypography.headlineSm(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                desc,
-                style: AppTypography.bodyMd(color: AppColors.onSurfaceVariant),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              AppButton(
-                text: 'Kembali ke Beranda',
-                variant: AppButtonVariant.secondary,
-                isFullWidth: false,
-                onPressed: () => setState(() => _currentNavIndex = 0),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   /// Empty state ketika belum ada motor yang terdaftar
   Widget _buildEmptyState(BuildContext context) {
