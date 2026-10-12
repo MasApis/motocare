@@ -251,10 +251,14 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
             Text(
               'Form Catat Servis',
               style: AppTypography.headlineSm().copyWith(fontWeight: FontWeight.w700),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             Text(
               activeVehicle.displayName,
               style: AppTypography.labelCaps(color: AppColors.onSurfaceVariant),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -380,37 +384,52 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'ODOMETER SAAT SERVIS (KM)',
-                        style: AppTypography.labelCaps(
-                          color: AppColors.onSurfaceVariant,
+                      Flexible(
+                        child: Text(
+                          'ODOMETER SAAT SERVIS (KM)',
+                          style: AppTypography.labelCaps(
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      InkWell(
-                        borderRadius: AppShapes.roundedFull,
-                        onTap: () {
-                          setState(() {
-                            _kmController.text = activeVehicle.currentKm.toString();
-                            _kmError = null;
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Symbols.auto_fix_high,
-                                size: 14,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Gunakan KM Terkini (${ServiceCalculator.formatKm(activeVehicle.currentKm)})',
-                                style: AppTypography.labelCaps(
+                      const SizedBox(width: AppSpacing.xs),
+                      Flexible(
+                        child: InkWell(
+                          borderRadius: AppShapes.roundedFull,
+                          onTap: () {
+                            setState(() {
+                              _kmController.text = activeVehicle.currentKm.toString();
+                              _kmError = null;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Symbols.auto_fix_high,
+                                  size: 14,
                                   color: AppColors.primary,
-                                ).copyWith(fontWeight: FontWeight.w700),
-                              ),
-                            ],
+                                ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    'Gunakan KM Terkini (${ServiceCalculator.formatKm(activeVehicle.currentKm)})',
+                                    style: AppTypography.labelCaps(
+                                      color: AppColors.primary,
+                                    ).copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.2,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

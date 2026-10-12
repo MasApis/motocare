@@ -124,5 +124,23 @@ void main() {
       expect(find.text('Nama bengkel atau tempat servis wajib diisi'), findsOneWidget);
       expect(find.text('Total biaya wajib diisi (ketik 0 jika gratis)'), findsOneWidget);
     });
+
+    testWidgets('tidak terjadi overflow pada layar ponsel standar Android (392.7 dan 360 dp)', (tester) async {
+      // Uji pada ukuran layar standar HP Android 392.7dp dan 360dp
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.75; // 1080 / 2.75 = 392.727 dp
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(buildTestableScreen());
+      await tester.pumpAndSettle();
+
+      // Memastikan tidak ada RenderFlex overflow error (Flutter test akan gagal jika tester.takeException() bukan null atau jika ada overflow)
+      expect(tester.takeException(), isNull);
+      expect(find.text('ODOMETER SAAT SERVIS (KM)'), findsOneWidget);
+      expect(find.textContaining('Gunakan KM Terkini'), findsOneWidget);
+    });
   });
 }
