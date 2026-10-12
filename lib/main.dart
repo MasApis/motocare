@@ -7,6 +7,7 @@ import 'features/auth/providers/auth_providers.dart';
 import 'features/auth/ui/login_screen.dart';
 import 'features/dashboard/ui/dashboard_screen.dart';
 import 'features/notifications/data/notification_service.dart';
+import 'features/reports/ui/monthly_report_screen.dart';
 import 'features/service/ui/service_form_screen.dart';
 import 'features/service/ui/service_history_screen.dart';
 import 'features/vehicles/ui/vehicle_form_screen.dart';
@@ -101,6 +102,11 @@ class MotoCareApp extends ConsumerWidget {
           path: '/service/history',
           builder: (BuildContext context, GoRouterState state) =>
               const ServiceHistoryScreen(),
+        ),
+        GoRoute(
+          path: '/reports',
+          builder: (BuildContext context, GoRouterState state) =>
+              const MonthlyReportScreen(),
         ),
       ],
     );

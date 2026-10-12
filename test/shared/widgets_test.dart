@@ -225,7 +225,7 @@ void main() {
 
       expect(find.text('Beranda'), findsOneWidget);
       expect(find.text('Catat'), findsOneWidget);
-      expect(find.text('Servis'), findsOneWidget);
+      expect(find.text('Buku Servis'), findsOneWidget);
       expect(find.text('Chat AI'), findsOneWidget);
       expect(find.text('Riwayat'), findsOneWidget);
 

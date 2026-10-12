@@ -18,6 +18,7 @@ import '../../vehicles/providers/vehicle_providers.dart';
 import '../../notifications/providers/notification_providers.dart';
 import '../../notifications/ui/notification_permission_banner.dart';
 import '../../notifications/ui/notification_test_card.dart';
+import '../../reports/ui/monthly_report_screen.dart';
 import '../../service/ui/service_form_screen.dart';
 import '../../service/ui/service_history_screen.dart';
 import 'widgets/component_health_card.dart';
@@ -239,11 +240,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         },
       );
     } else if (_currentNavIndex == 2) {
-      bodyWidget = _buildFeaturePlaceholder(
-        title: 'Buku Servis & Pengeluaran',
-        desc: 'Pantau riwayat pengeluaran servis dan unduh laporan bulanan PDF.',
-        icon: Symbols.menu_book,
-      );
+      bodyWidget = const MonthlyReportScreen();
     } else if (_currentNavIndex == 3) {
       bodyWidget = _buildFeaturePlaceholder(
         title: 'Chat AI Ahli Mekanik',

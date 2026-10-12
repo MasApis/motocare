@@ -42,7 +42,7 @@ class AppBottomNavBar extends StatelessWidget {
     ),
     AppBottomNavItem(
       icon: Symbols.menu_book,
-      label: 'Servis',
+      label: 'Buku Servis',
     ),
     AppBottomNavItem(
       icon: Symbols.smart_toy,
