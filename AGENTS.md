@@ -15,11 +15,13 @@ Pemula. Jelaskan dengan bahasa Indonesia sederhana, singkat, tanpa istilah yang 
 5. **Sebelum menyatakan selesai**, jalankan `flutter analyze` dan `flutter test`, lalu laporkan hasilnya apa adanya. Jangan bilang berhasil jika belum dijalankan atau gagal.
 6. **Cek setiap kriteria selesai** fitur di SPEC dan laporkan satu per satu: terpenuhi atau belum.
 7. **Tulis test** untuk logika di `lib/core/` dan untuk perilaku penting widget.
-8. **Jangan menjalankan `git commit`, `git push`, atau perintah yang menghapus data.** Pengguna yang commit sendiri. Cukup berikan saja pesan commit.
+8. **Jangan menjalankan `git commit`, `git push`, atau perintah yang menghapus data.** Pengguna yang commit sendiri. Cukup berikan pesan commit saja.
 9. **Jangan memasang paket baru** di luar daftar SPEC tanpa menjelaskan alasannya dan meminta persetujuan.
 10. Jika perintah gagal, tunjukkan pesan error, jelaskan penyebabnya dengan sederhana, lalu perbaiki. Jangan menyembunyikan error.
 11. Jika mengubah skema data atau aturan perhitungan, perbarui `docs/SPEC.md` dan sebutkan di ringkasan.
 12. Setelah selesai, tulis ringkasan: file yang diubah, perintah yang perlu dijalankan pengguna, dan apa yang perlu dicek di HP.
+13. **Proyek memakai Firebase paket Spark (gratis, tanpa kartu kredit).** Jangan memakai atau menyarankan layanan yang butuh paket Blaze (mis. Cloud Functions, Vertex AI/Agent Platform) tanpa bertanya. Jika langkah di konsol Firebase meminta upgrade atau kartu kredit, berhenti dan laporkan.
+14. Bagian SPEC yang bertanda DITUNDA (revisi F5, Tahap 7b) **jangan dikerjakan** sampai pengguna memintanya.
 
 ## UI/UX (desain dari Stitch, ada di folder `docs/design/`)
 - Tiap layar punya folder berisi `screen.png` (tampilan) dan `code.html` (HTML + Tailwind, memuat warna, ukuran, teks, dan susunan persisnya). Baca **keduanya** sebelum membuat sebuah layar; kalau tidak bisa melihat gambar, andalkan `code.html`.
@@ -31,7 +33,7 @@ Pemula. Jelaskan dengan bahasa Indonesia sederhana, singkat, tanpa istilah yang 
 - Jika layar yang diminta tidak ada di `docs/design/`, atau desain berbeda dengan SPEC, berhenti, laporkan perbedaannya, dan tanya mana yang dipakai. Jangan menebak desain.
 
 ## Tech Stack
-Flutter (Dart), Android. Riverpod, go_router, Firebase Auth + Cloud Firestore, flutter_local_notifications, pdf + printing, Gemini (tanpa kunci di aplikasi).
+Flutter (Dart), Android. Riverpod, go_router, Firebase Auth + Cloud Firestore, flutter_local_notifications, pdf + printing, Gemini lewat Firebase AI Logic (`firebase_ai`, `firebase_app_check`; Gemini Developer API di paket Spark, tanpa kunci di aplikasi).
 
 ## Struktur
 ```

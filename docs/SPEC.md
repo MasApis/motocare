@@ -5,7 +5,7 @@
 | **Nama Proyek** | MotoCare |
 | **Jenis** | Aplikasi mobile Android (Flutter) |
 | **Mata kuliah** | Pemrograman Perangkat Bergerak |
-| **Versi SPEC** | 2.1 |
+| **Versi SPEC** | 2.3 |
 | **Penulis** | Abdul |
 
 Dokumen ini adalah sumber kebenaran pengembangan. Jika kode dan SPEC berbeda, SPEC dianggap benar sampai diubah secara sengaja.
@@ -38,7 +38,7 @@ Pemilik motor matic harian: mahasiswa, pekerja, pengemudi ojek online.
 | State management | **Riverpod** (`flutter_riverpod`) |
 | Backend | **Firebase**: Authentication (email + password) dan Cloud Firestore (offline persistence aktif) |
 | Navigasi | `go_router` |
-| AI | Google Gemini. **Kunci API tidak boleh ada di kode aplikasi.** Cara pemanggilan (Firebase AI Logic atau proxy Cloud Function) diputuskan di mode plan Tahap 10 |
+| AI | Google Gemini lewat **Firebase AI Logic** (paket `firebase_ai`) dengan **Gemini Developer API** di paket **Spark (gratis, tanpa kartu kredit)**; **App Check** (`firebase_app_check`) melindungi panggilan. **Kunci API Gemini tidak boleh ada di kode aplikasi.** Cloud Functions dan Vertex AI/Agent Platform **tidak dipakai** karena butuh paket Blaze (berbayar) |
 | Notifikasi | `flutter_local_notifications`, notifikasi dijadwalkan pada tanggal tertentu (tanpa background service) |
 | PDF | `pdf` + `printing` (atau `share_plus`) |
 | UI/UX | Desain dari **Google Stitch** (export zip) di `docs/design/` (tiap layar: `screen.png` + `code.html`); peta layar ke fitur di `docs/design/SCREENS.md`; aturan visual di `docs/DESIGN.md` (MotoSense Design System). `code.html` hanya acuan nilai dan tata letak, bukan kode yang disalin ke Flutter |
@@ -79,7 +79,16 @@ Semua aturan ini ditulis sebagai **fungsi murni di `lib/core/`** dengan unit tes
 
 **Validasi odometer:** KM baru tidak boleh lebih kecil dari KM terakhir.
 
-**Nilai awal komponen:** saat motor dibuat, `lastServiceKm` tiap komponen = KM saat ini (dianggap baru diservis), sehingga semua mulai 100%. Pengguna memperbaikinya dengan mencatat servis di F5.
+**Nilai awal komponen:** saat motor dibuat, `lastServiceKm` tiap komponen = KM saat ini (dianggap baru diservis), sehingga semua mulai 100%. Pengguna memperbaikinya dengan mencatat servis di F5. Nilai ini juga disimpan sebagai `baselineKm` komponen.
+
+**Aturan servis (F5), DITUNDA sampai Tahap 7b; kode F5 saat ini belum mengikutinya:**
+- Satu catatan servis = satu kunjungan ke bengkel, berisi satu atau lebih **item**.
+- Item bertipe **komponen** (oli mesin, oli gardan, V-belt) atau **part lain** (bebas, mis. roller, kampas ganda, busi, filter udara, kampas rem).
+- Oli mesin dan oli gardan hanya bisa **diganti**. V-belt (CVT) bisa **diganti** atau **dibersihkan**. Part lain selalu dianggap diganti.
+- Hanya komponen yang **diganti** yang mereset kartunya: `lastServiceKm` = KM servis. **Dibersihkan** tidak mereset, tetapi tetap tercatat di riwayat.
+- Part lain tidak memengaruhi kartu mana pun; hanya tercatat di riwayat.
+- "Servis CVT" di MotoCare = item V-belt (diganti atau dibersihkan) ditambah part lain yang diganti, jika ada.
+- Saat catatan dihapus, `lastServiceKm` tiap komponen dihitung ulang: KM dari catatan "diganti" untuk komponen itu dengan KM tertinggi yang tersisa; jika tidak ada, kembali ke `baselineKm`.
 
 ---
 
@@ -120,10 +129,14 @@ Aturan: widget tidak memanggil Firestore langsung; semua lewat provider dan repo
 ```
 users/{uid}
   └─ vehicles/{vehicleId}:  name, brand, model, plate (opsional), currentKm, createdAt
-       ├─ components/{type}:   type, intervalKm, lastServiceKm
+       ├─ components/{type}:   type, intervalKm, lastServiceKm, baselineKm (KM saat motor dibuat)
        ├─ odometerLogs/{id}:   km, date
-       └─ serviceRecords/{id}: componentType, date, km, brand, price (rupiah, integer), location, note
+       └─ serviceRecords/{id}: date, km, location, price (rupiah, integer; total satu kunjungan), note, items[]
+            items[] = { kind: "component" | "part", componentType (jika kind = component: engine_oil | gear_oil | v_belt),
+                        action: "replaced" | "cleaned", name (wajib jika kind = part), brand (opsional) }
 ```
+
+> Skema `serviceRecords` dan `baselineKm` di atas adalah target revisi F5 (DITUNDA, Tahap 7b). Sampai saat itu kode tetap memakai struktur lama (satu `componentType` per catatan).
 
 - Semua data berada di bawah `users/{uid}`; **security rules** hanya mengizinkan pemilik `uid` yang login membaca dan menulis datanya.
 - `price` disimpan sebagai bilangan bulat rupiah.
@@ -166,9 +179,16 @@ Fitur dianggap **selesai** jika semua kriterianya terpenuhi, test terkait lulus,
 - Rata-rata KM harian dihitung sesuai bagian 2.1 dan terlihat di layar (mis. "± 25 km/hari"), ada unit test untuk kasus data kurang.
 
 #### F5. Interactive Service Input dan Riwayat
+> **Status:** kriteria di bawah adalah target revisi (DITUNDA, Tahap 7b setelah semua tahap selesai). Sampai Tahap 7b dimulai, jangan mengubah kode F5.
+
 **Kriteria selesai:**
-- Menekan kartu komponen membuka form catat servis: merek, harga, lokasi, tanggal, KM (default KM sekarang), catatan opsional.
-- Setelah disimpan: data masuk ke "Riwayat Servis", `lastServiceKm` komponen terisi, kartu kembali 100%.
+- Menekan kartu komponen (atau tab Catat) membuka form catat servis; komponen dari kartu yang ditekan sudah terpilih. Isian: KM (default KM sekarang), tanggal, nama bengkel, total biaya, catatan opsional.
+- Pengguna bisa memilih **satu atau lebih komponen** (oli mesin, oli gardan, V-belt/CVT). Oli selalu "diganti"; V-belt memilih "Diganti" atau "Dibersihkan". Komponen yang diganti punya merek opsional.
+- Ada bagian **"Part lain yang diganti"**: nol atau lebih baris (nama part wajib, merek opsional) dengan tombol tambah dan hapus baris.
+- Validasi: minimal satu item; harga tidak boleh negatif (0 diperbolehkan untuk servis gratis); input tidak valid ditolak dengan pesan jelas.
+- Setelah disimpan: satu catatan masuk "Riwayat Servis"; hanya komponen yang **diganti** yang `lastServiceKm`-nya terisi dan kartunya kembali 100%. Komponen yang **dibersihkan** dan part lain tidak mengubah kartu (aturan servis, bagian 2.1).
+- Tiap catatan di riwayat menampilkan daftar item dengan label "diganti" atau "dibersihkan", total biaya, dan bengkel.
+- Test untuk aturan reset: komponen diganti vs dibersihkan, beberapa komponen sekaligus, hanya part lain, hapus catatan, dan kembali ke `baselineKm`.
 - Riwayat Servis menampilkan daftar terbaru dulu, bisa difilter per motor, dengan format rupiah dan tanggal Indonesia.
 - Catatan servis bisa dihapus (dengan konfirmasi); kartu komponen kembali menghitung dari servis sebelumnya.
 
@@ -187,12 +207,16 @@ Fitur dianggap **selesai** jika semua kriterianya terpenuhi, test terkait lulus,
 - Setiap jawaban disertai pengingat singkat bahwa ini dugaan dan perlu dicek bengkel untuk masalah serius; pertanyaan di luar topik motor ditolak dengan sopan.
 - Ada status mengetik/loading, pesan gagal yang ramah saat offline atau API error, dan batas panjang pesan.
 - **Kunci API tidak ada di kode aplikasi maupun repositori.**
+- Berjalan di paket Firebase **Spark**: tidak ada layanan yang membutuhkan Blaze atau kartu kredit.
+- App Check aktif (debug provider saat pengembangan); panggilan tanpa App Check yang valid ditolak.
+- Hemat kuota gratis: batas panjang pesan, hanya beberapa pesan terakhir (mis. 10) yang dikirim sebagai konteks, tombol kirim nonaktif saat menunggu jawaban.
+- Saat kuota atau batas laju tercapai, tampil pesan ramah ("coba lagi nanti"), bukan error teknis.
 - Riwayat chat cukup di memori sesi (tidak disimpan permanen pada versi ini).
 
 #### F8. Laporan Bulanan PDF
 **Kriteria selesai:**
 - Halaman Laporan menampilkan total pengeluaran servis bulan terpilih (mis. "Pengeluaran September: Rp 150.000") dan bisa berganti bulan.
-- Tombol "Unduh Laporan PDF" membuat PDF berisi tabel riwayat (tanggal, komponen, merek, lokasi, harga) dan total.
+- Tombol "Unduh Laporan PDF" membuat PDF berisi tabel riwayat satu baris per kunjungan (tanggal, ringkasan item seperti "Oli Mesin (diganti), V-Belt (dibersihkan), Roller (diganti)", bengkel, total biaya) dan total bulan.
 - File bisa dibuka atau dibagikan dari HP (cara simpan mengikuti aturan penyimpanan Android, diputuskan di rencana).
 - Bulan tanpa data menampilkan pesan yang jelas, bukan PDF kosong.
 - Perhitungan total punya unit test.
@@ -220,7 +244,8 @@ Tata letak layar mengikuti `docs/design/` (10 layar; lihat `docs/design/SCREENS.
 
 | Risiko | Mitigasi |
 |--------|----------|
-| Kunci Gemini bocor | Jangan di kode aplikasi; lewat Firebase AI Logic atau proxy |
+| Kunci Gemini bocor | Jangan di kode aplikasi; lewat Firebase AI Logic (tanpa kunci di aplikasi) + App Check |
+| Kuota gratis Gemini habis atau berubah | Batasi panjang pesan dan konteks, pesan ramah saat limit; opsi paket berbayar nanti jika pengguna bertambah |
 | Interval komponen tidak akurat | Bisa diubah pengguna; tampilkan catatan "sesuaikan dengan buku manual" |
 | Notifikasi tidak muncul (penghemat baterai HP tertentu) | Beri panduan di aplikasi; uji di HP asli |
 | Scope terlalu besar | Satu fitur per tahap; selesai F1 sampai F5 dulu sebagai inti |
@@ -240,5 +265,5 @@ Scaffolding + Firebase → Tema dari desain → F1 → F2 → F3 → F4 → F5 �
 ## 11. Keputusan Terbuka
 
 - Interval default dan ambang warna (bagian 2.1) masih asumsi; verifikasi dengan buku manual motor.
-- Cara pemanggilan Gemini yang aman (Tahap 10).
+- Rilis publik: App Check produksi (di Android memakai Play Integrity) dan apakah kuota gratis Gemini cukup; mungkin perlu paket berbayar. Cek ketentuan penggunaan data pada tier gratis sebelum rilis.
 - Apakah rilis publik butuh fitur tambahan (hapus akun, kebijakan privasi); lihat Tahap 12 di panduan.

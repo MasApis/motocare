@@ -17,7 +17,7 @@ abstract class ChatRepository {
 class FirebaseAIChatRepository implements ChatRepository {
   FirebaseAIChatRepository({
     this.firebaseAI,
-    this.modelName = 'gemini-1.5-flash',
+    this.modelName = 'gemini-2.5-flash',
   });
 
   final FirebaseAI? firebaseAI;
