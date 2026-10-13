@@ -253,17 +253,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         scrolledUnderElevation: 1,
         title: Row(
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
-                color: AppColors.primaryFixed,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Symbols.two_wheeler,
-                color: AppColors.primary,
-                size: 22,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                'assets/icons/app_logo.png',
+                width: 36,
+                height: 36,
+                fit: BoxFit.contain,
               ),
             ),
             const SizedBox(width: AppSpacing.sm),

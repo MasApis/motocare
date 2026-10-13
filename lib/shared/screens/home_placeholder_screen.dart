@@ -27,18 +27,14 @@ class HomePlaceholderScreen extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Ikon motor
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryFixed,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Symbols.two_wheeler,
-                    size: 40,
-                    color: AppColors.primary,
+                // Logo aplikasi
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    'assets/icons/app_logo.png',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.contain,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
