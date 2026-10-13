@@ -166,13 +166,27 @@ class FirebaseAIChatRepository implements ChatRepository {
 class GroqChatRepository implements ChatRepository {
   GroqChatRepository({
     this.apiKey = const String.fromEnvironment('GROQ_API_KEY'),
-    this.modelName = 'llama-3.1-8b-instant',
+    this.modelName = const String.fromEnvironment(
+      'GROQ_MODEL',
+      defaultValue: 'openai/gpt-oss-120b',
+    ),
     this.httpClient,
   });
 
   final String apiKey;
   final String modelName;
   final HttpClient? httpClient;
+
+  /// Daftar model obrolan teruji dan stabil di Groq (diurutkan dari prioritas terbaik)
+  static const List<String> _preferredModels = [
+    'openai/gpt-oss-120b',
+    'openai/gpt-oss-20b',
+    'qwen/qwen3.8-27b',
+    'llama-3.3-70b-versatile',
+    'llama-3.1-8b-instant',
+    'llama3-70b-8192',
+    'llama3-8b-8192',
+  ];
 
   static const String _endpoint =
       'https://api.groq.com/openai/v1/chat/completions';
@@ -215,8 +229,8 @@ class GroqChatRepository implements ChatRepository {
     final requestBody = jsonEncode({
       'model': effectiveModel,
       'messages': messages,
-      'temperature': 0.7,
-      'max_tokens': 1024,
+      'temperature': 0.2,
+      'max_tokens': 600,
     });
 
     final client = httpClient ?? HttpClient();
@@ -257,20 +271,24 @@ class GroqChatRepository implements ChatRepository {
       if (response.statusCode == 404) {
         final availableModels = await _fetchAvailableModels(client, cleanKey);
         debugPrint('Groq Available Models: $availableModels');
-        if (overrideModelName == null &&
-            availableModels.isNotEmpty &&
-            !availableModels.contains(modelName)) {
-          final fallbackModel = availableModels.first;
-          debugPrint('Otomatis mencoba model fallback: $fallbackModel');
+
+        // Cari kandidat model yang teruji dan tersedia di akun
+        final safeFallback = _preferredModels.firstWhere(
+          (m) => availableModels.contains(m) && m != effectiveModel,
+          orElse: () => '',
+        );
+
+        if (overrideModelName == null && safeFallback.isNotEmpty) {
+          debugPrint('Otomatis mencoba model fallback yang aman: $safeFallback');
           return await sendMessage(
             systemInstruction: systemInstruction,
             history: history,
             userMessage: userMessage,
-            overrideModelName: fallbackModel,
+            overrideModelName: safeFallback,
           );
         }
         throw ChatException(
-          'Model ($effectiveModel) tidak ditemukan. Model yang tersedia di akun Groq Anda: ${availableModels.join(', ')}',
+          'Model ($effectiveModel) tidak dapat diakses saat ini. Silakan periksa koneksi dan coba beberapa saat lagi.',
         );
       }
 
