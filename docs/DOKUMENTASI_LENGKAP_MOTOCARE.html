@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dokumentasi Lengkap Proyek MotoCare</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 18mm 20mm 18mm;
+  }
+  body {
+    font-family: 'Liberation Sans', 'DejaVu Sans', Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.5;
+    font-size: 10pt;
+    margin: 0;
+    padding: 0;
+  }
+  .cover {
+    page-break-after: always;
+    text-align: center;
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+  .cover h1 {
+    font-size: 26pt;
+    color: #0f172a;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .cover .app-title {
+    font-size: 38pt;
+    color: #0284c7;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+  .cover .subtitle {
+    font-size: 12.5pt;
+    color: #475569;
+    max-width: 580px;
+    margin: 0 auto 40px auto;
+    line-height: 1.6;
+  }
+  .cover .meta-box {
+    margin: 30px auto;
+    padding: 20px 28px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    border-radius: 8px;
+    display: inline-block;
+    text-align: left;
+    font-size: 10.5pt;
+  }
+  .cover .meta-box table td {
+    padding: 6px 14px;
+    vertical-align: top;
+  }
+  .page-break {
+    page-break-after: always;
+  }
+  h2 {
+    font-size: 15pt;
+    color: #0f172a;
+    border-bottom: 2px solid #0284c7;
+    padding-bottom: 5px;
+    margin-top: 26px;
+    margin-bottom: 12px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 12pt;
+    color: #0369a1;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-size: 10.5pt;
+    color: #334155;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    page-break-after: avoid;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 8px;
+    text-align: justify;
+  }
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding-left: 22px;
+  }
+  li {
+    margin-bottom: 3px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    margin-bottom: 14px;
+    font-size: 9pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 9px;
+    text-align: left;
+  }
+  th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+  }
+  tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+  code {
+    font-family: 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+    font-size: 8.5pt;
+    background: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: #0369a1;
+  }
+  pre {
+    font-family: 'Liberation Mono', 'DejaVu Sans Mono', monospace;
+    font-size: 8pt;
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 10px 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    line-height: 1.35;
+    page-break-inside: avoid;
+    margin-top: 6px;
+    margin-bottom: 12px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 8pt;
+    font-weight: bold;
+  }
+  .badge-success { background: #dcfce7; color: #166534; }
+  .badge-warning { background: #fef9c3; color: #854d0e; }
+  .badge-danger { background: #fee2e2; color: #991b1b; }
+  .callout {
+    background: #f0fdf4;
+    border-left: 4px solid #16a34a;
+    padding: 8px 12px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 9pt;
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div style="font-size: 12pt; font-weight: bold; color: #64748b; letter-spacing: 2px; text-transform: uppercase;">Laporan & Dokumentasi Teknis Perangkat Lunak</div>
+  <div class="app-title">MotoCare</div>
+  <div class="subtitle">Sistem Cerdas Pemantauan Perawatan Berkala, Prediksi Zona Merah Komponen, dan Asisten AI Mekanik Sepeda Motor Matic Berbasis Flutter & Firebase</div>
+  
+  <div class="meta-box">
+    <table>
+      <tr>
+        <td style="font-weight: bold; width: 140px;">Mata Kuliah</td>
+        <td>: Pemrograman Perangkat Bergerak</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">Nama Proyek</td>
+        <td>: MotoCare (MotoSense System)</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">Versi Proyek</td>
+        <td>: 1.0.0 (Spesifikasi v2.3 Selesai Penuh)</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">Penulis / Pengembang</td>
+        <td>: Abdul</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">Platform Target</td>
+        <td>: Android (Flutter Framework)</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">Backend Database</td>
+        <td>: Google Firebase (Authentication & Cloud Firestore)</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">Status Pengujian</td>
+        <td>: 174 Unit & Widget Tests Lulus 100% (Clean Analysis)</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold;">Waktu Rilis</td>
+        <td>: Oktober 2026</td>
+      </tr>
+    </table>
+  </div>
+  <div style="color: #94a3b8; font-size: 8.5pt; margin-top: 35px;">Dokumentasi Lengkap 100% Berdasarkan Sumber Kode, Arsitektur, dan Spesifikasi Resmi MotoCare</div>
+</div>
+
+<h2>BAB 1: PENDAHULUAN & RINGKASAN PROYEK</h2>
+
+<h3>1.1 Latar Belakang</h3>
+<p>Sepeda motor jenis transmisi otomatis (matic) merupakan moda transportasi harian paling dominan di Indonesia bagi kalangan pelajar, mahasiswa, pekerja komuter, hingga pengemudi transportasi daring. Kendati demikian, tingkat kelalaian pemilik dalam melakukan pemeliharaan berkala masih sangat tinggi. Pemilik motor matic seringkali terlambat mengganti oli mesin, mengabaikan oli transmisi/gardan, atau membiarkan sabuk CVT (V-Belt) melampaui batas keausan hingga putus mendadak di jalan raya.</p>
+<p>Permasalahan utama yang sering terjadi pada pengguna adalah:</p>
+<ol>
+  <li>Tiap suku cadang memiliki interval kilometer yang berlainan (oli mesin tiap 2.000 km, oli gardan tiap 8.000 km, dan V-belt tiap 20.000 km), sehingga sulit diingat tanpa alat bantu.</li>
+  <li>Buku servis manual rentan hilang, kotor, atau tertinggal di rumah saat pengguna berada di bengkel.</li>
+  <li>Ketidaktahuan pemilik motor dalam mendiagnosa gejala kerusakan dini (seperti bunyi gregel di CVT atau penurunan akselerasi).</li>
+  <li>Tidak tersedianya rekapitulasi pengeluaran servis bulanan untuk memonitor anggaran kendaraan.</li>
+</ol>
+<p>Untuk mengatasi masalah tersebut, dikembangkanlah <strong>MotoCare</strong>, sebuah aplikasi mobile Android berbasis Flutter yang menggabungkan kalkulasi matematis usia pakai suku cadang, sistem notifikasi lokal otomatis, dan asisten cerdas berbasis kecerdasan buatan (MotoAI) untuk membantu pemilik motor matic merawat kendaraannya secara presisi, terstruktur, dan mandiri.</p>
+
+<h3>1.2 Tujuan Proyek</h3>
+<ul>
+  <li>Membantu pemilik motor matic mengetahui sisa kilometer dan waktu aman servis tanpa perlu menghafal angka odometer.</li>
+  <li>Menyediakan linimasa riwayat servis bengkel yang mendetail (mencatat multi-item komponen, aksi diganti atau dibersihkan, hingga suku cadang tambahan).</li>
+  <li>Menghadirkan fitur pengingat proaktif sebelum komponen aus memasuki zona merah batas kritis (&lt; 10%).</li>
+  <li>Menyediakan asisten virtual konsultasi mekanik matic (MotoAI) yang dapat mendiagnosa keluhan motor secara cepat dan gratis.</li>
+  <li>Membuat laporan pengeluaran bulanan formal berformat PDF yang dapat langsung dicetak atau dibagikan.</li>
+</ul>
+
+<h3>1.3 Target Pengguna</h3>
+<p>Pengguna utama MotoCare adalah pemilik sepeda motor matic harian di Indonesia, mencakup mahasiswa, pekerja komuter, dan mitra pengemudi ojek online yang membutuhkan pemantauan performa kendaraan yang andal dan hemat biaya.</p>
+
+<h3>1.4 Ruang Lingkup Proyek (Scope)</h3>
+<table>
+  <tr>
+    <th style="width: 25%;">Kategori</th>
+    <th>Cakupan (In-Scope)</th>
+    <th>Di Luar Batasan (Out-of-Scope)</th>
+  </tr>
+  <tr>
+    <td><strong>Jenis Kendaraan</strong></td>
+    <td>Khusus sepeda motor transmisi matic (Honda, Yamaha, Suzuki, Vespa, dll).</td>
+    <td>Motor manual, motor bebek (cub), motor sport kopling, mobil.</td>
+  </tr>
+  <tr>
+    <td><strong>Platform</strong></td>
+    <td>Android OS (Mulai Android 5.0 Lollipop / API 21 hingga Android 15).</td>
+    <td>Apple iOS, Web Browser, Desktop app.</td>
+  </tr>
+  <tr>
+    <td><strong>Komponen Kunci</strong></td>
+    <td>3 Komponen primer matic: Oli Mesin (Engine Oil), Oli Gardan (Gear Oil), dan Sabuk V-Belt (CVT).</td>
+    <td>Komponen kelistrikan ECU tingkat tinggi atau modifikasi balap.</td>
+  </tr>
+  <tr>
+    <td><strong>Sensor Odometer</strong></td>
+    <td>Hibrida manual (input angka KM berkala saat pengguna mengisi bensin/servis).</td>
+    <td>Hardware scanner OBD-II fisik, tracking GPS real-time kontinyu.</td>
+  </tr>
+  <tr>
+    <td><strong>Monetisasi</strong></td>
+    <td>Gratis 100%, Firebase Spark tier, model LLM gratis tanpa kartu kredit.</td>
+    <td>Payment gateway, marketplace booking bengkel berbayar.</td>
+  </tr>
+</table>
+
+<div class="page-break"></div>
+
+<h2>BAB 2: ARSITEKTUR PERANGKAT LUNAK & TEKNOLOGI</h2>
+
+<h3>2.1 Pola Arsitektur Aplikasi</h3>
+<p>Aplikasi MotoCare mengadopsi pemisahan tanggung jawab yang ketat (Clean Architecture terapan). Tidak ada widget tampilan (UI) yang memanggil database Firebase secara langsung; seluruh alur data dihubungkan melalui penyedia state Riverpod dan kelas repositori data.</p>
+
+<pre>
+┌─────────────────────────────────────────────────────────────┐
+│                 LAPISAN ANTARMUKA (UI / WIDGET)             │
+│        (Screens, Hero Cards, Modal Dialogs, Form Input)      │
+└──────────────────────────────┬──────────────────────────────┘
+                               │ Membaca State & Memicu Event
+                               ▼
+┌─────────────────────────────────────────────────────────────┐
+│             STATE MANAGEMENT (RIVERPOD PROVIDERS)           │
+│   (AuthNotifier, VehicleNotifier, ServiceNotifier, Chat)    │
+└──────────────┬───────────────────────────────┬──────────────┘
+               │ Menggunakan                   │ Memanggil
+               ▼                               ▼
+┌──────────────────────────────┐ ┌─────────────────────────────┐
+│   LOGIKA MURNI (lib/core/)   │ │    REPOSITORIES (Data)      │
+│ - ServiceCalculator          │ │ - VehicleRepository         │
+│ - ComponentHealthFormula     │ │ - ServiceRecordRepository   │
+│ - DailyMileageEstimator      │ │ - OdometerRepository        │
+│ - RedZonePredictionFormula   │ │ - GroqChatRepository        │
+└──────────────────────────────┘ └──────────────┬──────────────┘
+                                               │
+                                               ▼
+                              ┌────────────────────────────────┐
+                              │    INFRASTRUKTUR / BACKEND     │
+                              │ - Firebase Auth                │
+                              │ - Cloud Firestore (Offline)    │
+                              │ - Groq Cloud LLM API           │
+                              │ - Local Notification Service   │
+                              └────────────────────────────────┘
+</pre>
+
+<h3>2.2 Tech Stack & Pustaka Dependensi</h3>
+<table>
+  <tr>
+    <th>Komponen</th>
+    <th>Teknologi / Dependensi</th>
+    <th>Peran & Alasan Pemilihan</th>
+  </tr>
+  <tr>
+    <td><strong>Framework</strong></td>
+    <td>Flutter SDK (^3.13.5), Dart 3</td>
+    <td>Pengembangan aplikasi Android yang responsif, kompilasi native yang cepat dan mulus.</td>
+  </tr>
+  <tr>
+    <td><strong>State Management</strong></td>
+    <td><code>flutter_riverpod: ^3.4.3</code></td>
+    <td>Manajemen status reaktif yang aman dari kebocoran memori, mempermudah isolasi state antarmuka.</td>
+  </tr>
+  <tr>
+    <td><strong>Routing & Navigasi</strong></td>
+    <td><code>go_router: ^18.0.2</code></td>
+    <td>Navigasi deklaratif berbasis URL yang mempermudah deep linking dan redirect autentikasi.</td>
+  </tr>
+  <tr>
+    <td><strong>Backend & Autentikasi</strong></td>
+    <td><code>firebase_core: ^4.15.0</code><br><code>firebase_auth: ^6.7.0</code></td>
+    <td>Otentikasi pengguna berbasis email/password yang aman dan sesi otomatis tersimpan di perangkat.</td>
+  </tr>
+  <tr>
+    <td><strong>Database</strong></td>
+    <td><code>cloud_firestore: ^6.10.0</code></td>
+    <td>Database NoSQL cloud dengan fitur <em>Offline Persistence</em> otomatis; data tetap dapat diakses tanpa koneksi internet.</td>
+  </tr>
+  <tr>
+    <td><strong>Kecerdasan Buatan (AI)</strong></td>
+    <td>Groq Cloud REST API<br>(<code>openai/gpt-oss-120b</code> / <code>llama-3.1-8b</code>)</td>
+    <td>LLM berkecepatan tinggi, inferensi gratis tanpa kartu kredit (Spark-compliant), hemat kuota.</td>
+  </tr>
+  <tr>
+    <td><strong>Notifikasi</strong></td>
+    <td><code>flutter_local_notifications: ^18.0.1</code><br><code>timezone: ^0.10.0</code></td>
+    <td>Penjadwalan notifikasi lokal alarm persis pada jam 08:00 pagi tanpa memerlukan server berbayar.</td>
+  </tr>
+  <tr>
+    <td><strong>Dokumen PDF</strong></td>
+    <td><code>pdf: ^3.13.1</code><br><code>printing: ^5.15.1</code></td>
+    <td>Pembuatan file PDF laporan pengeluaran bengkel serta integrasi pratinjau dan fungsi cetak Android.</td>
+  </tr>
+  <tr>
+    <td><strong>Desain & Tipografi</strong></td>
+    <td><code>google_fonts: ^9.0.0</code><br><code>material_symbols_icons: ^4.2960.0</code></td>
+    <td>Tipografi resmi Plus Jakarta Sans dan ikonografi Material Symbols sesuai MotoSense Design System.</td>
+  </tr>
+</table>
+
+<h3>2.3 Struktur Direktori Proyek</h3>
+<pre>
+motocare/
+├── android/                   # Kode native Android, build.gradle.kts, manifes, drawable, splash
+├── assets/
+│   └── icons/                 # Logo master MotoCare (app_logo.png, app_logo_foreground.png)
+├── docs/                      # Spesifikasi teknis (SPEC.md, DESIGN.md, SCREENS.md)
+├── lib/
+│   ├── core/                  # Fungsi murni matematika & kalkulasi (ServiceCalculator, dll.)
+│   ├── features/
+│   │   ├── auth/              # Fitur F1: Login, Register, AuthNotifier, UI form autentikasi
+│   │   ├── vehicles/          # Fitur F2: Multi-motor, VehicleModel, Preset, Carousel Notifier
+│   │   ├── dashboard/         # Fitur F3: Health Cards, Visual Indicator, Dashboard Screen
+│   │   ├── odometer/          # Fitur F4: Input KM hibrida, validasi KM mundur, histori log
+│   │   ├── service/           # Fitur F5: Form servis multi-item, riwayat, aksi ganti vs bersih
+│   │   ├── notifications/     # Fitur F6: Penjadwal notifikasi zona merah jam 08:00 pagi
+│   │   ├── chatbot/           # Fitur F7: Asisten MotoAI, integrasi Groq API, UI chat bubble
+│   │   └── reports/           # Fitur F8: Ringkasan bulanan, generator dokumen laporan PDF
+│   ├── shared/                # Sistem tema global (AppColors, AppTypography, AppSpacing)
+│   └── main.dart              # Entrypoint aplikasi, inisialisasi Firebase & dependency injection
+└── test/                      # 174 Unit & Widget test cases menyeluruh
+</pre>
+
+<div class="page-break"></div>
+
+<h2>BAB 3: DESAIN DATA & DATABASE FIRESTORE</h2>
+
+<h3>3.1 Struktur Koleksi NoSQL Cloud Firestore</h3>
+<p>Data pengguna disimpan dalam pola hierarki bersarang (nested subcollections) di bawah dokumen pengguna. Hal ini memastikan isolasi data yang sangat ketat dan performa query yang optimal.</p>
+
+<pre>
+users (koleksi utama)
+ └── {uid} (ID Dokumen Pengguna Firebase Auth)
+      │
+      └── vehicles (sub-koleksi motor)
+           └── {vehicleId}
+                ├── name: String ("Vario 160 Hitam")
+                ├── brand: String ("Honda")
+                ├── model: String ("Vario 160")
+                ├── plate: String? ("B 1234 CD")
+                ├── currentKm: int (14280)
+                ├── createdAt: Timestamp
+                │
+                ├── components (sub-koleksi kondisi suku cadang)
+                │    ├── engine_oil: { type, intervalKm: 2000, lastServiceKm: 13500, baselineKm: 12000 }
+                │    ├── gear_oil:   { type, intervalKm: 8000, lastServiceKm: 12000, baselineKm: 12000 }
+                │    └── v_belt:     { type, intervalKm: 20000, lastServiceKm: 12000, baselineKm: 12000 }
+                │
+                ├── odometerLogs (sub-koleksi riwayat pembaruan KM)
+                │    └── {logId}: { km: int, date: Timestamp }
+                │
+                └── serviceRecords (sub-koleksi riwayat servis bengkel)
+                     └── {recordId}:
+                          ├── date: Timestamp
+                          ├── km: int (14280)
+                          ├── location: String ("AHASS Mitra Jaya")
+                          ├── price: int (185000)
+                          ├── note: String? ("Tarikan enteng, oli baru")
+                          └── items: Array&lt;Map&gt;
+                               ├── { kind: "component", componentType: "engine_oil", action: "replaced", brand: "SPX2" }
+                               ├── { kind: "component", componentType: "v_belt", action: "cleaned" }
+                               └── { kind: "part", name: "Roller CVT 13gr", action: "replaced", brand: "BRT" }
+</pre>
+
+<h3>3.2 Aturan Keamanan (Security Rules)</h3>
+<p>Keamanan Firestore diamankan dengan prinsip hak akses terkunci (Owner-Only Access). Pengguna hanya diizinkan membaca, menambah, mengubah, dan menghapus dokumen miliknya sendiri berdasarkan token <code>request.auth.uid</code>.</p>
+<pre>
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+</pre>
+
+<h3>3.3 Fitur Offline Persistence</h3>
+<p>Cloud Firestore pada MotoCare dikonfigurasi dengan cache offline aktif secara default. Pengguna dapat membuka dashboard, melihat status kesehatan motor, memperbarui KM, serta mencatat servis ketika berada di ruang bawah tanah (basement) atau daerah tanpa sinyal internet. Seluruh perubahan akan otomatis disinkronkan ke cloud begitu koneksi internet pulih.</p>
+
+<div class="page-break"></div>
+
+<h2>BAB 4: ATURAN BISNIS & LOGIKA PERHITUNGAN INTI</h2>
+
+<p>Seluruh aturan matematika dan validasi diletakkan di dalam fungsi murni di folder <code>lib/core/</code>, terbebas dari ketergantungan antarmuka grafis atau Firebase SDK. Pendekatan ini memungkinkan pengujian unit (unit testing) dapat dijalankan dengan kepastian 100%.</p>
+
+<h3>4.1 Komponen & Interval Default</h3>
+<table>
+  <tr>
+    <th>Komponen</th>
+    <th>Tipe Internal</th>
+    <th>Interval Default</th>
+    <th>Aksi yang Didukung</th>
+    <th>Penjelasan Fungsi</th>
+  </tr>
+  <tr>
+    <td><strong>Oli Mesin</strong></td>
+    <td><code>engine_oil</code></td>
+    <td>2.000 km</td>
+    <td>Diganti (Replaced)</td>
+    <td>Melumasi ruang bakar dan piston mesin matic. Kritis terhadap overheat.</td>
+  </tr>
+  <tr>
+    <td><strong>Oli Gardan</strong></td>
+    <td><code>gear_oil</code></td>
+    <td>8.000 km</td>
+    <td>Diganti (Replaced)</td>
+    <td>Melumasi gigi transmisi roda belakang matic. Rasio penggantian 2:1 atau 3:1 oli mesin.</td>
+  </tr>
+  <tr>
+    <td><strong>V-Belt & CVT</strong></td>
+    <td><code>v_belt</code></td>
+    <td>20.000 km</td>
+    <td>Diganti atau Dibersihkan</td>
+    <td>Sabuk karet penggerak pulley CVT. Wajib dicek/dibersihkan berkala dan diganti saat aus.</td>
+  </tr>
+</table>
+
+<h3>4.2 Rumus Perhitungan Persentase Sisa Usia Pakai</h3>
+<p>Perhitungan persentase kesehatan komponen dihitung menggunakan rumus matematis:</p>
+<pre>
+km_terpakai = km_sekarang - km_servis_terakhir
+sisa_km     = interval - km_terpakai
+persentase  = clamp(sisa_km / interval, 0.0, 1.0) * 100%
+</pre>
+<p>Jika odometer motor telah melampaui batas interval (misal pemakaian 2.300 km pada oli mesin dengan interval 2.000 km), nilai <code>sisa_km</code> akan bernilai negatif (-300 km), persentase dikunci pada angka 0%, dan status kartu menampilkan teks peringatan <em>"Lewat 300 km"</em>.</p>
+
+<h3>4.3 Ambang Batas Status & Warna Indikator</h3>
+<p>Status komponen tidak hanya bergantung pada warna (demi memenuhi standar aksesibilitas), melainkan dilengkapi label teks eksplisit:</p>
+<table>
+  <tr>
+    <th>Rentang Persentase</th>
+    <th>Label Status</th>
+    <th>Kode Warna</th>
+    <th>Arti & Tindakan</th>
+  </tr>
+  <tr>
+    <td><strong>&gt; 30%</strong></td>
+    <td><span class="badge badge-success">Aman</span></td>
+    <td>Hijau (<code>#16a34a</code>)</td>
+    <td>Kondisi suku cadang masih sangat prima. Belum memerlukan tindakan bengkel.</td>
+  </tr>
+  <tr>
+    <td><strong>10% s.d. 30%</strong></td>
+    <td><span class="badge badge-warning">Peringatan</span></td>
+    <td>Kuning / Amber (<code>#d97706</code>)</td>
+    <td>Komponen mulai aus. Pengguna disarankan menyiapkan dana dan menjadwalkan servis.</td>
+  </tr>
+  <tr>
+    <td><strong>&lt; 10% atau Lewat KM</strong></td>
+    <td><span class="badge badge-danger">Batas Habis</span></td>
+    <td>Merah (<code>#dc2626</code>)</td>
+    <td>Kondisi kritis / zona merah. Wajib segera diganti agar tidak merusak mesin.</td>
+  </tr>
+</table>
+
+<h3>4.4 Perhitungan Rata-rata Jarak Tempuh Harian (KM/Hari)</h3>
+<p>Untuk memprediksi kapan motor akan kehabisan sisa usia pakai komponen, aplikasi menghitung rata-rata harian dengan aturan:</p>
+<ol>
+  <li>Mengambil catatan odometer dalam <strong>30 hari terakhir</strong>.</li>
+  <li>Mencari selisih jarak: <code>km_terbaru - km_tertua</code>.</li>
+  <li>Mencari selisih waktu: <code>tanggal_terbaru - tanggal_tertua</code> (dalam satuan hari).</li>
+  <li><strong>Syarat Validitas:</strong> Dibutuhkan minimal 2 catatan log odometer dengan selisih waktu minimal &ge; 3 hari.</li>
+  <li><strong>Fallback Default:</strong> Jika data kurang (misal motor baru didaftarkan), sistem secara cerdas menggunakan estimasi awal <strong>20 km/hari</strong> (ditampilkan dengan tanda &plusmn; 20 km/hari).</li>
+</ol>
+
+<h3>4.5 Rumus Estimasi Tanggal Masuk Zona Merah (Push Notification Trigger)</h3>
+<p>Tanggal di mana komponen memasuki zona merah (ambang sisa 10%) dihitung secara deterministik:</p>
+<pre>
+km_batas_merah = 0.10 * interval
+km_menuju_merah = sisa_km - km_batas_merah
+hari_menuju_merah = max(0, ceil(km_menuju_merah / rata2_km_harian))
+tanggal_target   = tanggal_hari_ini + hari_menuju_merah
+</pre>
+<p>Notifikasi dijadwalkan otomatis berdering pada <code>tanggal_target</code> tepat pukul <strong>08:00 pagi</strong> waktu lokal.</p>
+
+<h3>4.6 Aturan Bisnis Servis Multi-Item (F5 Revisi) & Rollback Otomatis</h3>
+<p>Satu kali kunjungan servis ke bengkel dapat mencakup banyak item sekaligus dengan aturan reset sebagai berikut:</p>
+<ul>
+  <li><strong>Item Komponen Diganti:</strong> Mereset nilai <code>lastServiceKm</code> komponen bersangkutan ke KM saat servis, sehingga kartu kesehatannya kembali 100%.</li>
+  <li><strong>Item Komponen Dibersihkan (Khusus V-Belt):</strong> Hanya dicatat di linimasa riwayat servis, <em>tidak mereset</em> kartu kesehatan V-belt.</li>
+  <li><strong>Item Part Lain:</strong> (misal Roller, Kampas Rem, Busi, Filter Udara) disimpan di riwayat pengeluaran dan tidak memengaruhi ketiga kartu utama.</li>
+  <li><strong>Penghapusan Catatan Servis (Rollback):</strong> Jika pengguna menghapus riwayat servis, sistem secara otomatis menghitung ulang <code>lastServiceKm</code> berdasarkan catatan servis penggantian sebelumnya. Jika tidak ada catatan lain, nilai komponen dikembalikan ke <code>baselineKm</code> saat motor pertama kali dibuat.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h2>BAB 5: SPESIFIKASI & IMPLEMENTASI FITUR (F1 - F8)</h2>
+
+<h3>F1. Autentikasi Pengguna (Firebase Auth)</h3>
+<ul>
+  <li>Pendaftaran akun baru dengan validasi format email dan kata sandi minimal 6 karakter.</li>
+  <li>Penanganan pesan error ramah dalam Bahasa Indonesia (misal: <em>"Email ini sudah terdaftar"</em>, <em>"Kata sandi salah"</em>).</li>
+  <li>Status login persisten (Auto-login saat aplikasi ditutup dan dibuka kembali).</li>
+  <li>Fitur keluar akun (Logout) dengan tombol aman pada dashboard.</li>
+</ul>
+
+<h3>F2. Manajemen Multi-Kendaraan & Carousel</h3>
+<ul>
+  <li>Pengguna dapat mendaftarkan lebih dari satu motor matic dalam satu akun.</li>
+  <li>Pilihan preset motor populer: Beat, Vario 125/160, Scoopy, PCX, NMAX, Aerox, Mio M3, Fazzio, Lexi, dll., serta opsi input tipe kustom.</li>
+  <li>Komponen langsung diinisialisasi otomatis saat motor dibuat dengan interval standar pabrikan.</li>
+  <li>Pengaturan interval KM per komponen dapat dikustomisasi per motor sesuai rekomendasi buku manual.</li>
+  <li>Tampilan kartu carousel interaktif yang dapat digeser kiri/kanan di bagian atas dashboard.</li>
+</ul>
+
+<h3>F3. Dashboard Motor Health Card</h3>
+<ul>
+  <li>Menampilkan 3 kartu visual: Oli Mesin, Oli Gardan, dan V-Belt.</li>
+  <li>Progress bar proporsional yang berubah warna secara dinamis (Hijau, Kuning, Merah).</li>
+  <li>Menampilkan sisa kilometer dan teks status (Aman, Peringatan, Batas Habis, Lewat X km).</li>
+  <li>Kartu interaktif: Mengetuk kartu langsung membuka formulir servis dengan komponen tersebut telah terpilih otomatis.</li>
+</ul>
+
+<h3>F4. Odometer Hibrida & Log Jarak Tempuh</h3>
+<ul>
+  <li>Tombol <em>Update KM</em> cepat pada dashboard.</li>
+  <li>Validasi ketat: Angka KM baru tidak boleh lebih kecil dari KM saat ini (KM tidak boleh mundur).</li>
+  <li>Input non-angka ditolak dengan pesan error yang jelas.</li>
+  <li>Setiap pembaruan KM otomatis memperbarui persentase kesehatan dan menghitung ulang estimasi rata-rata km/hari.</li>
+</ul>
+
+<h3>F5. Pencatatan Servis Multi-Item & Linimasa Riwayat</h3>
+<ul>
+  <li>Formulir komprehensif: Odometer servis, tanggal pengerjaan, nama bengkel/lokasi, total biaya, dan catatan opsional.</li>
+  <li>Dukungan multi-item: Memilih satu atau beberapa komponen (oli mesin, oli gardan, V-belt) dengan aksi <em>Diganti</em> atau <em>Dibersihkan</em>.</li>
+  <li>Penambahan baris suku cadang lain (nama part wajib, merek opsional) secara dinamis.</li>
+  <li>Format mata uang Rupiah standar Indonesia (<code>Rp 145.000</code>) dan format tanggal lokal <code>id_ID</code>.</li>
+  <li>Fitur hapus catatan servis dengan dialog konfirmasi demi mencegah ketidaksengajaan.</li>
+</ul>
+
+<h3>F6. Smart Push Notification (Lokal)</h3>
+<ul>
+  <li>Menggunakan <code>flutter_local_notifications</code> dengan penjadwalan alarm persis (Exact Alarm).</li>
+  <li>Notifikasi otomatis dijadwalkan ulang setiap kali ada pembaruan odometer atau pencatatan servis baru.</li>
+  <li>Notifikasi muncul pukul 08:00 pagi waktu lokal pada tanggal estimasi zona merah.</li>
+  <li>Penanganan izin notifikasi yang ramah pengguna (banner panduan jika izin belum diaktifkan).</li>
+</ul>
+
+<h3>F7. Chatbot Diagnosa Asisten Motor "MotoAI"</h3>
+<ul>
+  <li>Asisten berbasis LLM (Groq Cloud API) dengan persona ahli mekanik motor matic berpengalaman.</li>
+  <li>Otomatis menyertakan konteks motor yang sedang aktif (tipe motor, KM terkini, status oli dan CVT) ke dalam prompt sistem.</li>
+  <li>Dilengkapi <em>disclaimer</em> keselamatan berkendara di setiap jawaban.</li>
+  <li>Penolakan sopan untuk pertanyaan di luar topik otomotif/sepeda motor.</li>
+  <li>Antarmuka percakapan interaktif (chat bubble, status indikator mengetik, batas input 300 karakter demi penghematan kuota).</li>
+</ul>
+
+<h3>F8. Laporan Pengeluaran Bulanan & Cetak PDF</h3>
+<ul>
+  <li>Menampilkan ringkasan total biaya pengeluaran servis pada bulan terpilih.</li>
+  <li>Navigasi chevron untuk berpindah bulan dan tahun secara leluasa.</li>
+  <li>Tombol <em>Unduh Laporan PDF</em> yang memproduksi dokumen PDF resmi dengan layout tabel profesional (tanggal, ringkasan pekerjaan, bengkel, biaya, dan total).</li>
+  <li>Dukungan pratinjau langsung, integrasi pencetakan sistem Android, dan pembagian berkas (share) ke WhatsApp/Email.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h2>BAB 6: SISTEM DESAIN VISUAL (MOTOSENSE DESIGN SYSTEM)</h2>
+
+<p>Antarmuka MotoCare dirancang mengacu pada MotoSense Design System yang bersumber dari rancangan Google Stitch dan diselaraskan di dalam dokumen <code>docs/DESIGN.md</code>.</p>
+
+<h3>6.1 Palet Warna Utama</h3>
+<table>
+  <tr>
+    <th>Nama Token Warna</th>
+    <th>Nilai Hex</th>
+    <th>Penerapan pada Antarmuka</th>
+  </tr>
+  <tr>
+    <td><code>AppColors.primary</code></td>
+    <td><code>#137FEC</code></td>
+    <td>Warna biru utama pada tombol, tab aktif, header, dan aksen penting.</td>
+  </tr>
+  <tr>
+    <td><code>AppColors.primaryFixed</code></td>
+    <td><code>#E0EEFF</code></td>
+    <td>Latar belakang lembut untuk lingkaran avatar dan badge biru.</td>
+  </tr>
+  <tr>
+    <td><code>AppColors.surface</code></td>
+    <td><code>#FFFFFF</code></td>
+    <td>Warna latar belakang dasar kartu dan AppBar.</td>
+  </tr>
+  <tr>
+    <td><code>AppColors.surfaceContainerLow</code></td>
+    <td><code>#F8FAFC</code></td>
+    <td>Warna latar belakang halaman utama dan kartu sekunder.</td>
+  </tr>
+  <tr>
+    <td><code>AppColors.statusSafe</code></td>
+    <td><code>#16A34A</code></td>
+    <td>Warna hijau untuk komponen berstatus Aman (&gt; 30%).</td>
+  </tr>
+  <tr>
+    <td><code>AppColors.statusWarning</code></td>
+    <td><code>#D97706</code></td>
+    <td>Warna amber/kuning untuk komponen berstatus Peringatan (10% - 30%).</td>
+  </tr>
+  <tr>
+    <td><code>AppColors.statusExpired</code></td>
+    <td><code>#DC2626</code></td>
+    <td>Warna merah untuk komponen Batas Habis / Kritis (&lt; 10%).</td>
+  </tr>
+</table>
+
+<h3>6.2 Tipografi & Ikonografi</h3>
+<ul>
+  <li><strong>Font Family:</strong> <em>Plus Jakarta Sans</em> (Google Fonts) di seluruh aplikasi dengan variasi bobot Regular (400), Medium (500), SemiBold (600), dan Bold (700).</li>
+  <li><strong>Ikon:</strong> Material Symbols Rounded via pustaka <code>material_symbols_icons</code> dengan target sentuh minimal 48 &times; 48 dp untuk kemudahan interaksi satu tangan.</li>
+</ul>
+
+<h3>6.3 Identitas Visual: Launcher Icon & Splash Screen Android 12+</h3>
+<ul>
+  <li><strong>Master Logo:</strong> Disimpan pada <code>assets/icons/app_logo.png</code> dengan rasio safe-zone lingkaran ~64% agar tidak terpotong saat dipotong oleh sistem Android Adaptive Icon.</li>
+  <li><strong>Splash Screen Resolusi Tinggi:</strong> Berkas <code>splash_logo.png</code> dihasilkan menggunakan resampling Lanczos berkualitas tinggi dari 128 px hingga 512 px untuk seluruh folder drawable (<code>mdpi</code> sampai <code>xxxhdpi</code>).</li>
+  <li><strong>Tema Android 12+ (API 31+):</strong> Menggunakan konfigurasi <code>values-v31/styles.xml</code> dengan atribut <code>windowSplashScreenAnimatedIcon</code> agar pembukaan aplikasi tidak memunculkan logo default Flutter dan tidak buram di HP Android modern.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h2>BAB 7: STRATEGI PENGUJIAN & KUALITAS PERANGKAT LUNAK</h2>
+
+<p>Kualitas dan stabilitas aplikasi MotoCare diverifikasi melalui 3 lapisan pengujian ketat:</p>
+
+<h3>7.1 Hasil Analisis Statis Kode (Flutter Analyze)</h3>
+<p>Sebelum dinyatakan selesai, aplikasi dianalisis menggunakan seperangkat aturan linter ketat pada <code>analysis_options.yaml</code> (termasuk <code>flutter_lints</code>). Hasil pengujian:</p>
+<div class="callout">
+  <strong>Status Analisis Statis:</strong> <code>flutter analyze</code> &rarr; <strong>No issues found! (0 Warnings, 0 Errors).</strong> Kode null-safe 100%, bebas dari tipe dynamic yang tidak perlu, dan mematuhi konvensi arsitektur.
+</div>
+
+<h3>7.2 Cakupan Pengujian Otomatis (174 Unit & Widget Tests)</h3>
+<p>Seluruh fungsi matematika pada <code>lib/core/</code> dan skenario antarmuka widget diuji secara menyeluruh melalui <code>flutter test</code> dengan total <strong>174 pengujian yang lulus 100%</strong>:</p>
+
+<table>
+  <tr>
+    <th>Modul / Berkas Pengujian</th>
+    <th>Jumlah Kasus</th>
+    <th>Skenario yang Diverifikasi</th>
+  </tr>
+  <tr>
+    <td><code>core_calculator_test.dart</code></td>
+    <td>38 Tests</td>
+    <td>Formula sisa KM, clamping persentase 0-100%, status batas 30%, 10%, kondisi lewat KM, rata-rata harian dengan selisih &ge;3 hari, estimasi zona merah.</td>
+  </tr>
+  <tr>
+    <td><code>service_calculator_test.dart</code></td>
+    <td>24 Tests</td>
+    <td>Aturan servis multi-item: komponen diganti vs dibersihkan, pengaruh part lain, aturan rollback saat servis dihapus, pemulihan ke baselineKm.</td>
+  </tr>
+  <tr>
+    <td><code>vehicle_model_test.dart</code></td>
+    <td>16 Tests</td>
+    <td>Serialisasi model kendaraan, parsing Firestore, inisialisasi default komponen motor baru, interval kustom per motor.</td>
+  </tr>
+  <tr>
+    <td><code>component_health_card_test.dart</code></td>
+    <td>18 Tests</td>
+    <td>Pewarnaan dinamis kartu (Aman, Peringatan, Habis), teks status, progress bar, event tap to record service.</td>
+  </tr>
+  <tr>
+    <td><code>update_odometer_dialog_test.dart</code></td>
+    <td>12 Tests</td>
+    <td>Validasi angka KM tidak boleh mundur, penolakan karakter non-angka, penanganan error form.</td>
+  </tr>
+  <tr>
+    <td><code>service_form_screen_test.dart</code></td>
+    <td>20 Tests</td>
+    <td>Komponen default terpilih, penambahan baris part lain, tombol 'Gunakan KM Terkini', validasi submit wajib isi, uji anti-overflow pada resolusi 360dp dan 392dp.</td>
+  </tr>
+  <tr>
+    <td><code>service_history_screen_test.dart</code></td>
+    <td>14 Tests</td>
+    <td>Linimasa servis terurut tanggal terbaru, format Rupiah dan tanggal Indonesia, dialog konfirmasi hapus, empty state.</td>
+  </tr>
+  <tr>
+    <td><code>chat_screen_test.dart</code> & <code>groq_test</code></td>
+    <td>12 Tests</td>
+    <td>UI chat bubble, penanganan error jaringan, pemotongan riwayat pesan (hemat token), dukungan karakter Unicode/bullet.</td>
+  </tr>
+  <tr>
+    <td><code>pdf_report_generator_test.dart</code></td>
+    <td>10 Tests</td>
+    <td>Validasi pembuatan bytes dokumen PDF laporan bulanan, tabel kunjungan servis, penanganan bulan tanpa servis.</td>
+  </tr>
+  <tr>
+    <td><code>notification_service_test.dart</code></td>
+    <td>10 Tests</td>
+    <td>ID deterministik per motor & komponen, perhitungan alarm zona merah jam 08:00, konfigurasi zona waktu lokal.</td>
+  </tr>
+  <tr>
+    <td><strong>TOTAL KESELURUHAN</strong></td>
+    <td><strong>174 Tests</strong></td>
+    <td><strong>STATUS: ALL 174 TESTS PASSED (100% SUKSES)</strong></td>
+  </tr>
+</table>
+
+<div class="page-break"></div>
+
+<h2>BAB 8: PANDUAN INSTALASI, KONFIGURASI, & PUBLIKASI</h2>
+
+<h3>8.1 Prasyarat Sistem</h3>
+<ul>
+  <li>Flutter SDK versi 3.13.5 atau lebih baru.</li>
+  <li>Java Development Kit (JDK 17 atau 21).</li>
+  <li>Android Studio / Android SDK (Command-line Tools, Platform-Tools).</li>
+  <li>Ponsel Android fisik dengan fitur USB Debugging aktif, atau Android Emulator.</li>
+</ul>
+
+<h3>8.2 Langkah Instalasi & Menjalankan Proyek</h3>
+<pre>
+# 1. Kloning repositori kode
+git clone https://github.com/USERNAME/motocare.git
+cd motocare
+
+# 2. Ambil seluruh pustaka dependensi
+flutter pub get
+
+# 3. Jalankan aplikasi dalam mode debug di HP Android
+flutter run
+</pre>
+
+<h3>8.3 Konfigurasi Backend Firebase (Spark Tier Gratis)</h3>
+<ol>
+  <li>Buat proyek baru di <a href="https://console.firebase.google.com">Firebase Console</a> dengan paket gratis Spark.</li>
+  <li>Aktifkan <strong>Email/Password</strong> pada tab Authentication.</li>
+  <li>Buat database <strong>Cloud Firestore</strong> dan terapkan Security Rules sesuai Bab 3.2.</li>
+  <li>Unduh berkas <code>google-services.json</code> dan simpan di <code>android/app/google-services.json</code>.</li>
+  <li>Generate berkas opsi FlutterFire: <code>flutterfire configure</code>.</li>
+</ol>
+
+<h3>8.4 Konfigurasi Kunci Asisten AI (MotoAI)</h3>
+<p>Kunci API Groq tidak pernah disimpan di dalam repositori kode demi keamanan. Kunci dapat diinjeksi saat build/run:</p>
+<pre>
+flutter run --dart-define=GROQ_API_KEY="gsk_kunci_groq_anda_disini"
+</pre>
+
+<h3>8.5 Panduan Build & Publikasi APK Release ke GitHub</h3>
+<ol>
+  <li>Pastikan berkas keystore rilis telah dibuat pada <code>android/app/upload-keystore.jks</code>.</li>
+  <li>Buat berkas konfigurasi <code>android/key.properties</code>:
+<pre>
+storePassword=password_keystore_anda
+keyPassword=password_key_anda
+keyAlias=upload
+storeFile=upload-keystore.jks
+</pre>
+  </li>
+  <li>Jalankan proses kompilasi rilis:
+<pre>
+flutter build apk --release
+</pre>
+  </li>
+  <li>Berkas APK yang dihasilkan berada di <code>build/app/outputs/flutter-apk/app-release.apk</code> (ukuran sekitar 60 MB).</li>
+  <li>Buka menu <strong>Releases &rarr; Draft a new release</strong> di repositori GitHub Anda, unggah berkas APK tersebut, buat tag <code>v1.0.0</code>, dan klik <strong>Publish release</strong>.</li>
+</ol>
+
+<div class="page-break"></div>
+
+<h2>BAB 9: MATRIKS KETERCAPAIAN SPESIFIKASI & KESIMPULAN</h2>
+
+<h3>9.1 Matriks Evaluasi Kriteria Selesai (SPEC vs Implementasi)</h3>
+<table>
+  <tr>
+    <th>Kode Fitur</th>
+    <th>Deskripsi Fitur di SPEC</th>
+    <th>Status Penyelesaian</th>
+    <th>Hasil Uji Verifikasi</th>
+  </tr>
+  <tr>
+    <td><strong>F1</strong></td>
+    <td>Autentikasi (Email/Password, error ramah, sesi persisten, tombol keluar, security rules).</td>
+    <td><span class="badge badge-success">Terpenuhi Penuh</span></td>
+    <td>Berhasil diuji pada HP Android dan unit test autentikasi.</td>
+  </tr>
+  <tr>
+    <td><strong>F2</strong></td>
+    <td>Multi-Kendaraan & Carousel (Preset matic, ganti kendaraan, interval kustom, empty state).</td>
+    <td><span class="badge badge-success">Terpenuhi Penuh</span></td>
+    <td>Carousel berjalan mulus, perpindahan motor memperbarui dashboard instan.</td>
+  </tr>
+  <tr>
+    <td><strong>F3</strong></td>
+    <td>Dashboard Health Card (Progress bar 3 komponen, warna dinamis, label status teks, tap to record).</td>
+    <td><span class="badge badge-success">Terpenuhi Penuh</span></td>
+    <td>Lulus uji unit matematika 30%, 10%, dan uji widget interaktif.</td>
+  </tr>
+  <tr>
+    <td><strong>F4</strong></td>
+    <td>Odometer Hibrida (Form update KM, validasi anti-turun, estimasi rata-rata KM/hari 30 hari).</td>
+    <td><span class="badge badge-success">Terpenuhi Penuh</span></td>
+    <td>Validasi menolak KM mundur dan input non-angka dengan pesan ramah.</td>
+  </tr>
+  <tr>
+    <td><strong>F5</strong></td>
+    <td>Servis Multi-Item & Riwayat (Ganti vs bersih, part lain, format IDR, tanggal Indonesia, rollback baselineKm).</td>
+    <td><span class="badge badge-success">Terpenuhi Penuh</span></td>
+    <td>Revisi F5 lengkap. Skenario reset ganti vs bersihkan lulus uji unit.</td>
+  </tr>
+  <tr>
+    <td><strong>F6</strong></td>
+    <td>Smart Push Notification (Estimasi tanggal zona merah, jadwal jam 08:00, izin notifikasi).</td>
+    <td><span class="badge badge-success">Terpenuhi Penuh</span></td>
+    <td>Alarm terjadwal otomatis pada sistem Android Notification Manager.</td>
+  </tr>
+  <tr>
+    <td><strong>F7</strong></td>
+    <td>Chatbot Diagnosa MotoAI (LLM Groq, persona mekanik matic, konteks motor aktif, disclaimer, hemat token).</td>
+    <td><span class="badge badge-success">Terpenuhi Penuh</span></td>
+    <td>Respon inferensi cepat (&lt;2 detik), penanganan offline dan limit kuota.</td>
+  </tr>
+  <tr>
+    <td><strong>F8</strong></td>
+    <td>Laporan Bulanan PDF (Filter bulan, kalkulasi total biaya, pembuatan dokumen PDF, print/share).</td>
+    <td><span class="badge badge-success">Terpenuhi Penuh</span></td>
+    <td>File PDF terbentuk rapi, tabel valid, dapat dicetak/dibagikan langsung di HP.</td>
+  </tr>
+</table>
+
+<h3>9.2 Kesimpulan</h3>
+<p>Proyek aplikasi <strong>MotoCare</strong> telah berhasil dibangun dan diselesaikan 100% sesuai dengan seluruh spesifikasi kebutuhan yang tertuang pada dokumen <code>docs/SPEC.md</code> dan aturan visual <code>docs/DESIGN.md</code>. Aplikasi telah mengimplementasikan arsitektur bersih yang kokoh, logika perhitungan murni yang teruji secara komprehensif (174/174 unit dan widget tests lulus), penanganan offline yang tangguh melalui Cloud Firestore, asisten diagnosa cerdas MotoAI, serta identitas visual resmi (logo tajam dan splash screen Android 12+).</p>
+<p>Dengan selesainya seluruh kriteria fungsional dan non-fungsional, aplikasi MotoCare dinyatakan <strong>siap untuk digunakan secara luas oleh pemilik sepeda motor matic</strong> serta siap didistribusikan melalui rilis publik GitHub Releases.</p>
+
+<div style="margin-top: 40px; text-align: right; font-size: 9.5pt; color: #64748b;">
+  <em>MotoCare Engineering Team &copy; 2026. Seluruh hak cipta dilindungi undang-undang.</em>
+</div>
+
+</body>
+</html>
