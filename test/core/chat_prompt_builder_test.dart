@@ -68,10 +68,11 @@ void main() {
         components: components,
       );
 
-      // Verifikasi peran
+      // Verifikasi peran & prinsip matic
       expect(instruction, contains('MotoAI'));
-      expect(instruction, contains('spesialis sepeda motor matic'));
-      expect(instruction, contains('mekanik bengkel matic profesional'));
+      expect(instruction, contains('mekanik ahli khusus sepeda motor matic'));
+      expect(instruction, contains('CVT (Continuous Variable Transmission)'));
+      expect(instruction, contains('TIDAK MEMILIKI: rantai roda'));
 
       // Verifikasi data motor aktif
       expect(instruction, contains('Vario Harian (Honda Vario 160)'));
@@ -84,7 +85,7 @@ void main() {
       expect(instruction, contains('Dugaan Penyebab'));
       expect(instruction, contains('Solusi / Cek Mandiri'));
       expect(instruction, contains('Saran Bengkel'));
-      expect(instruction, contains('TOLAK DENGAN RAMAH'));
+      expect(instruction, contains('tolak dengan ramah dan sopan'));
     });
 
     test('trimHistory mempertahankan seluruh pesan jika panjang <= 10', () {
