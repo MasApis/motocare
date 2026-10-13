@@ -223,9 +223,12 @@ class GroqChatRepository implements ChatRepository {
     try {
       final uri = Uri.parse(_endpoint);
       final request = await client.postUrl(uri);
-      request.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
+      request.headers.set(
+        HttpHeaders.contentTypeHeader,
+        'application/json; charset=utf-8',
+      );
       request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $cleanKey');
-      request.write(requestBody);
+      request.add(utf8.encode(requestBody));
 
       final response = await request.close();
       final responseBody = await response.transform(utf8.decoder).join();

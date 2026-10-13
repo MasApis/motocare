@@ -70,7 +70,8 @@ void main() {
 
       // Verifikasi peran
       expect(instruction, contains('MotoAI'));
-      expect(instruction, contains('ahli khusus sepeda motor matic'));
+      expect(instruction, contains('spesialis sepeda motor matic'));
+      expect(instruction, contains('mekanik bengkel matic profesional'));
 
       // Verifikasi data motor aktif
       expect(instruction, contains('Vario Harian (Honda Vario 160)'));
@@ -79,9 +80,11 @@ void main() {
       expect(instruction, contains('Oli Gardan'));
       expect(instruction, contains('V-Belt'));
 
-      // Verifikasi guardrail
+      // Verifikasi struktur diagnosa dan guardrail
+      expect(instruction, contains('Dugaan Penyebab'));
+      expect(instruction, contains('Solusi / Cek Mandiri'));
+      expect(instruction, contains('Saran Bengkel'));
       expect(instruction, contains('TOLAK DENGAN RAMAH'));
-      expect(instruction, contains('dugaan awal'));
     });
 
     test('trimHistory mempertahankan seluruh pesan jika panjang <= 10', () {
