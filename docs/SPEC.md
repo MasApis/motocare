@@ -136,7 +136,7 @@ users/{uid}
                         action: "replaced" | "cleaned", name (wajib jika kind = part), brand (opsional) }
 ```
 
-> Skema `serviceRecords` dan `baselineKm` di atas adalah target revisi F5 (DITUNDA, Tahap 7b). Sampai saat itu kode tetap memakai struktur lama (satu `componentType` per catatan).
+> Skema `serviceRecords` dan `baselineKm` di atas telah aktif dan diimplementasikan pada revisi F5.
 
 - Semua data berada di bawah `users/{uid}`; **security rules** hanya mengizinkan pemilik `uid` yang login membaca dan menulis datanya.
 - `price` disimpan sebagai bilangan bulat rupiah.
@@ -179,7 +179,7 @@ Fitur dianggap **selesai** jika semua kriterianya terpenuhi, test terkait lulus,
 - Rata-rata KM harian dihitung sesuai bagian 2.1 dan terlihat di layar (mis. "± 25 km/hari"), ada unit test untuk kasus data kurang.
 
 #### F5. Interactive Service Input dan Riwayat
-> **Status:** kriteria di bawah adalah target revisi (DITUNDA, Tahap 7b setelah semua tahap selesai). Sampai Tahap 7b dimulai, jangan mengubah kode F5.
+> **Status:** Revisi F5 telah selesai diimplementasikan (multi-item per kunjungan servis, aksi diganti/dibersihkan, part lain, dan baselineKm).
 
 **Kriteria selesai:**
 - Menekan kartu komponen (atau tab Catat) membuka form catat servis; komponen dari kartu yang ditekan sudah terpilih. Isian: KM (default KM sekarang), tanggal, nama bengkel, total biaya, catatan opsional.

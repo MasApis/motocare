@@ -54,11 +54,13 @@ class DefaultComponentData {
     required this.type,
     required this.intervalKm,
     required this.lastServiceKm,
+    required this.baselineKm,
   });
 
   final String type;
   final int intervalKm;
   final int lastServiceKm;
+  final int baselineKm;
 
   String get label => ComponentType.getLabel(type);
 
@@ -67,12 +69,13 @@ class DefaultComponentData {
       'type': type,
       'intervalKm': intervalKm,
       'lastServiceKm': lastServiceKm,
+      'baselineKm': baselineKm,
     };
   }
 }
 
 /// Membuat tiga komponen default (oli mesin, oli gardan, V-belt)
-/// dengan lastServiceKm = currentKm (dianggap baru diservis, mulai 100%)
+/// dengan lastServiceKm = currentKm dan baselineKm = currentKm
 /// sesuai aturan docs/SPEC.md bagian 2.1.
 List<DefaultComponentData> createDefaultComponents(int currentKm) {
   final safeKm = currentKm < 0 ? 0 : currentKm;
@@ -81,16 +84,19 @@ List<DefaultComponentData> createDefaultComponents(int currentKm) {
       type: ComponentType.engineOil,
       intervalKm: DefaultIntervals.engineOil,
       lastServiceKm: safeKm,
+      baselineKm: safeKm,
     ),
     DefaultComponentData(
       type: ComponentType.gearOil,
       intervalKm: DefaultIntervals.gearOil,
       lastServiceKm: safeKm,
+      baselineKm: safeKm,
     ),
     DefaultComponentData(
       type: ComponentType.vBelt,
       intervalKm: DefaultIntervals.vBelt,
       lastServiceKm: safeKm,
+      baselineKm: safeKm,
     ),
   ];
 }

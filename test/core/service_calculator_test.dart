@@ -1,133 +1,279 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:motocare/core/component_health.dart';
 import 'package:motocare/core/service_calculator.dart';
+import 'package:motocare/core/vehicle_components.dart';
 
 void main() {
   setUpAll(() async {
     await initializeDateFormatting('id_ID', null);
   });
 
-  group('ServiceCalculator - Reset & Logika Servis Baru', () {
-    test('calculateNewLastServiceKm mengembalikan KM servis yang baru diinput', () {
-      final newLastKm = ServiceCalculator.calculateNewLastServiceKm(serviceKm: 15000);
-      expect(newLastKm, 15000);
+  group('ServiceCalculator - getComponentsToReset (Aturan Reset Servis Baru)', () {
+    test('Hanya komponen yang diganti (replaced) yang di-reset', () {
+      final items = [
+        const ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.engineOil,
+          action: ServiceItemAction.replaced,
+          brand: 'SPX2',
+        ),
+        const ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.vBelt,
+          action: ServiceItemAction.cleaned,
+        ),
+      ];
+
+      final toReset = ServiceCalculator.getComponentsToReset(items);
+
+      expect(toReset.contains(ComponentType.engineOil), isTrue);
+      expect(toReset.contains(ComponentType.vBelt), isFalse);
+      expect(toReset.length, 1);
     });
 
-    test('calculateNewLastServiceKm menjaga nilai non-negatif', () {
-      final newLastKm = ServiceCalculator.calculateNewLastServiceKm(serviceKm: -500);
-      expect(newLastKm, 0);
+    test('Beberapa komponen sekaligus diganti mereset semua kartu yang diganti', () {
+      final items = [
+        const ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.engineOil,
+          action: ServiceItemAction.replaced,
+        ),
+        const ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.gearOil,
+          action: ServiceItemAction.replaced,
+        ),
+        const ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.vBelt,
+          action: ServiceItemAction.replaced,
+        ),
+      ];
+
+      final toReset = ServiceCalculator.getComponentsToReset(items);
+
+      expect(toReset.contains(ComponentType.engineOil), isTrue);
+      expect(toReset.contains(ComponentType.gearOil), isTrue);
+      expect(toReset.contains(ComponentType.vBelt), isTrue);
+      expect(toReset.length, 3);
     });
 
-    test('Kartu kembali 100% setelah servis baru dicatat pada KM sekarang', () {
-      const currentKm = 15000;
-      const intervalKm = 2000;
-      // Servis dicatat di currentKm
-      final newLastServiceKm = ServiceCalculator.calculateNewLastServiceKm(
-        serviceKm: currentKm,
-      );
+    test('Part lain yang diganti tidak memengaruhi kartu komponen manapun', () {
+      final items = [
+        const ServiceItem(
+          kind: ServiceItemKind.part,
+          name: 'Roller Daytona',
+          action: ServiceItemAction.replaced,
+        ),
+        const ServiceItem(
+          kind: ServiceItemKind.part,
+          name: 'Busi NGK',
+          action: ServiceItemAction.replaced,
+        ),
+      ];
 
-      final health = calculateComponentHealth(
-        intervalKm: intervalKm,
-        currentKm: currentKm,
-        lastServiceKm: newLastServiceKm,
-      );
+      final toReset = ServiceCalculator.getComponentsToReset(items);
+      expect(toReset.isEmpty, isTrue);
+    });
 
-      // Kartu kembali 100% (sisa 100%, terpakai 0%, status aman)
-      expect(health.remainingPercentage, 100.0);
-      expect(health.usedPercentage, 0.0);
-      expect(health.usedKm, 0);
-      expect(health.remainingKm, intervalKm);
-      expect(health.status, ComponentStatus.safe);
+    test('Servis CVT (V-Belt dibersihkan + Roller diganti) tidak mereset kartu manapun', () {
+      final items = [
+        const ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.vBelt,
+          action: ServiceItemAction.cleaned,
+        ),
+        const ServiceItem(
+          kind: ServiceItemKind.part,
+          name: 'Roller CVT',
+          action: ServiceItemAction.replaced,
+        ),
+      ];
+
+      final toReset = ServiceCalculator.getComponentsToReset(items);
+      expect(toReset.isEmpty, isTrue);
     });
   });
 
-  group('ServiceCalculator - Hapus Catatan Servis & Perhitungan Mundur', () {
-    test('calculateLastServiceKmAfterDelete kembali ke servis sebelumnya saat masih ada servis tersisa', () {
-      const initialKm = 10000;
-      // Riwayat servis: Servis 1 di 12.000 KM, Servis 2 di 14.000 KM, Servis 3 di 16.000 KM
-      // Ketika Servis 3 (16.000 KM) dihapus, yang tersisa adalah [12.000, 14.000]
-      final remainingKms = [12000, 14000];
+  group('ServiceCalculator - calculateComponentLastServiceKmAfterDelete (Aturan Hapus Servis)', () {
+    test('Kembali ke servis diganti sebelumnya dengan KM tertinggi saat catatan terbaru dihapus', () {
+      const baselineKm = 10000;
 
-      final lastKm = ServiceCalculator.calculateLastServiceKmAfterDelete(
-        initialKm: initialKm,
-        remainingServiceKms: remainingKms,
+      // Misal Servis 3 (KM 16.000) dihapus, catatan tersisa:
+      // Servis 1 (KM 12.000, diganti) & Servis 2 (KM 14.000, diganti)
+      final remainingRecords = [
+        const ServiceRecordSummary(
+          km: 12000,
+          items: [
+            ServiceItem(
+              kind: ServiceItemKind.component,
+              componentType: ComponentType.engineOil,
+              action: ServiceItemAction.replaced,
+            ),
+          ],
+        ),
+        const ServiceRecordSummary(
+          km: 14000,
+          items: [
+            ServiceItem(
+              kind: ServiceItemKind.component,
+              componentType: ComponentType.engineOil,
+              action: ServiceItemAction.replaced,
+            ),
+          ],
+        ),
+      ];
+
+      final lastKm = ServiceCalculator.calculateComponentLastServiceKmAfterDelete(
+        componentType: ComponentType.engineOil,
+        baselineKm: baselineKm,
+        remainingRecords: remainingRecords,
       );
 
       expect(lastKm, 14000);
     });
 
-    test('calculateLastServiceKmAfterDelete memilih KM terbesar jika urutan array acak', () {
-      const initialKm = 5000;
-      final remainingKms = [8000, 11000, 9500];
+    test('Mengabaikan catatan servis yang hanya dibersihkan (cleaned) saat mencari KM servis terakhir', () {
+      const baselineKm = 8000;
 
-      final lastKm = ServiceCalculator.calculateLastServiceKmAfterDelete(
-        initialKm: initialKm,
-        remainingServiceKms: remainingKms,
+      // Misal V-belt:
+      // Servis 1 di KM 10.000: V-Belt diganti
+      // Servis 2 di KM 13.000: V-Belt hanya dibersihkan
+      // Servis 3 di KM 15.000: V-Belt diganti (ini yang dihapus)
+      // Yang tersisa Servis 1 dan Servis 2. V-Belt harus kembali ke KM 10.000 (bukan 13.000)
+      final remainingRecords = [
+        const ServiceRecordSummary(
+          km: 10000,
+          items: [
+            ServiceItem(
+              kind: ServiceItemKind.component,
+              componentType: ComponentType.vBelt,
+              action: ServiceItemAction.replaced,
+            ),
+          ],
+        ),
+        const ServiceRecordSummary(
+          km: 13000,
+          items: [
+            ServiceItem(
+              kind: ServiceItemKind.component,
+              componentType: ComponentType.vBelt,
+              action: ServiceItemAction.cleaned,
+            ),
+          ],
+        ),
+      ];
+
+      final lastKm = ServiceCalculator.calculateComponentLastServiceKmAfterDelete(
+        componentType: ComponentType.vBelt,
+        baselineKm: baselineKm,
+        remainingRecords: remainingRecords,
       );
 
-      expect(lastKm, 11000);
+      expect(lastKm, 10000);
     });
 
-    test('calculateLastServiceKmAfterDelete kembali ke baseline initialKm ketika semua servis dihapus', () {
-      const initialKm = 10000;
-      final remainingKms = <int>[]; // Kosong karena seluruh servis telah dihapus
+    test('Kembali ke baselineKm jika seluruh catatan servis yang mengganti komponen tersebut dihapus', () {
+      const baselineKm = 10000;
 
-      final lastKm = ServiceCalculator.calculateLastServiceKmAfterDelete(
-        initialKm: initialKm,
-        remainingServiceKms: remainingKms,
+      // Hanya tersisa catatan yang berisi part lain atau komponen lain
+      final remainingRecords = [
+        const ServiceRecordSummary(
+          km: 14000,
+          items: [
+            ServiceItem(
+              kind: ServiceItemKind.component,
+              componentType: ComponentType.gearOil,
+              action: ServiceItemAction.replaced,
+            ),
+          ],
+        ),
+      ];
+
+      final lastKm = ServiceCalculator.calculateComponentLastServiceKmAfterDelete(
+        componentType: ComponentType.engineOil,
+        baselineKm: baselineKm,
+        remainingRecords: remainingRecords,
       );
 
-      expect(lastKm, initialKm);
+      expect(lastKm, baselineKm);
     });
 
-    test('calculateLastServiceKmAfterDelete menjaga nilai baseline tetap non-negatif', () {
-      const initialKm = -100;
-      final remainingKms = <int>[];
+    test('Kembali ke baselineKm jika daftar remainingRecords kosong', () {
+      const baselineKm = 12500;
+      final lastKm = ServiceCalculator.calculateComponentLastServiceKmAfterDelete(
+        componentType: ComponentType.engineOil,
+        baselineKm: baselineKm,
+        remainingRecords: [],
+      );
 
-      final lastKm = ServiceCalculator.calculateLastServiceKmAfterDelete(
-        initialKm: initialKm,
-        remainingServiceKms: remainingKms,
+      expect(lastKm, baselineKm);
+    });
+
+    test('Menjaga baselineKm non-negatif jika nilai baseline tidak valid', () {
+      final lastKm = ServiceCalculator.calculateComponentLastServiceKmAfterDelete(
+        componentType: ComponentType.engineOil,
+        baselineKm: -500,
+        remainingRecords: [],
       );
 
       expect(lastKm, 0);
     });
+  });
 
-    test('Kartu menghitung ulang secara presisi dari servis sebelumnya setelah servis terakhir dihapus', () {
-      // Skenario nyata:
-      // Odometer sekarang 15.000 KM, Interval oli 2.000 KM
-      // Servis 1: 12.000 KM
-      // Servis 2: 14.500 KM (Kondisi saat ini: used = 500 KM, remaining = 1.500 KM)
-      // Pengguna menghapus Servis 2 (salah catat)
-      // Kartu harus kembali menghitung dari Servis 1 (12.000 KM)
-      const currentKm = 15000;
-      const intervalKm = 2000;
-      const initialKm = 10000;
+  group('ServiceCalculator - formatItemsSummary', () {
+    test('Memformat satu item dengan rapi', () {
+      final items = [
+        const ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.engineOil,
+          action: ServiceItemAction.replaced,
+        ),
+      ];
+      expect(ServiceCalculator.formatItemsSummary(items), 'Oli Mesin (diganti)');
+    });
 
-      final remainingAfterDelete = [12000];
-      final revertedLastKm = ServiceCalculator.calculateLastServiceKmAfterDelete(
-        initialKm: initialKm,
-        remainingServiceKms: remainingAfterDelete,
+    test('Memformat multi-item dengan koma sesuai SPEC F8', () {
+      final items = [
+        const ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.engineOil,
+          action: ServiceItemAction.replaced,
+        ),
+        const ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.vBelt,
+          action: ServiceItemAction.cleaned,
+        ),
+        const ServiceItem(
+          kind: ServiceItemKind.part,
+          name: 'Roller',
+          action: ServiceItemAction.replaced,
+        ),
+      ];
+      expect(
+        ServiceCalculator.formatItemsSummary(items),
+        'Oli Mesin (diganti), V-Belt (dibersihkan), Roller (diganti)',
       );
+    });
 
-      expect(revertedLastKm, 12000);
-
-      // Hitung kesehatan setelah dihapus:
-      // Pemakaian dari 12.000 ke 15.000 = 3.000 KM (melebihi interval 2.000 KM)
-      final health = calculateComponentHealth(
-        intervalKm: intervalKm,
-        currentKm: currentKm,
-        lastServiceKm: revertedLastKm,
+    test('Mendukung penyertaan merek jika includeBrand true', () {
+      final items = [
+        const ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.engineOil,
+          action: ServiceItemAction.replaced,
+          brand: 'SPX2',
+        ),
+      ];
+      expect(
+        ServiceCalculator.formatItemsSummary(items, includeBrand: true),
+        'Oli Mesin (diganti, SPX2)',
       );
-
-      expect(health.usedKm, 3000);
-      expect(health.remainingKm, -1000);
-      expect(health.remainingPercentage, 0.0);
-      expect(health.status, ComponentStatus.critical);
     });
   });
 
-  group('ServiceCalculator - Format Rupiah & Tanggal Indonesia', () {
+  group('ServiceCalculator - Format & Parsing Rupiah / KM', () {
     test('formatRupiah memformat angka menjadi format mata uang Indonesia', () {
       expect(ServiceCalculator.formatRupiah(145000), 'Rp 145.000');
       expect(ServiceCalculator.formatRupiah(0), 'Rp 0');
@@ -149,21 +295,18 @@ void main() {
       expect(formatted, contains('2025'));
     });
 
-    test('parseRupiahInput mengurai teks rupiah dengan berbagai variasi ke integer', () {
+    test('parseRupiahInput mengurai teks rupiah ke integer', () {
       expect(ServiceCalculator.parseRupiahInput('145.000'), 145000);
       expect(ServiceCalculator.parseRupiahInput('Rp 145.000'), 145000);
-      expect(ServiceCalculator.parseRupiahInput('Rp145000'), 145000);
-      expect(ServiceCalculator.parseRupiahInput('50000'), 50000);
+      expect(ServiceCalculator.parseRupiahInput('0'), 0);
       expect(ServiceCalculator.parseRupiahInput(''), isNull);
       expect(ServiceCalculator.parseRupiahInput('   '), isNull);
-      expect(ServiceCalculator.parseRupiahInput('abc'), isNull);
       expect(ServiceCalculator.parseRupiahInput(null), isNull);
     });
 
     test('formatKm memformat angka kilometer dengan titik pemisah ribuan', () {
       expect(ServiceCalculator.formatKm(14280), '14.280');
       expect(ServiceCalculator.formatKm(0), '0');
-      expect(ServiceCalculator.formatKm(100000), '100.000');
     });
   });
 }

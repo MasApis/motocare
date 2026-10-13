@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/service_calculator.dart';
 import '../../notifications/providers/notification_providers.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
 import '../data/models/service_record_model.dart';
@@ -126,10 +127,9 @@ class ServiceController extends Notifier<ServiceControllerState> {
 
   Future<bool> addServiceRecord({
     required String vehicleId,
-    required String componentType,
+    required List<ServiceItem> items,
     required DateTime date,
     required int km,
-    required String brand,
     required int price,
     required String location,
     String? note,
@@ -139,10 +139,9 @@ class ServiceController extends Notifier<ServiceControllerState> {
       final repo = ref.read(serviceRepositoryProvider);
       await repo.addServiceRecord(
         vehicleId: vehicleId,
-        componentType: componentType,
+        items: items,
         date: date,
         km: km,
-        brand: brand,
         price: price,
         location: location,
         note: note,
@@ -170,7 +169,6 @@ class ServiceController extends Notifier<ServiceControllerState> {
   Future<bool> deleteServiceRecord({
     required String vehicleId,
     required String recordId,
-    required String componentType,
     int? vehicleInitialKm,
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: null, successMessage: null);
@@ -179,7 +177,6 @@ class ServiceController extends Notifier<ServiceControllerState> {
       await repo.deleteServiceRecord(
         vehicleId: vehicleId,
         recordId: recordId,
-        componentType: componentType,
         vehicleInitialKm: vehicleInitialKm,
       );
 

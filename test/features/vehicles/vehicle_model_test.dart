@@ -53,29 +53,33 @@ void main() {
   });
 
   group('VehicleComponent Model', () {
-    test('memberikan label ramah dan interval default', () {
+    test('memberikan label ramah, interval default, dan baselineKm', () {
       const comp = VehicleComponent(
         type: ComponentType.engineOil,
         intervalKm: 2000,
         lastServiceKm: 10000,
+        baselineKm: 10000,
       );
 
       expect(comp.label, 'Oli Mesin');
       expect(comp.intervalKm, 2000);
       expect(comp.lastServiceKm, 10000);
+      expect(comp.baselineKm, 10000);
     });
 
-    test('toMap menghasilkan struktur subkoleksi components', () {
+    test('toMap menghasilkan struktur subkoleksi components dengan baselineKm', () {
       const comp = VehicleComponent(
         type: ComponentType.vBelt,
         intervalKm: 20000,
         lastServiceKm: 5000,
+        baselineKm: 5000,
       );
 
       final map = comp.toMap();
       expect(map['type'], ComponentType.vBelt);
       expect(map['intervalKm'], 20000);
       expect(map['lastServiceKm'], 5000);
+      expect(map['baselineKm'], 5000);
     });
   });
 }

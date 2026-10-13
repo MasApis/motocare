@@ -511,7 +511,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      record.componentLabel,
+                      record.itemsSummary,
                       style: AppTypography.labelMd(color: AppColors.onSurface).copyWith(
                         fontWeight: FontWeight.w700,
                       ),
@@ -532,7 +532,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
               ),
             ],
           ),
-          if (record.location.isNotEmpty || record.brand.isNotEmpty) ...[
+          if (record.location.isNotEmpty || (record.note != null && record.note!.isNotEmpty)) ...[
             const SizedBox(height: AppSpacing.xs),
             Padding(
               padding: const EdgeInsets.only(left: 38 + AppSpacing.sm),
@@ -551,11 +551,6 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                           ),
                         ),
                       ],
-                    ),
-                  if (record.brand.isNotEmpty)
-                    Text(
-                      'Merek: ${record.brand}',
-                      style: AppTypography.bodySm(color: AppColors.onSurfaceVariant),
                     ),
                   if (record.note != null && record.note!.isNotEmpty)
                     Text(

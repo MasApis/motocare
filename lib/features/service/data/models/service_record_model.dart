@@ -5,15 +5,15 @@ import '../../../../core/vehicle_components.dart';
 /// Model data catatan riwayat servis kendaraan
 /// sesuai docs/SPEC.md bagian 4:
 /// `users/{uid}/vehicles/{vehicleId}/serviceRecords/{id}`
-/// field: componentType, date, km, brand, price (rupiah, integer), location, note
+/// field: date, km, location, price (rupiah, integer; total satu kunjungan), note, items[]
+/// items[] = { kind: "component" | "part", componentType, action: "replaced" | "cleaned", name, brand }
 class ServiceRecord {
   const ServiceRecord({
     required this.id,
     required this.vehicleId,
-    required this.componentType,
+    required this.items,
     required this.date,
     required this.km,
-    required this.brand,
     required this.price,
     required this.location,
     this.note,
@@ -26,8 +26,8 @@ class ServiceRecord {
   /// ID kendaraan pemilik catatan servis ini
   final String vehicleId;
 
-  /// Tipe komponen: engine_oil, gear_oil, atau v_belt
-  final String componentType;
+  /// Daftar item pekerjaan servis pada kunjungan ini (minimal 1)
+  final List<ServiceItem> items;
 
   /// Tanggal servis dilakukan
   final DateTime date;
@@ -35,10 +35,7 @@ class ServiceRecord {
   /// Kilometer odometer saat servis dilakukan
   final int km;
 
-  /// Merek suku cadang / oli (mis. SPX2, Shell Advance, dsb)
-  final String brand;
-
-  /// Total biaya servis dalam satuan rupiah integer (mis. 145000)
+  /// Total biaya servis dalam satuan rupiah integer (mis. 145000, minimal 0)
   final int price;
 
   /// Lokasi / Nama bengkel pengerjaan
@@ -50,8 +47,11 @@ class ServiceRecord {
   /// Timestamp pencatatan dibuat
   final DateTime? createdAt;
 
-  /// Label ramah komponen (mis. "Oli Mesin")
-  String get componentLabel => ComponentType.getLabel(componentType);
+  /// Ringkasan teks item sesuai SPEC: "Oli Mesin (diganti), V-Belt (dibersihkan), Roller (diganti)"
+  String get itemsSummary => ServiceCalculator.formatItemsSummary(items);
+
+  /// Ringkasan detail dengan merek
+  String get itemsDetailSummary => ServiceCalculator.formatItemsSummary(items, includeBrand: true);
 
   /// String harga terformat rupiah Indonesia (mis. "Rp 145.000")
   String get formattedPrice => ServiceCalculator.formatRupiah(price);
@@ -61,6 +61,9 @@ class ServiceRecord {
 
   /// String kilometer terformat (mis. "14.280 KM")
   String get formattedKm => '${ServiceCalculator.formatKm(km)} KM';
+
+  /// Konversi ke ServiceRecordSummary murni untuk kalkulasi
+  ServiceRecordSummary toSummary() => ServiceRecordSummary(km: km, items: items);
 
   /// Membuat instance ServiceRecord dari Firestore DocumentSnapshot
   factory ServiceRecord.fromFirestore(
@@ -75,13 +78,37 @@ class ServiceRecord {
       return DateTime.now();
     }
 
+    // Parsing items[] dengan fallback toleran untuk data uji lama
+    List<ServiceItem> parsedItems = [];
+    if (data['items'] is List) {
+      final rawList = data['items'] as List;
+      for (final raw in rawList) {
+        if (raw is Map) {
+          parsedItems.add(ServiceItem.fromMap(Map<String, dynamic>.from(raw)));
+        }
+      }
+    }
+
+    // Backward compatibility untuk catatan lama (skema single componentType)
+    if (parsedItems.isEmpty && data['componentType'] != null) {
+      final oldComp = data['componentType'] as String? ?? ComponentType.engineOil;
+      final oldBrand = data['brand'] as String?;
+      parsedItems.add(
+        ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: oldComp,
+          action: ServiceItemAction.replaced,
+          brand: oldBrand,
+        ),
+      );
+    }
+
     return ServiceRecord(
       id: doc.id,
       vehicleId: data['vehicleId'] as String? ?? fallbackVehicleId ?? '',
-      componentType: data['componentType'] as String? ?? ComponentType.engineOil,
+      items: parsedItems,
       date: parseTimestamp(data['date']),
       km: (data['km'] as num?)?.toInt() ?? 0,
-      brand: (data['brand'] as String?)?.trim() ?? '',
       price: (data['price'] as num?)?.toInt() ?? 0,
       location: (data['location'] as String?)?.trim() ?? '',
       note: (data['note'] as String?)?.trim().isNotEmpty == true
@@ -95,10 +122,9 @@ class ServiceRecord {
   Map<String, dynamic> toMap() {
     return {
       'vehicleId': vehicleId,
-      'componentType': componentType,
+      'items': items.map((i) => i.toMap()).toList(),
       'date': Timestamp.fromDate(date),
       'km': km,
-      'brand': brand.trim(),
       'price': price,
       'location': location.trim(),
       if (note != null && note!.trim().isNotEmpty) 'note': note!.trim(),
@@ -109,10 +135,9 @@ class ServiceRecord {
   ServiceRecord copyWith({
     String? id,
     String? vehicleId,
-    String? componentType,
+    List<ServiceItem>? items,
     DateTime? date,
     int? km,
-    String? brand,
     int? price,
     String? location,
     String? note,
@@ -121,10 +146,9 @@ class ServiceRecord {
     return ServiceRecord(
       id: id ?? this.id,
       vehicleId: vehicleId ?? this.vehicleId,
-      componentType: componentType ?? this.componentType,
+      items: items ?? this.items,
       date: date ?? this.date,
       km: km ?? this.km,
-      brand: brand ?? this.brand,
       price: price ?? this.price,
       location: location ?? this.location,
       note: note ?? this.note,

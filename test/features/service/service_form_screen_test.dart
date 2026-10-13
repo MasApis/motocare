@@ -48,17 +48,21 @@ void main() {
       expect(find.textContaining('Honda Vario 160 ABS'), findsWidgets);
       expect(find.text('Odo: 14.280 KM'), findsOneWidget);
 
-      // Pilihan Chip Komponen (Hanya 3 matic)
-      expect(find.text('Ganti Oli Mesin'), findsOneWidget);
+      // Pilihan Komponen Utama (Matic)
+      expect(find.text('KOMPONEN UTAMA (MATIC)'), findsOneWidget);
+      expect(find.text('Oli Mesin'), findsOneWidget);
       expect(find.text('Oli Gardan'), findsOneWidget);
-      expect(find.text('V-Belt'), findsOneWidget);
+      expect(find.text('V-Belt (CVT)'), findsOneWidget);
+
+      // Part Lain yang Diganti
+      expect(find.text('PART LAIN YANG DIGANTI'), findsOneWidget);
+      expect(find.text('Tambah Part Lain'), findsOneWidget);
 
       // Label Kolom Input
       expect(find.text('ODOMETER SAAT SERVIS (KM)'), findsOneWidget);
       expect(find.text('TANGGAL SERVIS'), findsOneWidget);
-      expect(find.text('MEREK SUKU CADANG / OLI'), findsOneWidget);
       expect(find.text('NAMA BENGKEL / TEMPAT PENGERJAAN'), findsOneWidget);
-      expect(find.text('TOTAL BIAYA SERVIS & SUKU CADANG'), findsOneWidget);
+      expect(find.text('TOTAL BIAYA SERVIS & SUKU CADANG (SATU KUNJUNGAN)'), findsOneWidget);
       expect(find.text('CATATAN MEKANIK / KELUHAN (OPSIONAL)'), findsOneWidget);
 
       // Tombol Simpan
@@ -69,8 +73,8 @@ void main() {
       await tester.pumpWidget(buildTestableScreen());
       await tester.pumpAndSettle();
 
-      // Kosongkan input KM
-      final kmFieldFinder = find.byType(TextField).first;
+      // Cari input KM dan kosongkan
+      final kmFieldFinder = find.byType(TextField).at(1); // field 0 adalah merek oli mesin karena tercentang awal
       await tester.enterText(kmFieldFinder, '');
       await tester.pumpAndSettle();
 
@@ -84,33 +88,52 @@ void main() {
       expect(find.text('14280'), findsOneWidget);
     });
 
-    testWidgets('initialComponentType otomatis memilih chip komponen yang sesuai', (tester) async {
+    testWidgets('initialComponentType otomatis memilih komponen yang sesuai', (tester) async {
       await tester.pumpWidget(
         buildTestableScreen(initialComponentType: ComponentType.vBelt),
       );
       await tester.pumpAndSettle();
 
-      final vBeltChip = tester.widget<ChoiceChip>(
-        find.widgetWithText(ChoiceChip, 'V-Belt'),
-      );
-      expect(vBeltChip.selected, isTrue);
+      // V-Belt terpilih sehingga opsi Diganti dan Dibersihkan muncul
+      expect(find.text('Diganti'), findsOneWidget);
+      expect(find.text('Dibersihkan'), findsOneWidget);
+    });
 
-      final engineOilChip = tester.widget<ChoiceChip>(
-        find.widgetWithText(ChoiceChip, 'Ganti Oli Mesin'),
-      );
-      expect(engineOilChip.selected, isFalse);
+    testWidgets('bisa menambah dan menghapus baris part lain', (tester) async {
+      await tester.pumpWidget(buildTestableScreen());
+      await tester.pumpAndSettle();
+
+      final addPartBtn = find.text('Tambah Part Lain');
+      await tester.ensureVisible(addPartBtn);
+      await tester.tap(addPartBtn);
+      await tester.pumpAndSettle();
+
+      final deleteBtn = find.byTooltip('Hapus part');
+      expect(deleteBtn, findsOneWidget);
+      expect(find.text('Nama part (mis. Roller, Busi)'), findsOneWidget);
+
+      // Hapus baris part
+      await tester.ensureVisible(deleteBtn);
+      await tester.tap(deleteBtn);
+      await tester.pumpAndSettle();
+
+      expect(find.byTooltip('Hapus part'), findsNothing);
     });
 
     testWidgets('menolak submit jika input wajib kosong dengan pesan error yang jelas', (tester) async {
       await tester.pumpWidget(buildTestableScreen());
       await tester.pumpAndSettle();
 
+      // Uncheck Oli Mesin agar 0 item terpilih
+      final checkboxes = find.byType(Checkbox);
+      await tester.tap(checkboxes.first);
+      await tester.pumpAndSettle();
+
       // Kosongkan KM field
-      final textFields = find.byType(TextField);
-      await tester.enterText(textFields.at(0), ''); // KM
-      await tester.enterText(textFields.at(1), ''); // Brand
-      await tester.enterText(textFields.at(2), ''); // Location
-      await tester.enterText(textFields.at(3), ''); // Price
+      final kmField = find.widgetWithText(TextField, '14280');
+      if (kmField.evaluate().isNotEmpty) {
+        await tester.enterText(kmField, '');
+      }
 
       // Tekan tombol Simpan
       final submitBtn = find.text('Simpan Catatan Servis');
@@ -120,15 +143,14 @@ void main() {
 
       // Validasi pesan error tampil
       expect(find.text('Kilometer servis wajib diisi'), findsOneWidget);
-      expect(find.text('Merek suku cadang atau oli wajib diisi'), findsOneWidget);
       expect(find.text('Nama bengkel atau tempat servis wajib diisi'), findsOneWidget);
       expect(find.text('Total biaya wajib diisi (ketik 0 jika gratis)'), findsOneWidget);
+      expect(find.text('Pilih minimal satu komponen atau tambahkan part lain'), findsOneWidget);
     });
 
     testWidgets('tidak terjadi overflow pada layar ponsel standar Android (392.7 dan 360 dp)', (tester) async {
-      // Uji pada ukuran layar standar HP Android 392.7dp dan 360dp
       tester.view.physicalSize = const Size(1080, 2400);
-      tester.view.devicePixelRatio = 2.75; // 1080 / 2.75 = 392.727 dp
+      tester.view.devicePixelRatio = 2.75;
       addTearDown(() {
         tester.view.resetPhysicalSize();
         tester.view.resetDevicePixelRatio();
@@ -137,7 +159,6 @@ void main() {
       await tester.pumpWidget(buildTestableScreen());
       await tester.pumpAndSettle();
 
-      // Memastikan tidak ada RenderFlex overflow error (Flutter test akan gagal jika tester.takeException() bukan null atau jika ada overflow)
       expect(tester.takeException(), isNull);
       expect(find.text('ODOMETER SAAT SERVIS (KM)'), findsOneWidget);
       expect(find.textContaining('Gunakan KM Terkini'), findsOneWidget);

@@ -239,18 +239,17 @@ class PdfReportGenerator {
       );
     }
 
-    const headers = ['No', 'Tanggal', 'Komponen', 'Merek', 'Bengkel/Lokasi', 'KM', 'Biaya'];
+    const headers = ['No', 'Tanggal', 'KM', 'Rincian Servis / Suku Cadang', 'Bengkel', 'Total Biaya'];
 
     return pw.Table(
       border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
       columnWidths: const {
-        0: pw.FixedColumnWidth(24),
-        1: pw.FlexColumnWidth(1.6),
-        2: pw.FlexColumnWidth(1.8),
-        3: pw.FlexColumnWidth(1.6),
-        4: pw.FlexColumnWidth(2.2),
-        5: pw.FlexColumnWidth(1.4),
-        6: pw.FlexColumnWidth(2.0),
+        0: pw.FixedColumnWidth(22),
+        1: pw.FlexColumnWidth(1.4),
+        2: pw.FlexColumnWidth(1.2),
+        3: pw.FlexColumnWidth(3.4),
+        4: pw.FlexColumnWidth(2.0),
+        5: pw.FlexColumnWidth(1.8),
       },
       children: [
         // Table Header
@@ -266,7 +265,7 @@ class PdfReportGenerator {
                   fontWeight: pw.FontWeight.bold,
                   color: PdfColors.blueGrey900,
                 ),
-                textAlign: (header == 'Biaya' || header == 'KM')
+                textAlign: (header == 'Total Biaya' || header == 'KM')
                     ? pw.TextAlign.right
                     : (header == 'No' ? pw.TextAlign.center : pw.TextAlign.left),
               ),
@@ -286,10 +285,9 @@ class PdfReportGenerator {
             children: [
               _tableCell(index.toString(), align: pw.TextAlign.center),
               _tableCell(r.formattedDate),
-              _tableCell(r.componentLabel),
-              _tableCell(r.brand.isNotEmpty ? r.brand : '-'),
-              _tableCell(r.location.isNotEmpty ? r.location : '-'),
               _tableCell(ServiceCalculator.formatKm(r.km), align: pw.TextAlign.right),
+              _tableCell(r.itemsSummary),
+              _tableCell(r.location.isNotEmpty ? r.location : '-'),
               _tableCell(r.formattedPrice, align: pw.TextAlign.right, isBold: true),
             ],
           );

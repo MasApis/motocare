@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:motocare/core/service_calculator.dart';
+import 'package:motocare/core/vehicle_components.dart';
 import 'package:motocare/features/reports/data/pdf_report_generator.dart';
 import 'package:motocare/features/service/data/models/service_record_model.dart';
 import 'package:motocare/features/vehicles/data/models/vehicle_model.dart';
@@ -26,20 +28,37 @@ void main() {
         ServiceRecord(
           id: 'rec1',
           vehicleId: 'v1',
-          componentType: 'engine_oil',
+          items: const [
+            ServiceItem(
+              kind: ServiceItemKind.component,
+              componentType: ComponentType.engineOil,
+              action: ServiceItemAction.replaced,
+              brand: 'SPX2',
+            ),
+            ServiceItem(
+              kind: ServiceItemKind.component,
+              componentType: ComponentType.vBelt,
+              action: ServiceItemAction.cleaned,
+            ),
+          ],
           date: DateTime(2025, 9, 15),
           km: 12500,
-          brand: 'SPX2',
           price: 145000,
           location: 'AHASS Mitra Jaya',
         ),
         ServiceRecord(
           id: 'rec2',
           vehicleId: 'v1',
-          componentType: 'gear_oil',
+          items: const [
+            ServiceItem(
+              kind: ServiceItemKind.component,
+              componentType: ComponentType.gearOil,
+              action: ServiceItemAction.replaced,
+              brand: 'AHM Gear Oil',
+            ),
+          ],
           date: DateTime(2025, 9, 20),
           km: 12500,
-          brand: 'AHM Gear Oil',
           price: 35000,
           location: 'AHASS Mitra Jaya',
         ),

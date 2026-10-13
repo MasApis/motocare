@@ -84,6 +84,7 @@ class VehicleRepository {
           'type': comp.type,
           'intervalKm': interval,
           'lastServiceKm': comp.lastServiceKm,
+          'baselineKm': comp.baselineKm,
         });
       }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:motocare/core/service_calculator.dart';
 import 'package:motocare/core/vehicle_components.dart';
 import 'package:motocare/features/service/data/models/service_record_model.dart';
 import 'package:motocare/features/service/providers/service_providers.dart';
@@ -28,10 +29,16 @@ void main() {
     ServiceRecord(
       id: 'rec-1',
       vehicleId: 'vehicle-1',
-      componentType: ComponentType.engineOil,
+      items: const [
+        ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.engineOil,
+          action: ServiceItemAction.replaced,
+          brand: 'SPX2',
+        ),
+      ],
       date: DateTime(2025, 3, 15),
       km: 14000,
-      brand: 'SPX2 (0.8L)',
       price: 145000,
       location: 'AHASS Bintang Motor Fatmawati',
       note: 'Ganti oli berkala rutin',
@@ -40,10 +47,16 @@ void main() {
     ServiceRecord(
       id: 'rec-2',
       vehicleId: 'vehicle-1',
-      componentType: ComponentType.gearOil,
+      items: const [
+        ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.gearOil,
+          action: ServiceItemAction.replaced,
+          brand: 'Ahm Oil Gear',
+        ),
+      ],
       date: DateTime(2025, 1, 10),
       km: 12000,
-      brand: 'Ahm Oil Gear',
       price: 45000,
       location: 'Bengkel Mandiri',
       createdAt: DateTime(2025, 1, 10),
@@ -71,18 +84,17 @@ void main() {
 
       // Judul Layar
       expect(find.text('Riwayat Servis'), findsOneWidget);
-      expect(find.text('Semua Motor'), findsOneWidget);
 
       // Verifikasi Catatan Servis 1
       expect(find.text('Rp 145.000'), findsOneWidget);
-      expect(find.textContaining('Oli Mesin • SPX2'), findsOneWidget);
+      expect(find.textContaining('Oli Mesin (diganti • SPX2)'), findsOneWidget);
       expect(find.text('AHASS Bintang Motor Fatmawati'), findsOneWidget);
       expect(find.text('Ganti oli berkala rutin'), findsOneWidget);
       expect(find.text('14.000 KM'), findsOneWidget);
 
       // Verifikasi Catatan Servis 2
       expect(find.text('Rp 45.000'), findsOneWidget);
-      expect(find.textContaining('Oli Gardan • Ahm Oil Gear'), findsOneWidget);
+      expect(find.textContaining('Oli Gardan (diganti • Ahm Oil Gear)'), findsOneWidget);
       expect(find.text('Bengkel Mandiri'), findsOneWidget);
       expect(find.text('12.000 KM'), findsOneWidget);
     });
@@ -119,7 +131,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Belum Ada Riwayat Servis'), findsOneWidget);
-      expect(find.text('Catat Servis Baru'), findsOneWidget);
+      expect(find.text('Catat Servis Sekarang'), findsOneWidget);
     });
   });
 }

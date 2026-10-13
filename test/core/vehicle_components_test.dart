@@ -24,12 +24,13 @@ void main() {
       expect(vBelt.intervalKm, 20000);
     });
 
-    test('lastServiceKm sama dengan currentKm saat motor dibuat (mulai 100%)', () {
+    test('lastServiceKm dan baselineKm sama dengan currentKm saat motor dibuat (mulai 100%)', () {
       const currentKm = 14280;
       final components = createDefaultComponents(currentKm);
 
       for (final component in components) {
         expect(component.lastServiceKm, currentKm);
+        expect(component.baselineKm, currentKm);
       }
     });
 

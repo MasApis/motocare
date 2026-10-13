@@ -565,6 +565,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   type: type,
                   intervalKm: DefaultIntervals.forType(type),
                   lastServiceKm: activeVehicle.currentKm,
+                  baselineKm: activeVehicle.currentKm,
                 );
             return ComponentHealthCard(
               componentType: comp.type,

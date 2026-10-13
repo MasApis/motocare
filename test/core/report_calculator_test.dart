@@ -3,6 +3,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:motocare/core/report_calculator.dart';
 import 'package:motocare/features/service/data/models/service_record_model.dart';
 
+import 'package:motocare/core/service_calculator.dart';
+
 ServiceRecord _createRecord({
   required String id,
   required DateTime date,
@@ -15,10 +17,16 @@ ServiceRecord _createRecord({
   return ServiceRecord(
     id: id,
     vehicleId: 'v1',
-    componentType: componentType,
+    items: [
+      ServiceItem(
+        kind: ServiceItemKind.component,
+        componentType: componentType,
+        action: ServiceItemAction.replaced,
+        brand: brand,
+      ),
+    ],
     date: date,
     km: km,
-    brand: brand,
     price: price,
     location: location,
   );

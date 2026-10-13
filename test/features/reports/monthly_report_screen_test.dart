@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:motocare/core/service_calculator.dart';
 import 'package:motocare/features/reports/ui/monthly_report_screen.dart';
 import 'package:motocare/features/service/data/models/service_record_model.dart';
 import 'package:motocare/features/service/providers/service_providers.dart';
@@ -78,10 +79,16 @@ void main() {
       ServiceRecord(
         id: 'rec1',
         vehicleId: testVehicle.id,
-        componentType: 'engine_oil',
+        items: const [
+          ServiceItem(
+            kind: ServiceItemKind.component,
+            componentType: 'engine_oil',
+            action: ServiceItemAction.replaced,
+            brand: 'SPX2',
+          ),
+        ],
         date: DateTime(now.year, now.month, 10),
         km: 14000,
-        brand: 'SPX2',
         price: 150000,
         location: 'Bengkel AHASS',
       ),
@@ -99,7 +106,7 @@ void main() {
 
     // Daftar rincian tampil
     expect(find.text('Rincian Servis'), findsOneWidget);
-    expect(find.text('Oli Mesin'), findsOneWidget);
+    expect(find.text('Oli Mesin (diganti)'), findsOneWidget);
     expect(find.text('Bengkel AHASS'), findsOneWidget);
 
     // Tombol Unduh Laporan PDF aktif

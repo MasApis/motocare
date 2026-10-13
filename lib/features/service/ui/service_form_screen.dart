@@ -15,8 +15,23 @@ import '../../vehicles/data/models/vehicle_model.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
 import '../providers/service_providers.dart';
 
-/// Layar Form Tambah Catatan Servis
-/// Mengacu pada docs/design/form_pencatatan_mandiri_motor/ dan docs/SPEC.md (F5)
+class _PartEntry {
+  _PartEntry({String name = '', String brand = ''})
+      : nameController = TextEditingController(text: name),
+        brandController = TextEditingController(text: brand);
+
+  final TextEditingController nameController;
+  final TextEditingController brandController;
+  String? errorText;
+
+  void dispose() {
+    nameController.dispose();
+    brandController.dispose();
+  }
+}
+
+/// Layar Form Tambah Catatan Servis Multi-Item
+/// Mengacu pada docs/design/form_pencatatan_mandiri_motor/ dan docs/SPEC.md (F5 revisi v2.2)
 class ServiceFormScreen extends ConsumerStatefulWidget {
   const ServiceFormScreen({
     super.key,
@@ -28,7 +43,7 @@ class ServiceFormScreen extends ConsumerStatefulWidget {
   /// ID kendaraan opsional (default menggunakan active/selected vehicle)
   final String? vehicleId;
 
-  /// Tipe komponen yang dipilih awal (misal saat kartu komponen ditekan)
+  /// Tipe komponen yang dipilih awal (misal saat kartu komponen ditekan di dashboard)
   final String? initialComponentType;
 
   /// Callback opsional setelah berhasil disimpan
@@ -40,30 +55,54 @@ class ServiceFormScreen extends ConsumerStatefulWidget {
 
 class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
   late TextEditingController _kmController;
-  late TextEditingController _brandController;
   late TextEditingController _locationController;
   late TextEditingController _priceController;
   late TextEditingController _noteController;
 
-  late String _selectedComponentType;
+  // Komponen Standar (Matic)
+  bool _isEngineOilSelected = false;
+  late TextEditingController _engineOilBrandController;
+
+  bool _isGearOilSelected = false;
+  late TextEditingController _gearOilBrandController;
+
+  bool _isVBeltSelected = false;
+  ServiceItemAction _vBeltAction = ServiceItemAction.replaced;
+  late TextEditingController _vBeltBrandController;
+
+  // Part Lain yang Diganti
+  final List<_PartEntry> _partEntries = [];
+
   late DateTime _selectedDate;
 
   String? _kmError;
-  String? _brandError;
   String? _locationError;
   String? _priceError;
+  String? _itemsError;
 
   @override
   void initState() {
     super.initState();
-    _selectedComponentType = widget.initialComponentType ?? ComponentType.engineOil;
     _selectedDate = DateTime.now();
 
     _kmController = TextEditingController();
-    _brandController = TextEditingController();
     _locationController = TextEditingController();
     _priceController = TextEditingController();
     _noteController = TextEditingController();
+
+    _engineOilBrandController = TextEditingController();
+    _gearOilBrandController = TextEditingController();
+    _vBeltBrandController = TextEditingController();
+
+    // Atur komponen yang dipilih awal berdasarkan initialComponentType
+    final initType = widget.initialComponentType;
+    if (initType == ComponentType.gearOil) {
+      _isGearOilSelected = true;
+    } else if (initType == ComponentType.vBelt) {
+      _isVBeltSelected = true;
+    } else {
+      _isEngineOilSelected = true;
+    }
 
     // Default KM saat ini akan diisi di post-frame callback jika belum diisi
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -77,10 +116,18 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
   @override
   void dispose() {
     _kmController.dispose();
-    _brandController.dispose();
     _locationController.dispose();
     _priceController.dispose();
     _noteController.dispose();
+
+    _engineOilBrandController.dispose();
+    _gearOilBrandController.dispose();
+    _vBeltBrandController.dispose();
+
+    for (final entry in _partEntries) {
+      entry.dispose();
+    }
+
     super.dispose();
   }
 
@@ -109,11 +156,25 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
     }
   }
 
+  void _addPartRow() {
+    setState(() {
+      _partEntries.add(_PartEntry());
+      _itemsError = null;
+    });
+  }
+
+  void _removePartRow(int index) {
+    setState(() {
+      final removed = _partEntries.removeAt(index);
+      removed.dispose();
+    });
+  }
+
   bool _validateInputs() {
     String? kmErr;
-    String? brandErr;
     String? locErr;
     String? priceErr;
+    String? itemsErr;
 
     final kmVal = _kmController.text.replaceAll('.', '').trim();
     if (kmVal.isEmpty) {
@@ -123,10 +184,6 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
       if (parsedKm == null || parsedKm < 0) {
         kmErr = 'Masukkan angka kilometer yang valid';
       }
-    }
-
-    if (_brandController.text.trim().isEmpty) {
-      brandErr = 'Merek suku cadang atau oli wajib diisi';
     }
 
     if (_locationController.text.trim().isEmpty) {
@@ -139,18 +196,98 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
     } else {
       final parsedPrice = ServiceCalculator.parseRupiahInput(priceVal);
       if (parsedPrice == null || parsedPrice < 0) {
-        priceErr = 'Masukkan angka biaya yang valid';
+        priceErr = 'Masukkan angka biaya yang valid (minimal 0)';
+      }
+    }
+
+    // Validasi minimal 1 item
+    final hasComponent = _isEngineOilSelected || _isGearOilSelected || _isVBeltSelected;
+    final hasParts = _partEntries.isNotEmpty;
+
+    if (!hasComponent && !hasParts) {
+      itemsErr = 'Pilih minimal satu komponen atau tambahkan part lain';
+    }
+
+    // Validasi tiap baris part lain
+    bool partValid = true;
+    for (final entry in _partEntries) {
+      if (entry.nameController.text.trim().isEmpty) {
+        entry.errorText = 'Nama part wajib diisi';
+        partValid = false;
+      } else {
+        entry.errorText = null;
       }
     }
 
     setState(() {
       _kmError = kmErr;
-      _brandError = brandErr;
       _locationError = locErr;
       _priceError = priceErr;
+      _itemsError = itemsErr;
     });
 
-    return kmErr == null && brandErr == null && locErr == null && priceErr == null;
+    return kmErr == null && locErr == null && priceErr == null && itemsErr == null && partValid;
+  }
+
+  List<ServiceItem> _buildServiceItems() {
+    final items = <ServiceItem>[];
+
+    if (_isEngineOilSelected) {
+      items.add(
+        ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.engineOil,
+          action: ServiceItemAction.replaced,
+          brand: _engineOilBrandController.text.trim().isNotEmpty
+              ? _engineOilBrandController.text.trim()
+              : null,
+        ),
+      );
+    }
+
+    if (_isGearOilSelected) {
+      items.add(
+        ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.gearOil,
+          action: ServiceItemAction.replaced,
+          brand: _gearOilBrandController.text.trim().isNotEmpty
+              ? _gearOilBrandController.text.trim()
+              : null,
+        ),
+      );
+    }
+
+    if (_isVBeltSelected) {
+      items.add(
+        ServiceItem(
+          kind: ServiceItemKind.component,
+          componentType: ComponentType.vBelt,
+          action: _vBeltAction,
+          brand: (_vBeltAction == ServiceItemAction.replaced &&
+                  _vBeltBrandController.text.trim().isNotEmpty)
+              ? _vBeltBrandController.text.trim()
+              : null,
+        ),
+      );
+    }
+
+    for (final entry in _partEntries) {
+      final name = entry.nameController.text.trim();
+      final brand = entry.brandController.text.trim();
+      if (name.isNotEmpty) {
+        items.add(
+          ServiceItem(
+            kind: ServiceItemKind.part,
+            name: name,
+            action: ServiceItemAction.replaced,
+            brand: brand.isNotEmpty ? brand : null,
+          ),
+        );
+      }
+    }
+
+    return items;
   }
 
   Future<void> _saveService(Vehicle vehicle) async {
@@ -160,13 +297,13 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
 
     final km = int.parse(_kmController.text.replaceAll('.', '').trim());
     final price = ServiceCalculator.parseRupiahInput(_priceController.text)!;
+    final items = _buildServiceItems();
 
     final success = await ref.read(serviceControllerProvider.notifier).addServiceRecord(
       vehicleId: vehicle.id,
-      componentType: _selectedComponentType,
+      items: items,
       date: _selectedDate,
       km: km,
-      brand: _brandController.text.trim(),
       price: price,
       location: _locationController.text.trim(),
       note: _noteController.text.trim().isNotEmpty ? _noteController.text.trim() : null,
@@ -177,7 +314,7 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Catatan servis tersimpan! Kartu komponen kini 100% aman.'),
+          content: Text('Catatan servis tersimpan! Perhitungan status motor telah diperbarui.'),
           backgroundColor: AppColors.tertiary,
         ),
       );
@@ -272,7 +409,7 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Banner Motor Aktif (Quick Telemetry Banner di desain)
+              // Banner Motor Aktif
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
@@ -340,42 +477,170 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
 
               const SizedBox(height: AppSpacing.lg),
 
-              // Pilihan Komponen Berbentuk Chip (Hanya 3 matic sesuai SPEC F5 & SCREENS.md)
+              // Bagian 1: Komponen Utama (Matic)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'KOMPONEN YANG DISERVIS',
-                    style: AppTypography.labelCaps(
-                      color: AppColors.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Wrap(
-                    spacing: AppSpacing.xs,
-                    runSpacing: AppSpacing.xs,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildComponentChip(
-                        type: ComponentType.engineOil,
-                        label: 'Ganti Oli Mesin',
-                        icon: Symbols.oil_barrel,
+                      Expanded(
+                        child: Text(
+                          'KOMPONEN UTAMA (MATIC)',
+                          style: AppTypography.labelCaps(
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      _buildComponentChip(
-                        type: ComponentType.gearOil,
-                        label: 'Oli Gardan',
-                        icon: Symbols.water_drop,
-                      ),
-                      _buildComponentChip(
-                        type: ComponentType.vBelt,
-                        label: 'V-Belt',
-                        icon: Symbols.settings,
+                      Text(
+                        'Pilih yang dikerjakan',
+                        style: AppTypography.bodySm(color: AppColors.onSurfaceVariant),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+
+                  // Card 1: Oli Mesin
+                  _buildComponentCard(
+                    title: 'Oli Mesin',
+                    icon: Symbols.oil_barrel,
+                    isSelected: _isEngineOilSelected,
+                    onToggle: (val) {
+                      setState(() {
+                        _isEngineOilSelected = val;
+                        _itemsError = null;
+                      });
+                    },
+                    actionBadge: 'Selalu Diganti',
+                    brandController: _engineOilBrandController,
+                    brandHint: 'Merek oli mesin (opsional, mis. SPX2, Shell)',
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+
+                  // Card 2: Oli Gardan
+                  _buildComponentCard(
+                    title: 'Oli Gardan',
+                    icon: Symbols.water_drop,
+                    isSelected: _isGearOilSelected,
+                    onToggle: (val) {
+                      setState(() {
+                        _isGearOilSelected = val;
+                        _itemsError = null;
+                      });
+                    },
+                    actionBadge: 'Selalu Diganti',
+                    brandController: _gearOilBrandController,
+                    brandHint: 'Merek oli gardan (opsional, mis. AHM, Yamalube)',
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+
+                  // Card 3: V-Belt (Pilihan Diganti / Dibersihkan)
+                  _buildVBeltCard(),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.lg),
+
+              // Bagian 2: Part Lain yang Diganti (SPEC F5)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'PART LAIN YANG DIGANTI',
+                          style: AppTypography.labelCaps(
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        '${_partEntries.length} part',
+                        style: AppTypography.bodySm(color: AppColors.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Suku cadang lain (mis. roller, kampas ganda, busi, filter udara, kampas rem). Part lain tercatat di riwayat tanpa mengubah kartu kesehatan.',
+                    style: AppTypography.bodySm(color: AppColors.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+
+                  if (_partEntries.isEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.md,
+                        horizontal: AppSpacing.md,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceContainerLowest,
+                        borderRadius: AppShapes.roundedDefault,
+                        border: Border.all(color: AppColors.borderSlate),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Belum ada part lain yang ditambahkan.',
+                          style: AppTypography.bodySm(color: AppColors.onSurfaceVariant),
+                        ),
+                      ),
+                    )
+                  else
+                    ..._partEntries.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final item = entry.value;
+                      return _buildPartRow(index, item);
+                    }),
+
+                  const SizedBox(height: AppSpacing.xs),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                      onPressed: _addPartRow,
+                      icon: const Icon(Symbols.add_circle, size: 20),
+                      label: const Text(
+                        'Tambah Part Lain',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
                   ),
                 ],
               ),
 
-              const SizedBox(height: AppSpacing.md),
+              if (_itemsError != null) ...[
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.errorContainer.withValues(alpha: 0.4),
+                    borderRadius: AppShapes.roundedDefault,
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Symbols.error, size: 16, color: AppColors.error),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _itemsError!,
+                          style: AppTypography.bodySm(color: AppColors.error),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: AppSpacing.lg),
 
               // Input: Odometer Saat Servis (KM) + Tombol "Gunakan KM Terkini"
               Column(
@@ -384,7 +649,7 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Flexible(
+                      Expanded(
                         child: Text(
                           'ODOMETER SAAT SERVIS (KM)',
                           style: AppTypography.labelCaps(
@@ -394,43 +659,33 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Flexible(
-                        child: InkWell(
-                          borderRadius: AppShapes.roundedFull,
-                          onTap: () {
-                            setState(() {
-                              _kmController.text = activeVehicle.currentKm.toString();
-                              _kmError = null;
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Symbols.auto_fix_high,
-                                  size: 14,
-                                  color: AppColors.primary,
-                                ),
-                                const SizedBox(width: 4),
-                                Flexible(
-                                  child: Text(
-                                    'Gunakan KM Terkini (${ServiceCalculator.formatKm(activeVehicle.currentKm)})',
-                                    style: AppTypography.labelCaps(
-                                      color: AppColors.primary,
-                                    ).copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 0.2,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
+                      InkWell(
+                        borderRadius: AppShapes.roundedFull,
+                        onTap: () {
+                          setState(() {
+                            _kmController.text = activeVehicle.currentKm.toString();
+                            _kmError = null;
+                          });
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Symbols.auto_fix_high,
+                              size: 14,
+                              color: AppColors.primary,
                             ),
-                          ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Gunakan KM Terkini',
+                              style: AppTypography.labelCaps(
+                                color: AppColors.primary,
+                              ).copyWith(
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -511,31 +766,6 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
 
               const SizedBox(height: AppSpacing.md),
 
-              // Input: Merek Suku Cadang / Oli (SPEC F5)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'MEREK SUKU CADANG / OLI',
-                    style: AppTypography.labelCaps(
-                      color: AppColors.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  AppTextField(
-                    controller: _brandController,
-                    hintText: 'Contoh: SPX2 / Yamalube / Shell / Bando',
-                    prefixIcon: const Icon(Symbols.verified, size: 20),
-                    errorText: _brandError,
-                    onChanged: (_) {
-                      if (_brandError != null) setState(() => _brandError = null);
-                    },
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: AppSpacing.md),
-
               // Input: Bengkel / Lokasi
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -561,12 +791,12 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
 
               const SizedBox(height: AppSpacing.md),
 
-              // Input: Total Biaya Servis
+              // Input: Total Biaya Servis (1 kunjungan)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'TOTAL BIAYA SERVIS & SUKU CADANG',
+                    'TOTAL BIAYA SERVIS & SUKU CADANG (SATU KUNJUNGAN)',
                     style: AppTypography.labelCaps(
                       color: AppColors.onSurfaceVariant,
                     ),
@@ -574,7 +804,7 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
                   const SizedBox(height: 6),
                   AppTextField(
                     controller: _priceController,
-                    hintText: '145.000',
+                    hintText: '145.000 (ketik 0 jika gratis)',
                     keyboardType: TextInputType.number,
                     prefixIcon: const Padding(
                       padding: EdgeInsets.only(left: 14, top: 14),
@@ -634,41 +864,268 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
     );
   }
 
-  Widget _buildComponentChip({
-    required String type,
-    required String label,
+  Widget _buildComponentCard({
+    required String title,
     required IconData icon,
+    required bool isSelected,
+    required ValueChanged<bool> onToggle,
+    required String actionBadge,
+    required TextEditingController brandController,
+    required String brandHint,
   }) {
-    final isSelected = _selectedComponentType == type;
-
-    return ChoiceChip(
-      selected: isSelected,
-      onSelected: (selected) {
-        if (selected) {
-          setState(() => _selectedComponentType = type);
-        }
-      },
-      avatar: Icon(
-        isSelected ? Symbols.check_circle : icon,
-        size: 18,
-        color: isSelected ? AppColors.onPrimary : AppColors.primary,
-      ),
-      label: Text(
-        label,
-        style: TextStyle(
-          color: isSelected ? AppColors.onPrimary : AppColors.onSurface,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-        ),
-      ),
-      selectedColor: AppColors.primary,
-      backgroundColor: AppColors.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(
-        borderRadius: AppShapes.roundedFull,
-        side: BorderSide(
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: isSelected
+            ? AppColors.primaryContainer.withValues(alpha: 0.08)
+            : AppColors.surfaceContainerLowest,
+        borderRadius: AppShapes.roundedDefault,
+        border: Border.all(
           color: isSelected ? AppColors.primary : AppColors.borderSlate,
+          width: isSelected ? 1.5 : 1,
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Checkbox(
+                value: isSelected,
+                activeColor: AppColors.primary,
+                onChanged: (val) => onToggle(val ?? false),
+              ),
+              Icon(icon, size: 20, color: isSelected ? AppColors.primary : AppColors.outline),
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: Text(
+                  title,
+                  style: AppTypography.bodyMd().copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? AppColors.onSurface : AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primaryFixed : AppColors.surfaceContainer,
+                  borderRadius: AppShapes.roundedFull,
+                ),
+                child: Text(
+                  actionBadge,
+                  style: AppTypography.labelCaps(
+                    color: isSelected ? AppColors.primary : AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (isSelected) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Padding(
+              padding: const EdgeInsets.only(left: 40, right: 8, bottom: 4),
+              child: AppTextField(
+                controller: brandController,
+                hintText: brandHint,
+                prefixIcon: const Icon(Symbols.sell, size: 16),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVBeltCard() {
+    final isSelected = _isVBeltSelected;
+    final isReplaced = _vBeltAction == ServiceItemAction.replaced;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: isSelected
+            ? AppColors.primaryContainer.withValues(alpha: 0.08)
+            : AppColors.surfaceContainerLowest,
+        borderRadius: AppShapes.roundedDefault,
+        border: Border.all(
+          color: isSelected ? AppColors.primary : AppColors.borderSlate,
+          width: isSelected ? 1.5 : 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Checkbox(
+                value: isSelected,
+                activeColor: AppColors.primary,
+                onChanged: (val) {
+                  setState(() {
+                    _isVBeltSelected = val ?? false;
+                    _itemsError = null;
+                  });
+                },
+              ),
+              Icon(
+                Symbols.settings,
+                size: 20,
+                color: isSelected ? AppColors.primary : AppColors.outline,
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: Text(
+                  'V-Belt (CVT)',
+                  style: AppTypography.bodyMd().copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? AppColors.onSurface : AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (isSelected) ...[
+            const SizedBox(height: AppSpacing.xs),
+            Padding(
+              padding: const EdgeInsets.only(left: 40, right: 8, bottom: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Pilihan Aksi: Diganti vs Dibersihkan (SPEC F5)
+                  Wrap(
+                    spacing: AppSpacing.xs,
+                    runSpacing: AppSpacing.xs,
+                    children: [
+                      ChoiceChip(
+                        label: const Text('Diganti'),
+                        selected: isReplaced,
+                        selectedColor: AppColors.primary,
+                        labelStyle: TextStyle(
+                          color: isReplaced ? AppColors.onPrimary : AppColors.onSurface,
+                          fontWeight: isReplaced ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 12,
+                        ),
+                        onSelected: (val) {
+                          if (val) setState(() => _vBeltAction = ServiceItemAction.replaced);
+                        },
+                      ),
+                      ChoiceChip(
+                        label: const Text('Dibersihkan'),
+                        selected: !isReplaced,
+                        selectedColor: AppColors.tertiary,
+                        labelStyle: TextStyle(
+                          color: !isReplaced ? AppColors.onTertiary : AppColors.onSurface,
+                          fontWeight: !isReplaced ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 12,
+                        ),
+                        onSelected: (val) {
+                          if (val) setState(() => _vBeltAction = ServiceItemAction.cleaned);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    isReplaced
+                        ? 'Kartu V-Belt akan di-reset (100% aman).'
+                        : 'Hanya tercatat di riwayat, kartu V-Belt tidak di-reset.',
+                    style: AppTypography.bodySm(
+                      color: isReplaced ? AppColors.primary : AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                  if (isReplaced) ...[
+                    const SizedBox(height: AppSpacing.xs),
+                    AppTextField(
+                      controller: _vBeltBrandController,
+                      hintText: 'Merek V-Belt (opsional, mis. Bando, Mitsuboshi)',
+                      prefixIcon: const Icon(Symbols.sell, size: 16),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPartRow(int index, _PartEntry entry) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: AppShapes.roundedDefault,
+        border: Border.all(
+          color: entry.errorText != null ? AppColors.error : AppColors.borderSlate,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 3,
+                child: TextField(
+                  controller: entry.nameController,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    hintText: 'Nama part (mis. Roller, Busi)',
+                    hintStyle: AppTypography.bodySm(color: AppColors.outline),
+                    border: OutlineInputBorder(
+                      borderRadius: AppShapes.roundedDefault,
+                      borderSide: const BorderSide(color: AppColors.borderSlate),
+                    ),
+                  ),
+                  style: AppTypography.bodySm(),
+                  onChanged: (_) {
+                    if (entry.errorText != null) {
+                      setState(() => entry.errorText = null);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                flex: 2,
+                child: TextField(
+                  controller: entry.brandController,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    hintText: 'Merek (opsional)',
+                    hintStyle: AppTypography.bodySm(color: AppColors.outline),
+                    border: OutlineInputBorder(
+                      borderRadius: AppShapes.roundedDefault,
+                      borderSide: const BorderSide(color: AppColors.borderSlate),
+                    ),
+                  ),
+                  style: AppTypography.bodySm(),
+                ),
+              ),
+              const SizedBox(width: 4),
+              IconButton(
+                icon: const Icon(Symbols.delete, size: 20, color: AppColors.error),
+                tooltip: 'Hapus part',
+                onPressed: () => _removePartRow(index),
+              ),
+            ],
+          ),
+          if (entry.errorText != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, left: 4),
+              child: Text(
+                entry.errorText!,
+                style: AppTypography.labelCaps(color: AppColors.error),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
