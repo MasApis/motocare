@@ -52,11 +52,40 @@ void main() {
     });
   });
 
+  group('DefaultIntervals', () {
+    test('forType mengembalikan interval default yang sesuai', () {
+      expect(DefaultIntervals.forType(ComponentType.engineOil), 2000);
+      expect(DefaultIntervals.forType(ComponentType.gearOil), 8000);
+      expect(DefaultIntervals.forType(ComponentType.vBelt), 20000);
+      expect(DefaultIntervals.forType('other'), 2000);
+    });
+  });
+
+  group('DefaultComponentData', () {
+    test('toMap dan label bekerja dengan benar', () {
+      const data = DefaultComponentData(
+        type: ComponentType.engineOil,
+        intervalKm: 2000,
+        lastServiceKm: 5000,
+        baselineKm: 5000,
+      );
+
+      expect(data.label, 'Oli Mesin');
+      final map = data.toMap();
+      expect(map['type'], ComponentType.engineOil);
+      expect(map['intervalKm'], 2000);
+      expect(map['lastServiceKm'], 5000);
+      expect(map['baselineKm'], 5000);
+    });
+  });
+
   group('VehiclePresets', () {
     test('memiliki daftar preset matic populer', () {
       expect(VehiclePresets.brands, containsAll(['Honda', 'Yamaha', 'Suzuki', 'Vespa']));
       expect(VehiclePresets.models, isNotEmpty);
       expect(VehiclePresets.models.any((m) => m.brand == 'Honda' && m.model == 'Vario 160'), isTrue);
+      final preset = VehiclePresets.models.first;
+      expect(preset.fullName, '${preset.brand} ${preset.model}');
     });
   });
 }

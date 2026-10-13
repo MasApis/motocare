@@ -309,4 +309,87 @@ void main() {
       expect(ServiceCalculator.formatKm(0), '0');
     });
   });
+
+  group('ServiceCalculator - calculateNewLastServiceKm & legacy calculateLastServiceKmAfterDelete', () {
+    test('calculateNewLastServiceKm mengembalikan serviceKm atau 0 jika negatif', () {
+      expect(ServiceCalculator.calculateNewLastServiceKm(serviceKm: 15000), 15000);
+      expect(ServiceCalculator.calculateNewLastServiceKm(serviceKm: -100), 0);
+    });
+
+    test('calculateLastServiceKmAfterDelete mengembalikan max KM atau initialKm jika kosong', () {
+      expect(
+        ServiceCalculator.calculateLastServiceKmAfterDelete(
+          initialKm: 5000,
+          remainingServiceKms: [6000, 8000, 7500],
+        ),
+        8000,
+      );
+      expect(
+        ServiceCalculator.calculateLastServiceKmAfterDelete(
+          initialKm: 5000,
+          remainingServiceKms: [],
+        ),
+        5000,
+      );
+      expect(
+        ServiceCalculator.calculateLastServiceKmAfterDelete(
+          initialKm: -10,
+          remainingServiceKms: [],
+        ),
+        0,
+      );
+    });
+
+    test('formatItemsSummary mengembalikan "-" jika list kosong', () {
+      expect(ServiceCalculator.formatItemsSummary([]), '-');
+    });
+  });
+
+  group('ServiceItem - Serialization & Copy', () {
+    test('toMap dan fromMap bekerja secara simetris untuk komponen dan part', () {
+      const item1 = ServiceItem(
+        kind: ServiceItemKind.component,
+        componentType: ComponentType.engineOil,
+        action: ServiceItemAction.replaced,
+        brand: 'AHM Oil',
+      );
+      final map1 = item1.toMap();
+      final revived1 = ServiceItem.fromMap(map1);
+      expect(revived1.kind, item1.kind);
+      expect(revived1.componentType, item1.componentType);
+      expect(revived1.action, item1.action);
+      expect(revived1.brand, item1.brand);
+
+      const item2 = ServiceItem(
+        kind: ServiceItemKind.part,
+        name: 'Kampas Rem',
+        action: ServiceItemAction.replaced,
+      );
+      final map2 = item2.toMap();
+      final revived2 = ServiceItem.fromMap(map2);
+      expect(revived2.kind, item2.kind);
+      expect(revived2.name, item2.name);
+      expect(revived2.action, item2.action);
+    });
+
+    test('displayName mengembalikan "Part Lain" jika nama part kosong', () {
+      const emptyPart = ServiceItem(
+        kind: ServiceItemKind.part,
+        action: ServiceItemAction.replaced,
+      );
+      expect(emptyPart.displayName, 'Part Lain');
+    });
+
+    test('copyWith memperbarui properti yang ditentukan', () {
+      const original = ServiceItem(
+        kind: ServiceItemKind.component,
+        componentType: ComponentType.engineOil,
+        action: ServiceItemAction.replaced,
+      );
+      final copied = original.copyWith(action: ServiceItemAction.cleaned, brand: 'Shell');
+      expect(copied.action, ServiceItemAction.cleaned);
+      expect(copied.brand, 'Shell');
+      expect(copied.componentType, ComponentType.engineOil);
+    });
+  });
 }
