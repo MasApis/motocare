@@ -61,3 +61,6 @@ lib/firebase_options.dart
 *.key
 
 devtools_options.yaml
+
+Agents.md
+docs/*
