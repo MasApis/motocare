@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -518,8 +519,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ),
 
-        // Section Mode Uji Coba Notifikasi F6 (Bertanda Jelas)
-        if (activeVehicle != null) ...[
+        // Section Mode Uji Coba Notifikasi F6 (hanya di build debug, tidak ikut rilis)
+        if (activeVehicle != null && kDebugMode) ...[
           const SizedBox(height: AppSpacing.md),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),

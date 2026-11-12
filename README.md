@@ -74,7 +74,7 @@ UI (Widgets & Pages) ──► Providers (Riverpod) ──► Repositories ─�
 | **State Management** | `flutter_riverpod` |
 | **Routing / Navigasi** | `go_router` |
 | **Backend & Database** | Firebase Authentication & Cloud Firestore (Offline Persistence) |
-| **AI Engine** | Groq Cloud API (`llama-3.1-8b-instant`) |
+| **AI Engine** | Groq Cloud API (`openai/gpt-oss-120b`, kunci lewat `--dart-define`) |
 | **Notifikasi** | `flutter_local_notifications` + `timezone` |
 | **Laporan & Dokumen** | `pdf` + `printing` |
 | **Ikon & Font** | `google_fonts` (Plus Jakarta Sans) & `material_symbols_icons` |

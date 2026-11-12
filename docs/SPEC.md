@@ -38,7 +38,7 @@ Pemilik motor matic harian: mahasiswa, pekerja, pengemudi ojek online.
 | State management | **Riverpod** (`flutter_riverpod`) |
 | Backend | **Firebase**: Authentication (email + password) dan Cloud Firestore (offline persistence aktif) |
 | Navigasi | `go_router` |
-| AI | LLM via **Groq Cloud API** (`llama-3.1-8b-instant`) gratis tanpa kartu kredit (fallback/opsi Firebase AI Logic tersedia); kunci API diinjeksi via `--dart-define=GROQ_API_KEY` saat menjalankan aplikasi. **Kunci API tidak disimpan di kode aplikasi maupun repositori.** Cloud Functions dan Vertex AI/Agent Platform berbayar **tidak dipakai** |
+| AI | LLM via **Groq Cloud API** (model default `openai/gpt-oss-120b`, daftar fallback lain ada di `chat_repository.dart`) gratis tanpa kartu kredit; kunci API diinjeksi via `--dart-define=GROQ_API_KEY` saat menjalankan aplikasi. **Kunci API tidak disimpan di kode aplikasi maupun repositori.** Firebase AI Logic (Gemini) dan Cloud Functions/Vertex AI tidak dipakai |
 | Notifikasi | `flutter_local_notifications`, notifikasi dijadwalkan pada tanggal tertentu (tanpa background service) |
 | PDF | `pdf` + `printing` (atau `share_plus`) |
 | UI/UX | Desain dari **Google Stitch** (export zip) di `docs/design/` (tiap layar: `screen.png` + `code.html`); peta layar ke fitur di `docs/design/SCREENS.md`; aturan visual di `docs/DESIGN.md` (MotoSense Design System). `code.html` hanya acuan nilai dan tata letak, bukan kode yang disalin ke Flutter |
@@ -129,7 +129,8 @@ Aturan: widget tidak memanggil Firestore langsung; semua lewat provider dan repo
 ```
 users/{uid}
   └─ vehicles/{vehicleId}:  name, brand, model, plate (opsional), currentKm, createdAt
-       ├─ components/{type}:   type, intervalKm, lastServiceKm, baselineKm (KM saat motor dibuat)
+       ├─ components/{type}:   type, intervalKm, lastServiceKm, baselineKm (KM saat motor dibuat),
+       │                       lastRedNotifiedKm (KM saat notifikasi zona merah terakhir tampil)
        ├─ odometerLogs/{id}:   km, date
        └─ serviceRecords/{id}: date, km, location, price (rupiah, integer; total satu kunjungan), note, items[]
             items[] = { kind: "component" | "part", componentType (jika kind = component: engine_oil | gear_oil | v_belt),
@@ -243,8 +244,8 @@ Tata letak layar mengikuti `docs/design/` (10 layar; lihat `docs/design/SCREENS.
 
 | Risiko | Mitigasi |
 |--------|----------|
-| Kunci Gemini bocor | Jangan di kode aplikasi; lewat Firebase AI Logic (tanpa kunci di aplikasi) + App Check |
-| Kuota gratis Gemini habis atau berubah | Batasi panjang pesan dan konteks, pesan ramah saat limit; opsi paket berbayar nanti jika pengguna bertambah |
+| Kunci Groq terbaca dari APK | Batasi kuota di konsol Groq, rotasi kunci sebelum APK dibagikan, jangan unggah APK publik dengan kunci aktif; kunci tidak pernah masuk repositori |
+| Kuota gratis Groq habis atau berubah | Batasi panjang pesan dan konteks, pesan ramah saat limit; opsi model/kunci lain nanti jika pengguna bertambah |
 | Interval komponen tidak akurat | Bisa diubah pengguna; tampilkan catatan "sesuaikan dengan buku manual" |
 | Notifikasi tidak muncul (penghemat baterai HP tertentu) | Beri panduan di aplikasi; uji di HP asli |
 | Scope terlalu besar | Satu fitur per tahap; selesai F1 sampai F5 dulu sebagai inti |
@@ -264,5 +265,5 @@ Scaffolding + Firebase → Tema dari desain → F1 → F2 → F3 → F4 → F5 �
 ## 11. Keputusan Terbuka
 
 - Interval default dan ambang warna (bagian 2.1) masih asumsi; verifikasi dengan buku manual motor.
-- Rilis publik: App Check produksi (di Android memakai Play Integrity) dan apakah kuota gratis Gemini cukup; mungkin perlu paket berbayar. Cek ketentuan penggunaan data pada tier gratis sebelum rilis.
+- Rilis publik: App Check produksi (di Android memakai Play Integrity) dan apakah kuota gratis Groq cukup; mungkin perlu kunci/kuota tambahan. Cek ketentuan penggunaan data pada tier gratis sebelum rilis.
 - Apakah rilis publik butuh fitur tambahan (hapus akun, kebijakan privasi); lihat Tahap 12 di panduan.

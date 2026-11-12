@@ -1,9 +1,11 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'features/auth/providers/auth_providers.dart';
 import 'features/auth/ui/login_screen.dart';
@@ -19,6 +21,11 @@ import 'shared/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Muat nama hari/bulan Indonesia. Tanpa ini semua DateFormat('...', 'id_ID')
+  // gagal dan tanggal jatuh ke format Inggris (mis. "5 May 2025").
+  await initializeDateFormatting('id_ID', null);
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -54,7 +61,7 @@ class MotoCareApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final router = _buildRouter(ref);
+    final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
       title: 'MotoCare',
@@ -64,9 +71,12 @@ class MotoCareApp extends ConsumerWidget {
     );
   }
 
-  GoRouter _buildRouter(WidgetRef ref) {
+  static GoRouter buildRouter(Ref ref) {
+    final authNotifier = _AuthNotifier(ref);
+    ref.onDispose(authNotifier.dispose);
+
     return GoRouter(
-      refreshListenable: _AuthNotifier(ref),
+      refreshListenable: authNotifier,
       redirect: (BuildContext context, GoRouterState state) {
         final authState = ref.read(authStateProvider);
         final isLoggedIn = authState.asData?.value != null;
@@ -134,13 +144,25 @@ class MotoCareApp extends ConsumerWidget {
   }
 }
 
+/// Router aplikasi dibuat sekali per ProviderScope. Kalau dibangun di dalam
+/// `build()`, riwayat navigasi ter-reset dan listener auth menumpuk.
+final routerProvider = Provider<GoRouter>(
+  (ref) => MotoCareApp.buildRouter(ref),
+);
+
 /// Notifier yang memberitahu GoRouter saat status auth berubah
 class _AuthNotifier extends ChangeNotifier {
-  _AuthNotifier(this._ref) {
-    _ref.listen(authStateProvider, (_, _) {
+  _AuthNotifier(Ref ref) {
+    _subscription = ref.listen(authStateProvider, (_, _) {
       notifyListeners();
     });
   }
 
-  final WidgetRef _ref;
+  late final ProviderSubscription<AsyncValue<User?>> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.close();
+    super.dispose();
+  }
 }

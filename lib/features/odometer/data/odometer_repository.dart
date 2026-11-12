@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../core/validators.dart';
 import 'models/odometer_log_model.dart';
 
 class OdometerException implements Exception {
@@ -91,6 +92,18 @@ class OdometerRepository {
       final vehicleRef = _vehicleDoc(vehicleId, uid);
       final logsCol = _odometerLogsRef(vehicleId, uid);
       final newLogDoc = logsCol.doc();
+
+      // Validasi dilakukan di sini juga (bukan hanya di form), karena repository
+      // adalah pintu terakhir sebelum data masuk Firestore.
+      final vehicleSnap = await vehicleRef.get();
+      final currentKm = (vehicleSnap.data()?['currentKm'] as num?)?.toInt();
+      if (currentKm == null) {
+        throw const OdometerException(
+          'Data motor tidak ditemukan. Muat ulang halaman lalu coba lagi.',
+        );
+      }
+      final kmError = validateOdometerInput(km.toString(), currentKm);
+      if (kmError != null) throw OdometerException(kmError);
 
       final batch = _firestore.batch();
 

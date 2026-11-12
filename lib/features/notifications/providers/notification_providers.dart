@@ -57,10 +57,6 @@ class NotificationScheduler {
 
   NotificationService get _service => _ref.read(notificationServiceProvider);
 
-  // Set untuk menyimpan track komponen yang sudah memicu notifikasi langsung pada KM tertentu
-  // Format key: "vehicleId_componentType_km"
-  static final Set<String> _immediateNotifiedKeys = {};
-
   /// Menjadwalkan ulang notifikasi untuk seluruh komponen pada kendaraan tertentu
   Future<void> syncNotificationsForVehicle({
     required Vehicle vehicle,
@@ -78,16 +74,19 @@ class NotificationScheduler {
       ) <= 0;
 
       if (isRed) {
-        // Jika komponen sudah merah
-        final notificationKey = '${vehicle.id}_${comp.type}_${vehicle.currentKm}';
-        // Tampilkan langsung sekali per komponen sampai di-reset (KM berubah atau servis dicatat)
-        if (!_immediateNotifiedKeys.contains(notificationKey)) {
-          _immediateNotifiedKeys.add(notificationKey);
+        // Tampilkan langsung sekali per komponen sampai di-reset (servis dicatat).
+        // Penanda disimpan di Firestore, jadi tidak muncul lagi setelah app ditutup.
+        if (comp.lastRedNotifiedKm != vehicle.currentKm) {
           await _service.showImmediateRedZoneNotification(
             vehicleId: vehicle.id,
             vehicleName: vehicle.displayName,
             componentType: comp.type,
           );
+          await _ref.read(vehicleRepositoryProvider).markRedZoneNotified(
+                vehicleId: vehicle.id,
+                componentType: comp.type,
+                km: vehicle.currentKm,
+              );
         }
       } else {
         // Jika belum merah, hitung tanggal masuk zona merah

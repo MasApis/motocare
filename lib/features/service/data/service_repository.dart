@@ -147,6 +147,9 @@ class ServiceRepository {
         batch.set(compDoc, {
           'type': compType,
           'lastServiceKm': km,
+          // Reset penanda notifikasi: komponen yang baru diservis harus bisa
+          // memberi peringatan lagi saat masuk zona merah berikutnya.
+          'lastRedNotifiedKm': null,
         }, SetOptions(merge: true));
       }
 
@@ -185,29 +188,28 @@ class ServiceRepository {
     try {
       final uid = _getRequiredUid();
       final vehicleDocRef = _vehicleDoc(vehicleId, uid);
-      final recordDoc = _serviceRecordsRef(vehicleId, uid).doc(recordId);
+      final recordsRef = _serviceRecordsRef(vehicleId, uid);
+      final recordDoc = recordsRef.doc(recordId);
 
-      // 1. Hapus dokumen catatan servis
-      await recordDoc.delete();
+      // Semua pembacaan dilakukan dulu. Penghapusan dan hitung ulang komponen
+      // ditulis dalam satu batch, supaya tidak ada kondisi catatan sudah hilang
+      // tetapi lastServiceKm masih menunjuk servis yang sudah dihapus.
+      final remainingDocs = await recordsRef.get();
+      final remainingSummaries = remainingDocs.docs
+          .where((doc) => doc.id != recordId)
+          .map((doc) => ServiceRecord.fromFirestore(
+                doc,
+                fallbackVehicleId: vehicleId,
+              ).toSummary())
+          .toList();
 
-      // 2. Ambil seluruh sisa catatan servis untuk kendaraan ini
-      final remainingDocs = await _serviceRecordsRef(vehicleId, uid).get();
-      final remainingSummaries = remainingDocs.docs.map((d) {
-        final record = ServiceRecord.fromFirestore(d, fallbackVehicleId: vehicleId);
-        return record.toSummary();
-      }).toList();
-
-      // 3. Ambil data komponen motor saat ini untuk baselineKm
       final componentsSnap = await _componentsRef(vehicleId, uid).get();
+      int? vehicleKm;
+
       final batch = _firestore.batch();
+      batch.delete(recordDoc);
 
-      final standardComponents = [
-        ComponentType.engineOil,
-        ComponentType.gearOil,
-        ComponentType.vBelt,
-      ];
-
-      for (final compType in standardComponents) {
+      for (final compType in ComponentType.values) {
         final compDoc = _componentsRef(vehicleId, uid).doc(compType);
         final compDocSnap =
             componentsSnap.docs.where((d) => d.id == compType).firstOrNull;
@@ -218,8 +220,11 @@ class ServiceRepository {
         } else if (vehicleInitialKm != null) {
           baselineKm = vehicleInitialKm;
         } else {
-          final vehicleSnap = await vehicleDocRef.get();
-          baselineKm = (vehicleSnap.data()?['currentKm'] as num?)?.toInt() ?? 0;
+          if (vehicleKm == null) {
+            final vehicleSnap = await vehicleDocRef.get();
+            vehicleKm = (vehicleSnap.data()?['currentKm'] as num?)?.toInt() ?? 0;
+          }
+          baselineKm = vehicleKm;
         }
 
         final newLastServiceKm =
@@ -233,6 +238,8 @@ class ServiceRepository {
           'type': compType,
           'lastServiceKm': newLastServiceKm,
           'baselineKm': baselineKm,
+          // Hitung ulang setelah penghapusan, jadi penanda notifikasi ikut direset.
+          'lastRedNotifiedKm': null,
         }, SetOptions(merge: true));
       }
 

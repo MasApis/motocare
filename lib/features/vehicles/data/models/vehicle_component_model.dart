@@ -10,12 +10,17 @@ class VehicleComponent {
     required this.intervalKm,
     required this.lastServiceKm,
     required this.baselineKm,
+    this.lastRedNotifiedKm,
   });
 
   final String type;
   final int intervalKm;
   final int lastServiceKm;
   final int baselineKm;
+
+  /// KM saat notifikasi "sudah masuk zona merah" terakhir ditampilkan.
+  /// Dipakai agar notifikasi itu tidak muncul berulang tiap aplikasi dibuka.
+  final int? lastRedNotifiedKm;
 
   String get label => ComponentType.getLabel(type);
 
@@ -25,6 +30,7 @@ class VehicleComponent {
       'intervalKm': intervalKm,
       'lastServiceKm': lastServiceKm,
       'baselineKm': baselineKm,
+      if (lastRedNotifiedKm != null) 'lastRedNotifiedKm': lastRedNotifiedKm,
     };
   }
 
@@ -43,6 +49,7 @@ class VehicleComponent {
           DefaultIntervals.forType(type),
       lastServiceKm: lastServiceKm,
       baselineKm: baselineKm,
+      lastRedNotifiedKm: (data['lastRedNotifiedKm'] as num?)?.toInt(),
     );
   }
 
@@ -51,12 +58,14 @@ class VehicleComponent {
     int? intervalKm,
     int? lastServiceKm,
     int? baselineKm,
+    int? lastRedNotifiedKm,
   }) {
     return VehicleComponent(
       type: type ?? this.type,
       intervalKm: intervalKm ?? this.intervalKm,
       lastServiceKm: lastServiceKm ?? this.lastServiceKm,
       baselineKm: baselineKm ?? this.baselineKm,
+      lastRedNotifiedKm: lastRedNotifiedKm ?? this.lastRedNotifiedKm,
     );
   }
 }

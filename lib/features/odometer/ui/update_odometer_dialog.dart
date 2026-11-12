@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../core/service_calculator.dart';
 import '../../../core/validators.dart';
 import '../../../shared/theme/app_colors.dart';
 import '../../../shared/theme/app_shapes.dart';
@@ -66,23 +67,8 @@ class _UpdateOdometerDialogState extends ConsumerState<UpdateOdometerDialog> {
     return buffer.toString();
   }
 
-  String _formatDate(DateTime date) {
-    const monthNames = [
-      'Januari',
-      'Februari',
-      'Maret',
-      'April',
-      'Mei',
-      'Juni',
-      'Juli',
-      'Agustus',
-      'September',
-      'Oktober',
-      'November',
-      'Desember',
-    ];
-    return '${date.day} ${monthNames[date.month - 1]} ${date.year}';
-  }
+  String _formatDate(DateTime date) =>
+      ServiceCalculator.formatFullDate(date);
 
   Future<void> _pickDate() async {
     final now = DateTime.now();

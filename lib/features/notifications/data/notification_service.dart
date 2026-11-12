@@ -6,6 +6,34 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../../../core/vehicle_components.dart';
 
+/// Zona waktu dengan offset tetap (tanpa DST) yang sesuai offset perangkat.
+///
+/// Penjadwalan notifikasi hanya butuh jam dinding ("pukul 08:00 waktu lokal"),
+/// jadi zona offset tetap lebih tepat daripada mencari nama zona mana pun yang
+/// kebetulan punya offset sama: pencarian seperti itu bisa memilih zona ber-DST
+/// (mis. Antarctica/Macquarie) sehingga jam 08:00 bergeser di sebagian tahun.
+///
+/// IANA membalik tanda: `Etc/GMT-7` berarti UTC+7 (WIB).
+tz.Location localLocationFor(Duration offset) {
+  if (offset.inMinutes % 60 == 0) {
+    final sign = offset.isNegative ? '+' : '-';
+    final name = 'Etc/GMT$sign${offset.inHours.abs()}';
+    if (tz.timeZoneDatabase.locations.containsKey(name)) {
+      return tz.getLocation(name);
+    }
+  }
+  // Offset pecahan jam (mis. +5:30): pakai zona pertama yang offsetnya cocok.
+  try {
+    final offsetMs = offset.inMilliseconds;
+    final match = tz.timeZoneDatabase.locations.entries.firstWhere(
+      (entry) => entry.value.currentTimeZone.offset == offsetMs,
+    );
+    return match.value;
+  } catch (_) {
+    return tz.getLocation('UTC');
+  }
+}
+
 /// Service untuk menangani notifikasi lokal Android sesuai F6 docs/SPEC.md
 class NotificationService {
   NotificationService({
@@ -27,21 +55,7 @@ class NotificationService {
 
     // Inisialisasi database timezone
     tz.initializeTimeZones();
-    // Default fallback local location
-    try {
-      final now = DateTime.now();
-      final offsetInMilliseconds = now.timeZoneOffset.inMilliseconds;
-      final locationName = tz.timeZoneDatabase.locations.entries
-          .firstWhere(
-            (entry) => entry.value.currentTimeZone.offset == offsetInMilliseconds,
-            orElse: () => tz.timeZoneDatabase.locations.entries.first,
-          )
-          .key;
-      tz.setLocalLocation(tz.getLocation(locationName));
-    } catch (_) {
-      // Jika penentuan nama zona gagal, gunakan UTC/default yang tersedia
-      tz.setLocalLocation(tz.getLocation('UTC'));
-    }
+    tz.setLocalLocation(localLocationFor(DateTime.now().timeZoneOffset));
 
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
     const initSettings = InitializationSettings(android: androidSettings);

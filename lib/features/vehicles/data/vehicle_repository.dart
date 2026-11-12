@@ -254,4 +254,23 @@ class VehicleRepository {
       return [];
     }
   }
+
+  /// Menandai bahwa notifikasi zona merah untuk komponen ini sudah ditampilkan
+  /// pada [km]. Disimpan di Firestore agar tidak muncul lagi setelah aplikasi
+  /// ditutup (SPEC F6: sekali per komponen sampai di-reset).
+  Future<void> markRedZoneNotified({
+    required String vehicleId,
+    required String componentType,
+    required int km,
+  }) async {
+    try {
+      final uid = _getRequiredUid();
+      await _componentsRef(vehicleId, uid).doc(componentType).set(
+        {'lastRedNotifiedKm': km},
+        SetOptions(merge: true),
+      );
+    } on FirebaseException catch (e) {
+      throw VehicleException(e.message ?? 'Gagal menyimpan status notifikasi.');
+    }
+  }
 }
