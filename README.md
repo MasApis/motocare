@@ -4,7 +4,7 @@
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Spark%20Plan-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com)
 [![State Management](https://img.shields.io/badge/State-Riverpod%20v3-00599C)](https://riverpod.dev)
-[![Tests](https://img.shields.io/badge/Tests-174%20Passed-brightgreen)](https://github.com)
+[![Tests](https://img.shields.io/badge/Tests-177%20Passed-brightgreen)](https://github.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **MotoCare** adalah aplikasi mobile Android berbasis Flutter yang dirancang khusus untuk membantu pemilik **sepeda motor matic** memantau kesehatan komponen kendaraan (oli mesin, oli gardan, V-belt), mencatat riwayat servis berkala, menjadwalkan pengingat servis otomatis, serta berkonsultasi seputar kendala motor dengan asisten cerdas berbasis AI (**MotoAI**).
@@ -78,7 +78,7 @@ UI (Widgets & Pages) ──► Providers (Riverpod) ──► Repositories ─�
 | **Notifikasi** | `flutter_local_notifications` + `timezone` |
 | **Laporan & Dokumen** | `pdf` + `printing` |
 | **Ikon & Font** | `google_fonts` (Plus Jakarta Sans) & `material_symbols_icons` |
-| **Pengujian** | `flutter_test` (174 Unit & Widget Tests) |
+| **Pengujian** | `flutter_test` (177 Unit & Widget Tests) |
 
 ---
 
@@ -99,8 +99,14 @@ motocare/
 │   │   └── vehicles/          # Tambah, kelola, & ganti kendaraan
 │   ├── shared/                # Tema warna, tipografi, komponen bersama
 │   └── main.dart              # Entrypoint aplikasi
-├── test/                      # 174 Unit & Widget test
-├── docs/                      # Spesifikasi teknis (SPEC.md) & Desain visual (DESIGN.md)
+├── test/                      # 177 Unit & Widget test
+├── docs/                      # Spesifikasi & desain
+│   ├── SPEC.md                #   daftar fitur resmi (sumber kebenaran)
+│   ├── DESIGN.md              #   aturan visual (warna, font, ukuran)
+│   ├── ERD.md                 #   struktur data Firestore
+│   ├── FIRESTORE_RULES_SETUP.md  # cara memasang rules keamanan
+│   └── design/SCREENS.md      #   peta layar desain ke fitur
+├── CONTRIBUTING.md            # Panduan untuk kontributor
 └── README.md
 ```
 
@@ -117,38 +123,115 @@ Pastikan lingkungan pengembangan Anda sudah terpasang:
 
 ### 2. Kloning Repositori
 ```bash
-git clone https://github.com/USERNAME/motocare.git
+git clone https://github.com/MasApis/motocare.git
 cd motocare
 ```
 
-### 3. Konfigurasi Firebase
-Aplikasi ini memerlukan Firebase Authentication dan Cloud Firestore:
-1. Buat proyek baru di [Firebase Console](https://console.firebase.google.com/) (Gunakan paket gratis **Spark**).
-2. Aktifkan **Email/Password** pada menu **Authentication**.
-3. Buat database **Cloud Firestore** dalam mode pengujian (*test mode*).
-4. Daftarkan aplikasi Android:
-   - Unduh file `google-services.json` dan letakkan di:
-     ```text
-     android/app/google-services.json
-     ```
-   - Buat file konfigurasi `lib/firebase_options.dart` menggunakan FlutterFire CLI:
-     ```bash
-     flutterfire configure
-     ```
-
-### 4. Ambil Dependensi
+### 3. Ambil Dependensi
 ```bash
 flutter pub get
 ```
 
-### 5. Jalankan Aplikasi
-Untuk mengaktifkan fitur asisten **MotoAI**, Anda dapat menyertakan API Key dari [Groq Console](https://console.groq.com/keys) (gratis):
+### 4. Konfigurasi Firebase
+Repo ini **sengaja tidak menyimpan** dua berkas konfigurasi Firebase, karena isinya kunci project:
+
+```text
+android/app/google-services.json
+lib/firebase_options.dart
+```
+
+Tanpa keduanya, aplikasi **gagal di-build** — bukan sekadar kehilangan sebagian fitur. Kabar baiknya, keduanya bisa dibuat otomatis dalam satu perintah:
+
+```bash
+dart pub global activate flutterfire_cli
+flutterfire configure
+```
+
+Pilih project `motocare-d902e`, lalu platform **Android** saja. Perintah ini membaca `firebase.json` di repo dan membuat kedua berkas dengan isi yang benar.
+
+Kalau `flutterfire configure` tidak bisa dipakai, salin contoh yang sudah disiapkan lalu isi manual:
+
+```bash
+cp lib/firebase_options.example.dart lib/firebase_options.dart
+```
+
+Nilai yang perlu diisi didapat dari **Firebase Console → Project Settings → General → Your apps**. Untuk `google-services.json`, unduh dari halaman yang sama.
+
+> **Punya project Firebase sendiri?** Langkah lengkapnya ada di [Lampiran A pada CONTRIBUTING.md](CONTRIBUTING.md#lampiran-a-memakai-project-firebase-sendiri). Cukup paket **Spark** (gratis, tanpa kartu kredit).
+
+### 5. Pasang Firestore Security Rules
+Jangan biarkan database dalam *test mode* (terbuka untuk siapa saja). Rules yang benar sudah ada di `firestore.rules`:
+
+```bash
+firebase login
+firebase deploy --only firestore:rules
+```
+
+Alternatif tanpa CLI: **Firestore Database → Rules →** tempel isi `firestore.rules` **→ Publish**.
+
+### 6. Jalankan Aplikasi
+Untuk mengaktifkan fitur asisten **MotoAI**, sertakan API Key dari [Groq Console](https://console.groq.com/keys) (gratis, tanpa kartu kredit):
 
 ```bash
 flutter run --dart-define=GROQ_API_KEY="gsk_kunci_groq_anda_disini"
 ```
 
-> **Catatan:** Jika dijalankan tanpa parameter `--dart-define=GROQ_API_KEY`, seluruh fitur pemantauan motor, servis, odometer, notifikasi, dan PDF tetap berfungsi normal, namun fitur chatbot akan menampilkan panduan konfigurasi API key.
+> **Catatan:** Tanpa `--dart-define=GROQ_API_KEY`, seluruh fitur pemantauan motor, servis, odometer, notifikasi, dan PDF tetap berfungsi normal. Hanya fitur chatbot yang menampilkan panduan konfigurasi API key.
+
+Saat pertama kali dijalankan, **dashboard kemungkinan masih kosong**. Itu wajar — lanjut ke langkah 7.
+
+### 7. Daftarkan Token App Check
+MotoCare memakai **Firebase App Check**. Pada mode debug, aplikasi membuat *debug token* sendiri yang **harus didaftarkan** dulu. Selama belum terdaftar, semua permintaan ke Firestore ditolak dan dashboard tampak kosong tanpa pesan error.
+
+1. Dengan aplikasi masih berjalan, buka terminal kedua dan lihat log:
+
+   ```bash
+   adb logcat -s com.google.firebase.appcheck.debug.internal.DebugAppCheckProvider
+   ```
+
+   Jika kosong, nyalakan log detailnya lebih dulu:
+   ```bash
+   adb shell setprop log.tag.com.google.firebase.appcheck.debug.internal.DebugAppCheckProvider VERBOSE
+   ```
+   Tutup-buka aplikasi, salin token yang tercetak, lalu matikan lagi:
+   ```bash
+   adb shell setprop log.tag.com.google.firebase.appcheck.debug.internal.DebugAppCheckProvider 0
+   ```
+
+2. Buka [Firebase Console → App Check → Apps](https://console.firebase.google.com/project/motocare-d902e/appcheck/apps)
+3. Kartu `com.hdp.motocare` → **⋮** → **Manage debug tokens** → **Add debug token**
+4. Tempel token tadi, beri nama bebas, **Save**
+5. Tutup dan jalankan ulang aplikasi — dashboard sekarang terisi.
+
+> Token ini berubah kalau aplikasi di-uninstall atau data aplikasi dibersihkan. Kalau suatu saat dashboard kosong lagi, ulangi langkah ini.
+>
+> Perintah `firebase appcheck:debugtokens:create` **tidak bisa** dipakai untuk mendaftarkan token pilihan Anda — perintah itu membuat token acak baru. Gunakan halaman web di atas.
+
+### 8. Build APK Rilis (opsional)
+Build rilis memerlukan berkas `android/key.properties` berisi lokasi keystore:
+
+```properties
+storePassword=...
+keyPassword=...
+keyAlias=...
+storeFile=/jalur/lengkap/ke/keystore.jks
+```
+
+Lalu:
+
+```bash
+flutter build apk --release --dart-define=GROQ_API_KEY="gsk_..."
+```
+
+> **Peringatan:** build rilis memakai **Play Integrity**, bukan debug token. APK rilis yang dipasang manual (sideload, bukan lewat Play Store) umumnya **gagal** pemeriksaan App Check, sehingga aplikasi tampak rusak padahal kodenya benar. Untuk pengujian, gunakan `flutter run`.
+
+---
+
+## 🤝 Ingin Berkontribusi?
+
+Baca **[CONTRIBUTING.md](CONTRIBUTING.md)**. Isinya: quickstart, penanganan berkas rahasia, langkah App Check yang detail, aturan kerja, konvensi kode, tabel error umum, dan checklist PR.
+
+Ikhtisar singkat: satu fitur per PR, `flutter analyze` harus bersih, `flutter test` harus lulus semua, dan fitur yang dikerjakan harus ada di [`docs/SPEC.md`](docs/SPEC.md).
 
 ---
 
@@ -164,12 +247,12 @@ flutter run --dart-define=GROQ_API_KEY="gsk_kunci_groq_anda_disini"
 4. **Perbarui Kilometer (Odometer):**
    - Tekan tombol **Update KM** di kartu motor untuk mencatat angka kilometer terkini setelah bepergian.
 5. **Catat Servis Bengkel:**
-   - Buka menu **Servis** > **Catat Servis**.
+   - Buka tab **Catat**.
    - Masukkan tanggal, bengkel, pilih komponen yang diganti atau dibersihkan, serta tambahkan part lain jika ada (misal: kampas rem). Simpan untuk memperbarui status kesehatan motor secara otomatis.
 6. **Konsultasi dengan MotoAI:**
-   - Buka tab **Chatbot** untuk menanyakan indikasi kerusakan, bunyi asing di bagian CVT, atau rekomendasi perawatan motor matic Anda.
+   - Buka tab **Chat AI** untuk menanyakan indikasi kerusakan, bunyi asing di bagian CVT, atau rekomendasi perawatan motor matic Anda.
 7. **Unduh Laporan Biaya Servis:**
-   - Buka tab **Laporan**, pilih bulan yang diinginkan, dan tekan **Unduh Laporan PDF** untuk melihat rincian serta mencetak bukti servis.
+   - Buka tab **Buku Servis**, pilih bulan yang diinginkan, dan tekan tombol unduh laporan PDF untuk melihat rincian serta mencetak bukti servis.
 
 ---
 
@@ -181,7 +264,7 @@ Proyek ini dilengkapi dengan cakupan pengujian komprehensif pada fungsi inti (*c
 # Menjalankan analisis statis kode
 flutter analyze
 
-# Menjalankan seluruh pengujian (174 test cases)
+# Menjalankan seluruh pengujian (177 test cases)
 flutter test
 ```
 
@@ -189,8 +272,10 @@ flutter test
 
 ## 🔒 Keamanan & Kebijakan Privasi
 
-- Kunci API rahasia tidak pernah disimpan di dalam repositori kode (diinjeksi aman melalui runtime compilation `--dart-define`).
-- Data pengguna diisolasi pada tingkat sub-koleksi Firestore (`users/{uid}/vehicles/...`) sehingga tiap pengguna hanya dapat membaca dan menulis data miliknya sendiri.
+- Kunci API rahasia tidak pernah disimpan di dalam repositori kode (diinjeksi aman melalui `--dart-define`).
+- Data pengguna diisolasi pada tingkat sub-koleksi Firestore (`users/{uid}/vehicles/...`) sehingga tiap pengguna hanya dapat membaca dan menulis data miliknya sendiri. Aturannya ada di `firestore.rules` — lihat [langkah 5](#5-pasang-firestore-security-rules).
+- **Firebase App Check** memastikan permintaan ke Firestore hanya datang dari aplikasi asli, bukan dari skrip pihak lain.
+- Berkas berisi kunci (`google-services.json`, `firebase_options.dart`, `key.properties`, `*.jks`) tidak disimpan di repo. Daftar lengkapnya ada di [CONTRIBUTING.md](CONTRIBUTING.md#lampiran-b-daftar-berkas-rahasia).
 
 ---
 
