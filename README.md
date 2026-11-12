@@ -225,6 +225,40 @@ flutter build apk --release --dart-define=GROQ_API_KEY="gsk_..."
 
 > **Peringatan:** build rilis memakai **Play Integrity**, bukan debug token. APK rilis yang dipasang manual (sideload, bukan lewat Play Store) umumnya **gagal** pemeriksaan App Check, sehingga aplikasi tampak rusak padahal kodenya benar. Untuk pengujian, gunakan `flutter run`.
 
+### 9. Ukuran APK
+
+Build debug memang besar. Angka terukur langsung di proyek ini:
+
+| Hasil build | Ukuran file |
+|---|---|
+| `flutter build apk --debug` | 200 MB (terpasang di HP **± 386 MB**) |
+| `flutter build apk --release` | 59 MB |
+| `--release --split-per-abi` | arm64 **23 MB** · armeabi-v7a 21 MB · x86_64 25 MB |
+
+Penyebab utamanya `kernel_blob.bin` (134 MB): kode Dart bentuk mentah yang hanya dibutuhkan mode debug. Selain itu APK debug membawa `libflutter.so` untuk **tiga** arsitektur prosesor sekaligus (arm64 37 MB + x86_64 38 MB + armeabi-v7a 32 MB), padahal satu HP hanya memakai satu.
+
+Maka:
+
+- **Untuk testing harian di HP sendiri**, batasi ke arsitektur HP Anda. Hemat ± 70 MB dan tetap bisa dibaca lognya:
+
+  ```bash
+  flutter run --target-platform android-arm64
+  ```
+
+- **Untuk dibagikan ke orang lain**, pisahkan APK per arsitektur:
+
+  ```bash
+  flutter build apk --release --split-per-abi
+  ```
+
+  Menghasilkan tiga APK kecil (arm64 23 MB, armeabi-v7a 21 MB, x86_64 25 MB). Bagikan yang **arm64-v8a** — itu yang dipakai hampir semua HP sekarang. Tetap ingat peringatan Play Integrity di atas.
+
+Untuk cek arsitektur HP yang tersambung:
+
+```bash
+adb shell getprop ro.product.cpu.abi
+```
+
 ---
 
 ## 🤝 Ingin Berkontribusi?

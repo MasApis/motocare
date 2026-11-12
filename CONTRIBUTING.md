@@ -285,6 +285,28 @@ flutter build apk --release --dart-define=GROQ_API_KEY="gsk_..."
 
 File `key.properties` dan `*.jks` **tidak boleh** masuk repo. Keduanya sudah di-`.gitignore`.
 
+### Kenapa APK debug besar
+
+APK debug ± 200 MB (terpasang ± 386 MB) karena membawa `kernel_blob.bin` (134 MB) — kode Dart mentah yang hanya dipakai mode debug — plus `libflutter.so` untuk tiga arsitektur prosesor (arm64, x86_64, armeabi-v7a), padahal HP Anda hanya memakai satu.
+
+Hemat ± 70 MB saat testing:
+
+```bash
+flutter run --target-platform android-arm64
+```
+
+Atau untuk APK bersama:
+
+```bash
+flutter build apk --release --split-per-abi
+```
+
+Hasilnya 21–25 MB per APK, tergantung arsitektur. Bagikan yang `arm64-v8a`.
+
+Cek arsitektur HP: `adb shell getprop ro.product.cpu.abi`.
+
+Rincian angka dan peringatan Play Integrity ada di [README bagian 9](README.md#9-ukuran-apk).
+
 ---
 
 ## 10. Error yang sering muncul
