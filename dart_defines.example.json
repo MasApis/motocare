@@ -1,0 +1,4 @@
+{
+  "GROQ_API_KEY": "gsk_kunci_groq_anda_disini",
+  "GROQ_MODEL": "openai/gpt-oss-120b"
+}

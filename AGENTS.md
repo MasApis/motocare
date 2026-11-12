@@ -33,7 +33,7 @@ Pemula. Jelaskan dengan bahasa Indonesia sederhana, singkat, tanpa istilah yang 
 - Jika layar yang diminta tidak ada di `docs/design/`, atau desain berbeda dengan SPEC, berhenti, laporkan perbedaannya, dan tanya mana yang dipakai. Jangan menebak desain.
 
 ## Tech Stack
-Flutter (Dart), Android. Riverpod, go_router, Firebase Auth + Cloud Firestore, flutter_local_notifications, pdf + printing, `firebase_app_check`, dan Groq Cloud API (`openai/gpt-oss-120b`) dengan kunci lewat `--dart-define=GROQ_API_KEY`. Paket Spark, tanpa kunci di dalam aplikasi.
+Flutter (Dart), Android. Riverpod, go_router, Firebase Auth + Cloud Firestore, flutter_local_notifications, pdf + printing, `firebase_app_check`, dan Groq Cloud API (`openai/gpt-oss-120b`) dengan kunci lewat `--dart-define-from-file=dart_defines.json`. Paket Spark, tanpa kunci di dalam aplikasi.
 
 ## Struktur
 ```
@@ -64,7 +64,7 @@ Widget tidak memanggil Firestore langsung; selalu lewat provider dan repository.
 
 ## Keamanan (wajib)
 - **Jangan pernah menaruh kunci API (Groq dll.) di kode, aset, atau repositori.**
-- Jangan membaca, mencetak, atau meng-commit file rahasia (`.env`, keystore, `key.properties`).
+- Jangan membaca, mencetak, atau meng-commit file rahasia (`.env`, `dart_defines.json`, keystore, `key.properties`).
 - Security rules Firestore: hanya pemilik `uid` yang bisa membaca dan menulis datanya.
 - Validasi semua input pengguna.
 

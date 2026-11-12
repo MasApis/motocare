@@ -32,8 +32,9 @@ Kalau Anda sudah punya akses ke project Firebase `motocare-d902e`:
 git clone https://github.com/MasApis/motocare.git
 cd motocare
 flutter pub get
-flutterfire configure          # membuat 2 file rahasia (lihat bagian 3)
-flutter run --dart-define=GROQ_API_KEY="gsk_..."
+flutterfire configure                          # membuat 2 file rahasia (lihat bagian 3)
+cp dart_defines.example.json dart_defines.json # lalu isi kunci Groq Anda di file itu
+flutter run --dart-define-from-file=dart_defines.json
 ```
 
 Setelah aplikasi terbuka, **dashboard kemungkinan masih kosong**. Itu bukan bug: token App Check Anda belum didaftarkan. Kerjakan [bagian 4](#4-app-check-sekali-pasang-tidak-dipikir-lagi) sekali saja, lalu jalankan ulang aplikasinya.
@@ -44,14 +45,15 @@ Kalau muncul error di salah satu langkah, lompat ke [tabel error](#10-error-yang
 
 ---
 
-## 3. Tiga file rahasia (paling sering bikin gagal)
+## 3. File rahasia (paling sering bikin gagal)
 
-Repo ini **sengaja tidak menyimpan** tiga file ini. Tanpa ketiganya, aplikasi gagal jalan.
+Repo ini **sengaja tidak menyimpan** empat file ini. Tanpa ketiganya yang pertama, aplikasi gagal jalan.
 
 | File | Untuk apa | Didapat dari |
 |---|---|---|
 | `android/app/google-services.json` | Menghubungkan aplikasi Android ke Firebase | `flutterfire configure` |
 | `lib/firebase_options.dart` | Alamat & kunci project untuk kode Dart | `flutterfire configure` |
+| `dart_defines.json` | Kunci API Groq untuk fitur Chat AI | Dibuat sendiri (lihat [3b](#3b-kunci-groq-tidak-tersimpan-di-aplikasi)) |
 | `android/key.properties` | Tanda tangan APK rilis | Dibuat sendiri (hanya perlu saat build rilis) |
 
 Kabar baiknya: **dua yang pertama dibuat otomatis.** File `firebase.json` di repo sudah menyimpan daftar project dan app ID, jadi cukup satu perintah:
@@ -91,6 +93,45 @@ Untuk `google-services.json`, unduh dari halaman yang sama: **Project Settings �
 
 **Jangan pernah** men-commit ketiga file itu. Semuanya sudah masuk `.gitignore`, jadi Anda tidak perlu khawatir — cukup jangan paksa dengan `git add -f`.
 
+### 3b. Kunci Groq tidak tersimpan di aplikasi
+
+Fitur Chat AI butuh kunci dari [Groq Console](https://console.groq.com/keys). Kunci itu dibaca lewat:
+
+```dart
+const String.fromEnvironment('GROQ_API_KEY')
+```
+
+Kata **`const`** di situ penting artinya: nilainya harus diketahui **saat aplikasi dikompilasi**, bukan saat dijalankan. Jadi kunci itu **ditempel ke dalam APK saat build**, seperti Anda mengetiknya langsung di source code.
+
+Konsekuensinya:
+
+1. **Anda harus menyertakannya setiap kali build.** Kalau lupa, chatbot mati (fitur lain tetap jalan). Aplikasi akan menampilkan pesan *"Kunci API Groq belum dikonfigurasi"*.
+2. **Kunci bisa diambil orang dari APK Anda.** Siapa pun yang memegang file APK bisa mengeluarkan kunci itu dengan alat sederhana. Enkripsi tidak menolong, karena aplikasi sendiri harus bisa membacanya.
+
+Karena itu, simpan kunci di satu file yang tidak masuk repo:
+
+```bash
+cp dart_defines.example.json dart_defines.json
+```
+
+Isi `dart_defines.json`:
+
+```json
+{
+  "GROQ_API_KEY": "gsk_kunci_asli_anda_disini"
+}
+```
+
+Lalu selalu jalankan dengan:
+
+```bash
+flutter run --dart-define-from-file=dart_defines.json
+```
+
+File `dart_defines.json` sudah tercantum di `.gitignore`. **Jangan hapus baris itu**, dan jangan pakai `git add -f` untuk file tersebut.
+
+> **Jangan bagikan APK hasil build Anda yang berisi kunci Groq.** Jika perlu membagikan aplikasi ke orang lain, minta mereka membuat kunci Groq sendiri dan build sendiri, atau hapus kuncinya (`flutter build apk --release` tanpa `--dart-define-from-file`) sehingga fitur Chat AI mati tapi aplikasi tetap jalan.
+
 ---
 
 ## 4. App Check: sekali pasang, tidak dipikir lagi
@@ -110,7 +151,7 @@ Saat mode debug, App Check memakai **debug token**: kode acak yang dibuat otomat
 2. Jalankan aplikasi:
 
    ```bash
-   flutter run --dart-define=GROQ_API_KEY="gsk_..."
+   flutter run --dart-define-from-file=dart_defines.json
    ```
 
 3. Buka terminal kedua, lalu:
@@ -280,7 +321,7 @@ storeFile=/jalur/lengkap/ke/keystore.jks
 Lalu:
 
 ```bash
-flutter build apk --release --dart-define=GROQ_API_KEY="gsk_..."
+flutter build apk --release --dart-define-from-file=dart_defines.json
 ```
 
 File `key.properties` dan `*.jks` **tidak boleh** masuk repo. Keduanya sudah di-`.gitignore`.
@@ -321,7 +362,7 @@ Rincian angka dan peringatan Play Integrity ada di [README bagian 9](README.md#9
 | Notifikasi pukul 08:00 tidak muncul | Izin "Alarm & pengingat" belum diizinkan | Pengaturan HP → Aplikasi → MotoCare → izin Alarm & pengingat |
 | Notifikasi tidak muncul sama sekali | Izin notifikasi ditolak | Pengaturan HP → Aplikasi → MotoCare → Notifikasi |
 | "KM baru tidak boleh lebih kecil dari KM terakhir" | Memang validasi, bukan bug | Isi odometer ≥ angka terakhir |
-| Chat AI bilang kunci API belum dikonfigurasi | `--dart-define=GROQ_API_KEY` tidak disertakan | Jalankan dengan parameter itu |
+| Chat AI bilang kunci API belum dikonfigurasi | `dart_defines.json` belum ada, atau flag `--dart-define-from-file` tidak disertakan saat build/run | Lihat [3b](#3b-kunci-groq-tidak-tersimpan-di-aplikasi). Kunci **tidak** tersimpan di aplikasi — harus disertakan setiap build |
 | Chat AI bilang kunci tidak valid | Kunci Groq salah atau sudah dicabut | Buat kunci baru di [console.groq.com/keys](https://console.groq.com/keys) |
 | Perubahan di `docs/` tidak ikut ter-commit | `.gitignore` memuat `docs/*` | `git add -f docs/nama_file.md` |
 | `flutter analyze` bersih tapi `flutter test` gagal | Test lama menyesuaikan perilaku lama | Perbaiki kodenya, bukan testnya — kecuali memang perilakunya sengaja diubah |
@@ -374,6 +415,7 @@ Agar tidak ragu, ini daftar lengkap yang **tidak boleh** masuk repo:
 android/app/google-services.json
 android/key.properties
 lib/firebase_options.dart
+dart_defines.json
 *.jks
 *.keystore
 .env

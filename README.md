@@ -74,7 +74,7 @@ UI (Widgets & Pages) ──► Providers (Riverpod) ──► Repositories ─�
 | **State Management** | `flutter_riverpod` |
 | **Routing / Navigasi** | `go_router` |
 | **Backend & Database** | Firebase Authentication & Cloud Firestore (Offline Persistence) |
-| **AI Engine** | Groq Cloud API (`openai/gpt-oss-120b`, kunci lewat `--dart-define`) |
+| **AI Engine** | Groq Cloud API (`openai/gpt-oss-120b`, kunci lewat `--dart-define-from-file`) |
 | **Notifikasi** | `flutter_local_notifications` + `timezone` |
 | **Laporan & Dokumen** | `pdf` + `printing` |
 | **Ikon & Font** | `google_fonts` (Plus Jakarta Sans) & `material_symbols_icons` |
@@ -170,13 +170,33 @@ firebase deploy --only firestore:rules
 Alternatif tanpa CLI: **Firestore Database → Rules →** tempel isi `firestore.rules` **→ Publish**.
 
 ### 6. Jalankan Aplikasi
-Untuk mengaktifkan fitur asisten **MotoAI**, sertakan API Key dari [Groq Console](https://console.groq.com/keys) (gratis, tanpa kartu kredit):
+Untuk mengaktifkan fitur asisten **MotoAI**, Anda perlu API Key dari [Groq Console](https://console.groq.com/keys) (gratis, tanpa kartu kredit).
 
-```bash
-flutter run --dart-define=GROQ_API_KEY="gsk_kunci_groq_anda_disini"
+Buat file `dart_defines.json` di root proyek (cukup **sekali**), isinya:
+
+```json
+{
+  "GROQ_API_KEY": "gsk_kunci_asli_anda_disini"
+}
 ```
 
-> **Catatan:** Tanpa `--dart-define=GROQ_API_KEY`, seluruh fitur pemantauan motor, servis, odometer, notifikasi, dan PDF tetap berfungsi normal. Hanya fitur chatbot yang menampilkan panduan konfigurasi API key.
+Cara tercepat, salin contohnya:
+
+```bash
+cp dart_defines.example.json dart_defines.json
+```
+
+Lalu isi kunci asli Anda di file itu. Setelah itu jalankan:
+
+```bash
+flutter run --dart-define-from-file=dart_defines.json
+```
+
+> **File `dart_defines.json` sudah masuk `.gitignore`**, jadi kunci Anda tidak akan ikut ter-commit. Jangan hapus baris itu dari `.gitignore`.
+
+> **Kenapa tidak disimpan di aplikasi?** Kunci dari `--dart-define` **ditempel ke dalam APK saat build**, bukan disimpan sebagai file. Artinya Anda harus menyertakan flag ini **setiap kali** build atau menjalankan aplikasi — kalau lupa, chatbot mati sementara fitur lain tetap jalan.
+>
+> Tanpa kunci, seluruh fitur pemantauan motor, servis, odometer, notifikasi, dan PDF tetap berfungsi normal. Hanya fitur chatbot yang menampilkan panduan konfigurasi.
 
 Saat pertama kali dijalankan, **dashboard kemungkinan masih kosong**. Itu wajar — lanjut ke langkah 7.
 
@@ -220,7 +240,7 @@ storeFile=/jalur/lengkap/ke/keystore.jks
 Lalu:
 
 ```bash
-flutter build apk --release --dart-define=GROQ_API_KEY="gsk_..."
+flutter build apk --release --dart-define-from-file=dart_defines.json
 ```
 
 > **Peringatan:** build rilis memakai **Play Integrity**, bukan debug token. APK rilis yang dipasang manual (sideload, bukan lewat Play Store) umumnya **gagal** pemeriksaan App Check, sehingga aplikasi tampak rusak padahal kodenya benar. Untuk pengujian, gunakan `flutter run`.
@@ -242,7 +262,8 @@ Maka:
 - **Untuk testing harian di HP sendiri**, batasi ke arsitektur HP Anda. Hemat ± 70 MB dan tetap bisa dibaca lognya:
 
   ```bash
-  flutter run --target-platform android-arm64
+  flutter run --target-platform android-arm64 \
+    --dart-define-from-file=dart_defines.json
   ```
 
 - **Untuk dibagikan ke orang lain**, pisahkan APK per arsitektur:
@@ -306,10 +327,12 @@ flutter test
 
 ## 🔒 Keamanan & Kebijakan Privasi
 
-- Kunci API rahasia tidak pernah disimpan di dalam repositori kode (diinjeksi aman melalui `--dart-define`).
+- Kunci API tidak disimpan di dalam repositori. Kunci Groq diambil dari `dart_defines.json` (sudah di-`.gitignore`) lewat `--dart-define-from-file`.
 - Data pengguna diisolasi pada tingkat sub-koleksi Firestore (`users/{uid}/vehicles/...`) sehingga tiap pengguna hanya dapat membaca dan menulis data miliknya sendiri. Aturannya ada di `firestore.rules` — lihat [langkah 5](#5-pasang-firestore-security-rules).
 - **Firebase App Check** memastikan permintaan ke Firestore hanya datang dari aplikasi asli, bukan dari skrip pihak lain.
-- Berkas berisi kunci (`google-services.json`, `firebase_options.dart`, `key.properties`, `*.jks`) tidak disimpan di repo. Daftar lengkapnya ada di [CONTRIBUTING.md](CONTRIBUTING.md#lampiran-b-daftar-berkas-rahasia).
+- Berkas berisi kunci (`google-services.json`, `firebase_options.dart`, `key.properties`, `dart_defines.json`, `*.jks`) tidak disimpan di repo. Daftar lengkapnya ada di [CONTRIBUTING.md](CONTRIBUTING.md#lampiran-b-daftar-berkas-rahasia).
+
+> **Yang perlu diketahui:** kunci Groq yang diberikan lewat `--dart-define` **tertanam di dalam APK** saat build. Siapa pun yang memegang APK Anda secara teknis bisa mengambilnya. Karena itu **jangan bagikan APK hasil build dengan kunci Anda** ke orang lain, dan jangan unggah ke Play Store. Penjelasan lengkap ada di [CONTRIBUTING.md bagian 3b](CONTRIBUTING.md#3b-kunci-groq-tidak-tersimpan-di-aplikasi).
 
 ---
 
