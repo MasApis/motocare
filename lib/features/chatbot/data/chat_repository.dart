@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -44,6 +45,10 @@ class GroqChatRepository implements ChatRepository {
   static const String _endpoint =
       'https://api.groq.com/openai/v1/chat/completions';
 
+  /// Batas tunggu permintaan; mencegah spinner berputar tanpa akhir
+  /// saat Wi-Fi tersambung tetapi tidak ada internet.
+  static const Duration _requestTimeout = Duration(seconds: 20);
+
   @override
   Future<String> sendMessage({
     required String systemInstruction,
@@ -54,7 +59,7 @@ class GroqChatRepository implements ChatRepository {
     final cleanKey = apiKey.trim();
     if (cleanKey.isEmpty) {
       throw const ChatException(
-        'Kunci API Groq belum dikonfigurasi. Jalankan aplikasi dengan argumen: --dart-define=GROQ_API_KEY=gsk_...',
+        'Kunci API Groq belum dikonfigurasi. Jalankan aplikasi dengan argumen: --dart-define-from-file=dart_defines.json',
       );
     }
 
@@ -89,7 +94,7 @@ class GroqChatRepository implements ChatRepository {
     final client = httpClient ?? HttpClient();
     try {
       final uri = Uri.parse(_endpoint);
-      final request = await client.postUrl(uri);
+      final request = await client.postUrl(uri).timeout(_requestTimeout);
       request.headers.set(
         HttpHeaders.contentTypeHeader,
         'application/json; charset=utf-8',
@@ -97,8 +102,9 @@ class GroqChatRepository implements ChatRepository {
       request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $cleanKey');
       request.add(utf8.encode(requestBody));
 
-      final response = await request.close();
-      final responseBody = await response.transform(utf8.decoder).join();
+      final response = await request.close().timeout(_requestTimeout);
+      final responseBody =
+          await response.transform(utf8.decoder).join().timeout(_requestTimeout);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(responseBody) as Map<String, dynamic>;
@@ -169,6 +175,10 @@ class GroqChatRepository implements ChatRepository {
       throw const ChatException(
         'Koneksi internet terputus. Mohon periksa sambungan internet Anda dan coba lagi.',
       );
+    } on TimeoutException {
+      throw const ChatException(
+        'Koneksi terlalu lambat atau tidak tersedia. Periksa internet Anda lalu coba lagi.',
+      );
     } catch (e) {
       debugPrint('Groq General Error: $e');
       if (e is ChatException) rethrow;
@@ -200,9 +210,9 @@ class GroqChatRepository implements ChatRepository {
   ) async {
     try {
       final uri = Uri.parse('https://api.groq.com/openai/v1/models');
-      final request = await client.getUrl(uri);
+      final request = await client.getUrl(uri).timeout(_requestTimeout);
       request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $cleanKey');
-      final response = await request.close();
+      final response = await request.close().timeout(_requestTimeout);
       final body = await response.transform(utf8.decoder).join();
       if (response.statusCode == 200) {
         final data = jsonDecode(body) as Map<String, dynamic>;

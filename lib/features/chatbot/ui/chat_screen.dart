@@ -8,6 +8,7 @@ import '../../../../shared/theme/app_spacing.dart';
 import '../../../../shared/theme/app_typography.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
 import '../providers/chat_providers.dart';
+import '../providers/connection_providers.dart';
 import 'widgets/chat_bubble.dart';
 import 'widgets/chat_input_bar.dart';
 
@@ -26,6 +27,15 @@ class ChatScreen extends ConsumerStatefulWidget {
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Periksa koneksi saat layar dibuka; status awal "Memeriksa".
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(connectionStatusProvider.notifier).refresh();
+    });
+  }
 
   @override
   void dispose() {
@@ -48,8 +58,17 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final chatState = ref.watch(chatNotifierProvider);
+    final connectionStatus = ref.watch(connectionStatusProvider);
     final activeVehicle = ref.watch(selectedVehicleProvider);
     final vehicleDisplayName = activeVehicle?.displayName ?? 'Motor Matic';
+
+    // Perbarui status koneksi setiap kali kirim pesan mulai/selesai,
+    // supaya badge ikut berubah saat internet mati di tengah obrolan.
+    ref.listen<ChatState>(chatNotifierProvider, (previous, next) {
+      if (previous?.isLoading != next.isLoading) {
+        ref.read(connectionStatusProvider.notifier).refresh();
+      }
+    });
 
     // Auto-scroll saat ada pesan baru atau loading
     ref.listen<ChatState>(chatNotifierProvider, (previous, next) {
@@ -99,13 +118,30 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.statusSafeBg,
+                          color: switch (connectionStatus) {
+                            ConnectionStatus.online => AppColors.statusSafeBg,
+                            ConnectionStatus.offline =>
+                              AppColors.statusCriticalBg,
+                            ConnectionStatus.checking =>
+                              AppColors.surfaceContainerLow,
+                          },
                           borderRadius: AppShapes.roundedFull,
                         ),
                         child: Text(
-                          'Online',
+                          switch (connectionStatus) {
+                            ConnectionStatus.online => 'Online',
+                            ConnectionStatus.offline => 'Offline',
+                            ConnectionStatus.checking => 'Memeriksa',
+                          },
                           style: AppTypography.labelCaps(
-                            color: AppColors.statusSafeText,
+                            color: switch (connectionStatus) {
+                              ConnectionStatus.online =>
+                                AppColors.statusSafeText,
+                              ConnectionStatus.offline =>
+                                AppColors.statusCriticalText,
+                              ConnectionStatus.checking =>
+                                AppColors.onSurfaceVariant,
+                            },
                           ),
                         ),
                       ),

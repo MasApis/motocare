@@ -39,7 +39,7 @@ void main() {
           isA<ChatException>().having(
             (e) => e.userFriendlyMessage,
             'userFriendlyMessage',
-            contains('--dart-define=GROQ_API_KEY'),
+            contains('dart_defines.json'),
           ),
         ),
       );

@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:motocare/core/chat_prompt_builder.dart';
+import 'package:motocare/core/connection_checker.dart';
 import 'package:motocare/features/chatbot/data/chat_repository.dart';
 import 'package:motocare/features/chatbot/providers/chat_providers.dart';
+import 'package:motocare/features/chatbot/providers/connection_providers.dart';
 import 'package:motocare/features/chatbot/ui/chat_screen.dart';
 
 /// Fake ChatRepository untuk pengujian widget
@@ -30,6 +34,14 @@ class FakeChatRepository implements ChatRepository {
 }
 
 void main() {
+  /// Pemeriksa koneksi palsu agar widget test tidak benar-benar
+  /// melakukan DNS lookup ke internet.
+  ConnectionChecker fakeChecker({required bool online}) => ConnectionChecker(
+        lookup: (host) async => online
+            ? [InternetAddress('127.0.0.1')]
+            : <InternetAddress>[],
+      );
+
   testWidgets('ChatScreen menampilkan empty state dan contoh pertanyaan awal',
       (WidgetTester tester) async {
     final fakeRepo = FakeChatRepository();
@@ -38,6 +50,9 @@ void main() {
       ProviderScope(
         overrides: [
           chatRepositoryProvider.overrideWithValue(fakeRepo),
+          connectionCheckerProvider.overrideWithValue(
+            fakeChecker(online: true),
+          ),
         ],
         child: const MaterialApp(
           home: ChatScreen(),
@@ -58,6 +73,9 @@ void main() {
       ProviderScope(
         overrides: [
           chatRepositoryProvider.overrideWithValue(fakeRepo),
+          connectionCheckerProvider.overrideWithValue(
+            fakeChecker(online: true),
+          ),
         ],
         child: const MaterialApp(
           home: ChatScreen(),
@@ -95,6 +113,9 @@ void main() {
       ProviderScope(
         overrides: [
           chatRepositoryProvider.overrideWithValue(fakeRepo),
+          connectionCheckerProvider.overrideWithValue(
+            fakeChecker(online: true),
+          ),
         ],
         child: const MaterialApp(
           home: ChatScreen(),
@@ -125,6 +146,9 @@ void main() {
       ProviderScope(
         overrides: [
           chatRepositoryProvider.overrideWithValue(fakeRepo),
+          connectionCheckerProvider.overrideWithValue(
+            fakeChecker(online: true),
+          ),
         ],
         child: const MaterialApp(
           home: ChatScreen(),
@@ -160,5 +184,51 @@ void main() {
     // Riwayat kembali kosong (empty state)
     expect(find.text('Selamat Datang di MotoAI!'), findsOneWidget);
     expect(find.text('V-belt bunyi decit'), findsNothing);
+  });
+
+  testWidgets('Badge berubah menjadi Offline saat internet tidak tersedia',
+      (WidgetTester tester) async {
+    final fakeRepo = FakeChatRepository();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          chatRepositoryProvider.overrideWithValue(fakeRepo),
+          connectionCheckerProvider.overrideWithValue(
+            fakeChecker(online: false),
+          ),
+        ],
+        child: const MaterialApp(
+          home: ChatScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Offline'), findsOneWidget);
+    expect(find.text('Online'), findsNothing);
+  });
+
+  testWidgets('Badge berubah menjadi Online saat internet tersedia',
+      (WidgetTester tester) async {
+    final fakeRepo = FakeChatRepository();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          chatRepositoryProvider.overrideWithValue(fakeRepo),
+          connectionCheckerProvider.overrideWithValue(
+            fakeChecker(online: true),
+          ),
+        ],
+        child: const MaterialApp(
+          home: ChatScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Online'), findsOneWidget);
+    expect(find.text('Offline'), findsNothing);
   });
 }
