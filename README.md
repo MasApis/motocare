@@ -243,7 +243,11 @@ Lalu:
 flutter build apk --release --dart-define-from-file=dart_defines.json
 ```
 
-> **Peringatan:** build rilis memakai **Play Integrity**, bukan debug token. APK rilis yang dipasang manual (sideload, bukan lewat Play Store) umumnya **gagal** pemeriksaan App Check, sehingga aplikasi tampak rusak padahal kodenya benar. Untuk pengujian, gunakan `flutter run`.
+> **Peringatan:** build rilis memakai **Play Integrity**, bukan debug token. APK rilis yang dipasang manual (sideload, bukan lewat Play Store) umumnya **gagal** pemeriksaan App Check.
+>
+> **Apakah itu masalah?** Saat ini **tidak**, karena enforcement App Check untuk Firestore dan Auth masih **UNENFORCED** (mati). Selama belum dinyalakan, APK rilis tetap bisa dipakai dan dibagikan.
+>
+> Yang berubah kalau enforcement dinyalakan: APK rilis sideload akan tampak rusak (dashboard kosong) padahal kodenya benar. Jangan nyalakan enforcement kecuali aplikasi didistribusikan lewat Play Store.
 
 ### 9. Ukuran APK
 
@@ -272,7 +276,9 @@ Maka:
   flutter build apk --release --split-per-abi
   ```
 
-  Menghasilkan tiga APK kecil (arm64 23 MB, armeabi-v7a 21 MB, x86_64 25 MB). Bagikan yang **arm64-v8a** — itu yang dipakai hampir semua HP sekarang. Tetap ingat peringatan Play Integrity di atas.
+  Menghasilkan tiga APK kecil (arm64 23 MB, armeabi-v7a 21 MB, x86_64 25 MB). Bagikan yang **arm64-v8a** — itu yang dipakai hampir semua HP sekarang.
+
+  Untuk keperluan membagikan APK (demo, penguji), ikuti panduan lengkap di [CONTRIBUTING bagian 9b](CONTRIBUTING.md#9b-membagikan-aplikasi-untuk-demo) — termasuk cara memakai kunci khusus demo yang bisa dicabut.
 
 Untuk cek arsitektur HP yang tersambung:
 

@@ -200,9 +200,21 @@ Token debug disimpan di dalam data aplikasi. Kalau aplikasi **di-uninstall** ata
 
 ### 4d. Token debug tidak berlaku untuk APK rilis
 
-Build rilis memakai **Play Integrity**, bukan debug token. APK rilis yang dipasang manual (sideload) biasanya **gagal** pemeriksaan ini, sehingga aplikasi tampak rusak padahal kodenya benar.
+Build rilis memakai **Play Integrity**, bukan debug token. APK rilis yang dipasang manual (sideload) biasanya **gagal** pemeriksaan ini.
 
-Kalau App Check enforcement sedang aktif dan Anda membagikan APK rilis ke orang lain, pastikan APK itu dipasang lewat **Google Play Store**. Untuk pengujian lokal, gunakan `flutter run` (mode debug).
+**Tapi ini belum jadi masalah.** Status App Check di proyek `motocare-d902e` saat dokumen ini ditulis:
+
+| Layanan | Enforcement |
+|---|---|
+| `firestore.googleapis.com` | **UNENFORCED** |
+| `identitytoolkit.googleapis.com` (Auth) | **UNENFORCED** |
+| `firebasestorage.googleapis.com` | UNENFORCED |
+
+Selama masih `UNENFORCED`, APK rilis sideload tetap bisa membaca dan menulis data. Jadi APK rilis **aman dibagikan sekarang**.
+
+Yang berubah kalau enforcement dinyalakan: APK rilis sideload akan tampak rusak (dashboard kosong) padahal kodenya benar. Jangan nyalakan enforcement kecuali aplikasi didistribusikan lewat **Google Play Store**.
+
+> Cek sendiri statusnya sebelum rilis: **Firebase Console → App Check → APIs**. Kalau ada yang sudah *Enforced*, pastikan distribusinya lewat Play Store.
 
 ---
 
@@ -347,6 +359,78 @@ Hasilnya 21–25 MB per APK, tergantung arsitektur. Bagikan yang `arm64-v8a`.
 Cek arsitektur HP: `adb shell getprop ro.product.cpu.abi`.
 
 Rincian angka dan peringatan Play Integrity ada di [README bagian 9](README.md#9-ukuran-apk).
+
+---
+
+## 9b. Membagikan aplikasi untuk demo
+
+Bagian ini untuk Anda yang perlu membagikan APK ke orang lain — dosen, penguji, atau teman — tanpa mengorbankan kunci pengembangan sendiri.
+
+### Pakai kunci khusus demo
+
+Buat kunci **baru** di [console.groq.com/keys](https://console.groq.com/keys), beri nama `demo`. Jangan pakai kunci harian Anda.
+
+| Keuntungan | Penjelasan |
+|---|---|
+| Bisa dicabut kapan saja | Hapus kunci `demo` setelah selesai; kunci harian Anda tidak tersentuh |
+| Kuota terpisah | Demo tidak memakan jatah kunci harian Anda |
+| Mudah diganti | Kalau bocor, buat baru dalam 1 menit lalu build ulang |
+
+Simpan kunci demo di **salah satu** nama ini (keduanya sudah di-`.gitignore`):
+
+```bash
+dart_defines.json        # paling sederhana
+dart_defines.demo.json   # kalau ingin memisahkan dari kunci harian
+```
+
+> **Jangan** menyimpan kunci di nama lain seperti `kunci.json` atau `defines.json` — nama itu **tidak** di-`.gitignore`, sehingga `git add .` bisa memasukkannya ke repo. Kalau ragu, cek dengan `git check-ignore -v namafile.json`.
+
+### Build APK demo
+
+```bash
+flutter build apk --release --split-per-abi \
+  --dart-define-from-file=dart_defines.demo.json
+```
+
+Hasilnya tiga file di `build/app/outputs/flutter-apk/`:
+
+| File | Ukuran | Untuk |
+|---|---|---|
+| `app-arm64-v8a-release.apk` | ± 23 MB | HP modern — **ini yang dibagikan** |
+| `app-armeabi-v7a-release.apk` | ± 21 MB | HP lama 32-bit |
+| `app-x86_64-release.apk` | ± 25 MB | Emulator — jangan dibagikan |
+
+### Memasang ke HP sendiri
+
+APK release ditandatangani kunci berbeda dari APK debug, jadi harus uninstall dulu:
+
+```bash
+adb uninstall com.hdp.motocare
+adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+```
+
+> Setelah uninstall, **token App Check hilang** dan dibuat ulang. Kalau nanti kembali memakai `flutter run`, tokennya berbeda dan harus didaftarkan lagi ([bagian 4](#4-app-check-sekali-pasang-tidak-dipikir-lagi)). Data Anda aman — tersimpan di Firestore, bukan di HP.
+
+### Sebelum dan sesudah demo
+
+**Sebelum:**
+- Cek status App Check di **Console → App Check → APIs**. Kalau ada yang *Enforced*, APK sideload tidak akan bisa baca data.
+- **Jangan** nyalakan enforcement selama masih membagikan APK secara manual.
+- Uji chat AI sekali dengan kunci demo, dari HP yang berbeda kalau bisa.
+
+**Sesudah:**
+- Cabut kunci demo di [console.groq.com/keys](https://console.groq.com/keys).
+- Kalau kuota gratis Groq habis di tengah demo, **semua fitur lain tetap jalan** — hanya tab Chat AI yang menampilkan pesan batas kuota. Karena itu taruh demo Chat AI di **akhir** presentasi.
+
+### Yang tetap berisiko
+
+Kunci di dalam APK bisa diambil orang. Untuk demo kelas risikonya kecil, tapi **jangan** unggah APK berisi kunci ke tempat publik (GitHub Release, Google Drive terbuka, Play Store). Kalau butuh APK publik, build tanpa kunci:
+
+```bash
+flutter build apk --release --split-per-abi
+```
+
+Aplikasi tetap jalan penuh; hanya Chat AI yang meminta konfigurasi.
 
 ---
 
