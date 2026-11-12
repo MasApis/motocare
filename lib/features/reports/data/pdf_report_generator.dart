@@ -244,7 +244,7 @@ class PdfReportGenerator {
     return pw.Table(
       border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
       columnWidths: const {
-        0: pw.FixedColumnWidth(22),
+        0: pw.FixedColumnWidth(30),
         1: pw.FlexColumnWidth(1.4),
         2: pw.FlexColumnWidth(1.2),
         3: pw.FlexColumnWidth(3.4),
