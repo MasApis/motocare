@@ -95,18 +95,21 @@ Untuk `google-services.json`, unduh dari halaman yang sama: **Project Settings �
 
 ### 3b. Kunci Groq tidak tersimpan di aplikasi
 
-Fitur Chat AI butuh kunci dari [Groq Console](https://console.groq.com/keys). Kunci itu dibaca lewat:
+Fitur Chat AI butuh kunci dari [Groq Console](https://console.groq.com/keys). Ada dua cara kunci masuk ke aplikasi:
 
-```dart
-const String.fromEnvironment('GROQ_API_KEY')
-```
+| Cara | Untuk siapa | Kunci ikut di APK? |
+|---|---|---|
+| **Diisi pengguna di layar Chat AI** | APK yang dibagikan / rilis | **Tidak** |
+| `--dart-define-from-file=dart_defines.json` | Pengembangan di HP sendiri | Ya |
 
-Kata **`const`** di situ penting artinya: nilainya harus diketahui **saat aplikasi dikompilasi**, bukan saat dijalankan. Jadi kunci itu **ditempel ke dalam APK saat build**, seperti Anda mengetiknya langsung di source code.
+**Cara utama (dipakai build publik):** kunci ditempel pengguna di layar Chat AI, lalu disimpan terenkripsi di perangkat lewat `flutter_secure_storage` (Android Keystore). Kode membacanya di `lib/features/chatbot/data/api_key_store.dart`. Kalau belum ada, layar Chat menampilkan ajakan *"Chat AI butuh kunci API"* — bukan error teknis.
 
-Konsekuensinya:
+**Cara pengembangan:** `dart_defines.json` masih didukung sebagai nilai cadangan, karena lebih cepat daripada menempel kunci tiap kali install ulang. Kunci dari flag ini dibaca lewat `String.fromEnvironment`, yang nilainya **diketahui saat kompilasi** — artinya kunci itu **ditempel ke dalam APK saat build**.
 
-1. **Anda harus menyertakannya setiap kali build.** Kalau lupa, chatbot mati (fitur lain tetap jalan). Aplikasi akan menampilkan pesan *"Kunci API Groq belum dikonfigurasi"*.
-2. **Kunci bisa diambil orang dari APK Anda.** Siapa pun yang memegang file APK bisa mengeluarkan kunci itu dengan alat sederhana. Enkripsi tidak menolong, karena aplikasi sendiri harus bisa membacanya.
+Konsekuensinya kalau memakai cara pengembangan:
+
+1. **Harus disertakan setiap kali build.** Kalau lupa, chatbot menampilkan panduan mengatur kunci.
+2. **Kunci bisa diambil orang dari APK Anda.** Siapa pun yang memegang file APK bisa mengeluarkannya dengan alat sederhana.
 
 Karena itu, simpan kunci di satu file yang tidak masuk repo:
 
@@ -130,7 +133,7 @@ flutter run --dart-define-from-file=dart_defines.json
 
 File `dart_defines.json` sudah tercantum di `.gitignore`. **Jangan hapus baris itu**, dan jangan pakai `git add -f` untuk file tersebut.
 
-> **Jangan bagikan APK hasil build Anda yang berisi kunci Groq.** Jika perlu membagikan aplikasi ke orang lain, minta mereka membuat kunci Groq sendiri dan build sendiri, atau hapus kuncinya (`flutter build apk --release` tanpa `--dart-define-from-file`) sehingga fitur Chat AI mati tapi aplikasi tetap jalan.
+> **Jangan bagikan APK hasil build Anda yang berisi kunci Groq.** Untuk dibagikan, build **tanpa** `--dart-define-from-file`. Pengguna mengisi kuncinya sendiri di layar Chat AI, jadi kuota Anda tidak terpakai dan kunci Anda tidak pernah keluar dari HP Anda.
 
 ---
 
@@ -240,7 +243,7 @@ Detail tambahan ada di [`docs/FIRESTORE_RULES_SETUP.md`](docs/FIRESTORE_RULES_SE
 1. **Satu fitur per PR.** Jangan campur perbaikan bug dengan fitur baru. PR kecil lebih cepat ditinjau.
 2. **Jangan menambah fitur di luar `docs/SPEC.md`.** Kalau punya ide, buka *issue* dulu. Ini bukan untuk membatasi — tapi supaya aplikasi tetap fokus pada satu masalah.
 3. **`flutter analyze` harus bersih.** Nol peringatan, bukan "hanya satu-dua".
-4. **`flutter test` harus lulus semua** (189 test saat dokumen ini ditulis).
+4. **`flutter test` harus lulus semua** (197 test saat dokumen ini ditulis).
 5. **Tulis test** untuk logika baru di `lib/core/`, dan untuk perilaku widget yang penting.
 6. **Ubah dulu, jalankan, baru lanjut.** Langkah kecil lebih mudah diperbaiki daripada satu perubahan besar.
 
@@ -362,21 +365,30 @@ Rincian angka dan peringatan Play Integrity ada di [README bagian 9](README.md#9
 
 ---
 
-## 9b. Membagikan aplikasi untuk demo
+## 9b. Membagikan aplikasi (demo atau rilis)
 
-Bagian ini untuk Anda yang perlu membagikan APK ke orang lain — dosen, penguji, atau teman — tanpa mengorbankan kunci pengembangan sendiri.
+Bagian ini untuk Anda yang perlu membagikan APK ke orang lain — dosen, penguji, teman, atau publik — tanpa mengorbankan kunci pengembangan sendiri.
 
-### Pakai kunci khusus demo
+### Cara yang dianjurkan: tanpa kunci sama sekali
 
-Buat kunci **baru** di [console.groq.com/keys](https://console.groq.com/keys), beri nama `demo`. Jangan pakai kunci harian Anda.
+Build **tanpa** `--dart-define-from-file`. APK-nya tidak berisi kunci apa pun, jadi aman dibagikan ke siapa saja. Pengguna mengisi kunci Groq miliknya sendiri di layar Chat AI (sekali saja, disimpan di HP).
+
+```bash
+flutter build apk --release --split-per-abi
+```
 
 | Keuntungan | Penjelasan |
 |---|---|
-| Bisa dicabut kapan saja | Hapus kunci `demo` setelah selesai; kunci harian Anda tidak tersentuh |
-| Kuota terpisah | Demo tidak memakan jatah kunci harian Anda |
-| Mudah diganti | Kalau bocor, buat baru dalam 1 menit lalu build ulang |
+| Kunci Anda tidak pernah keluar | Tidak ada yang bisa diambil dari APK |
+| Kuota Anda tidak terpakai | Setiap pengguna memakai kuota gratisnya sendiri |
+| Tidak perlu build ulang | APK yang sama bisa dipakai selamanya |
+| Tidak ada kunci yang perlu dicabut | Tidak ada yang bocor karena tidak ada yang disimpan |
 
-Simpan kunci demo di **salah satu** nama ini (keduanya sudah di-`.gitignore`):
+### Cara lama: menempelkan kunci demo di dalam APK
+
+Masih bisa dipakai kalau Anda ingin penguji langsung bisa mencoba Chat AI tanpa mengatur kunci. Risikonya: siapa pun yang memegang APK bisa mengambil kunci itu.
+
+Buat kunci **baru** di [console.groq.com/keys](https://console.groq.com/keys), beri nama `demo`. Jangan pakai kunci harian Anda. Simpan di salah satu nama ini (keduanya sudah di-`.gitignore`):
 
 ```bash
 dart_defines.json        # paling sederhana
@@ -385,7 +397,7 @@ dart_defines.demo.json   # kalau ingin memisahkan dari kunci harian
 
 > **Jangan** menyimpan kunci di nama lain seperti `kunci.json` atau `defines.json` — nama itu **tidak** di-`.gitignore`, sehingga `git add .` bisa memasukkannya ke repo. Kalau ragu, cek dengan `git check-ignore -v namafile.json`.
 
-### Build APK demo
+Build-nya:
 
 ```bash
 flutter build apk --release --split-per-abi \
@@ -424,13 +436,28 @@ adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 
 ### Yang tetap berisiko
 
-Kunci di dalam APK bisa diambil orang. Untuk demo kelas risikonya kecil, tapi **jangan** unggah APK berisi kunci ke tempat publik (GitHub Release, Google Drive terbuka, Play Store). Kalau butuh APK publik, build tanpa kunci:
+Kunci di dalam APK bisa diambil orang. Untuk demo kelas risikonya kecil, tapi **jangan** unggah APK berisi kunci ke tempat publik (GitHub Release, Google Drive terbuka, Play Store). Untuk apa pun yang publik, build tanpa kunci:
 
 ```bash
 flutter build apk --release --split-per-abi
 ```
 
 Aplikasi tetap jalan penuh; hanya Chat AI yang meminta konfigurasi.
+
+### Merilis lewat GitHub Release
+
+1. Pastikan `flutter analyze` bersih dan `flutter test` lulus semua.
+2. Naikkan versi di `pubspec.yaml` (`version: 1.2.0+3` — angka setelah `+` harus selalu bertambah).
+3. Build tanpa kunci: `flutter build apk --release --split-per-abi`
+4. Buat checksum supaya pengunduh bisa memverifikasi file:
+   ```bash
+   cd build/app/outputs/flutter-apk && sha256sum app-arm64-v8a-release.apk app-armeabi-v7a-release.apk > SHA256SUMS.txt
+   ```
+5. Buat tag dan dorong: `git tag v1.2.0 && git push origin v1.2.0`
+6. Di GitHub: **Releases → Draft a new release** → pilih tag → unggah kedua APK + `SHA256SUMS.txt`
+7. Tulis di catatan rilis: cara memasang, cara mengisi kunci Groq, dan bahwa APK GitHub **tidak diperbarui otomatis**.
+
+> **Jangan** nyalakan enforcement App Check selama rilis masih lewat GitHub. APK sideload memakai Play Integrity dan akan gagal pemeriksaan begitu enforcement aktif — dashboard jadi kosong.
 
 ---
 
@@ -446,7 +473,7 @@ Aplikasi tetap jalan penuh; hanya Chat AI yang meminta konfigurasi.
 | Notifikasi pukul 08:00 tidak muncul | Izin "Alarm & pengingat" belum diizinkan | Pengaturan HP → Aplikasi → MotoCare → izin Alarm & pengingat |
 | Notifikasi tidak muncul sama sekali | Izin notifikasi ditolak | Pengaturan HP → Aplikasi → MotoCare → Notifikasi |
 | "KM baru tidak boleh lebih kecil dari KM terakhir" | Memang validasi, bukan bug | Isi odometer ≥ angka terakhir |
-| Chat AI bilang kunci API belum dikonfigurasi | `dart_defines.json` belum ada, atau flag `--dart-define-from-file` tidak disertakan saat build/run | Lihat [3b](#3b-kunci-groq-tidak-tersimpan-di-aplikasi). Kunci **tidak** tersimpan di aplikasi — harus disertakan setiap build |
+| Chat AI menampilkan "butuh kunci API" | Pengguna belum mengisi kunci di layar Chat AI | Tekan **Atur Kunci API**, tempel kunci dari [console.groq.com/keys](https://console.groq.com/keys). Lihat [3b](#3b-kunci-groq-tidak-tersimpan-di-aplikasi) |
 | Chat AI bilang kunci tidak valid | Kunci Groq salah atau sudah dicabut | Buat kunci baru di [console.groq.com/keys](https://console.groq.com/keys) |
 | Data tidak muncul di HP baru atau setelah install ulang | Salinan lokal Firestore hanya ada di HP yang pernah membuka aplikasi | Buka sekali dengan internet, setelah itu bisa dipakai offline |
 | Catatan bertanda "Menunggu dikirim" lama hilang | Belum terkirim ke server | Tunggu internet tersambung; penanda hilang sendiri |

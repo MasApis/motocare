@@ -7,6 +7,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:motocare/core/chat_prompt_builder.dart';
 import 'package:motocare/core/connection_checker.dart';
 import 'package:motocare/features/chatbot/data/chat_repository.dart';
+import 'package:motocare/features/chatbot/data/api_key_store.dart';
+import 'package:motocare/features/chatbot/providers/api_key_providers.dart';
 import 'package:motocare/features/chatbot/providers/chat_providers.dart';
 import 'package:motocare/features/chatbot/providers/connection_providers.dart';
 import 'package:motocare/features/chatbot/ui/chat_screen.dart';
@@ -33,6 +35,22 @@ class FakeChatRepository implements ChatRepository {
   }
 }
 
+/// Penyimpanan kunci palsu agar widget test tidak menyentuh Android Keystore.
+class FakeApiKeyStore implements ApiKeyStore {
+  FakeApiKeyStore([this.value]);
+
+  String? value;
+
+  @override
+  Future<String?> read() async => value;
+
+  @override
+  Future<void> save(String key) async => value = key;
+
+  @override
+  Future<void> clear() async => value = null;
+}
+
 void main() {
   /// Pemeriksa koneksi palsu agar widget test tidak benar-benar
   /// melakukan DNS lookup ke internet.
@@ -50,6 +68,7 @@ void main() {
       ProviderScope(
         overrides: [
           chatRepositoryProvider.overrideWithValue(fakeRepo),
+          apiKeyStoreProvider.overrideWithValue(FakeApiKeyStore('gsk_uji')),
           connectionCheckerProvider.overrideWithValue(
             fakeChecker(online: true),
           ),
@@ -59,6 +78,8 @@ void main() {
         ),
       ),
     );
+
+    await tester.pumpAndSettle();
 
     expect(find.text('Selamat Datang di MotoAI!'), findsOneWidget);
     expect(find.text('Contoh Pertanyaan:'), findsOneWidget);
@@ -73,6 +94,7 @@ void main() {
       ProviderScope(
         overrides: [
           chatRepositoryProvider.overrideWithValue(fakeRepo),
+          apiKeyStoreProvider.overrideWithValue(FakeApiKeyStore('gsk_uji')),
           connectionCheckerProvider.overrideWithValue(
             fakeChecker(online: true),
           ),
@@ -82,6 +104,8 @@ void main() {
         ),
       ),
     );
+
+    await tester.pumpAndSettle();
 
     final inputFinder = find.byType(TextField);
     await tester.enterText(inputFinder, 'Tarikan motor saya berat');
@@ -113,6 +137,7 @@ void main() {
       ProviderScope(
         overrides: [
           chatRepositoryProvider.overrideWithValue(fakeRepo),
+          apiKeyStoreProvider.overrideWithValue(FakeApiKeyStore('gsk_uji')),
           connectionCheckerProvider.overrideWithValue(
             fakeChecker(online: true),
           ),
@@ -122,6 +147,8 @@ void main() {
         ),
       ),
     );
+
+    await tester.pumpAndSettle();
 
     final inputFinder = find.byType(TextField);
     await tester.enterText(inputFinder, 'Kenapa motor mati mendadak?');
@@ -146,6 +173,7 @@ void main() {
       ProviderScope(
         overrides: [
           chatRepositoryProvider.overrideWithValue(fakeRepo),
+          apiKeyStoreProvider.overrideWithValue(FakeApiKeyStore('gsk_uji')),
           connectionCheckerProvider.overrideWithValue(
             fakeChecker(online: true),
           ),
@@ -155,6 +183,8 @@ void main() {
         ),
       ),
     );
+
+    await tester.pumpAndSettle();
 
     // Tombol kirim nonaktif saat input kosong
     final sendButtonFinder = find.widgetWithIcon(IconButton, Symbols.send);
@@ -194,6 +224,7 @@ void main() {
       ProviderScope(
         overrides: [
           chatRepositoryProvider.overrideWithValue(fakeRepo),
+          apiKeyStoreProvider.overrideWithValue(FakeApiKeyStore('gsk_uji')),
           connectionCheckerProvider.overrideWithValue(
             fakeChecker(online: false),
           ),
@@ -217,6 +248,7 @@ void main() {
       ProviderScope(
         overrides: [
           chatRepositoryProvider.overrideWithValue(fakeRepo),
+          apiKeyStoreProvider.overrideWithValue(FakeApiKeyStore('gsk_uji')),
           connectionCheckerProvider.overrideWithValue(
             fakeChecker(online: true),
           ),
@@ -230,5 +262,56 @@ void main() {
 
     expect(find.text('Online'), findsOneWidget);
     expect(find.text('Offline'), findsNothing);
+  });
+
+  testWidgets('Menampilkan ajakan mengatur kunci saat kunci belum ada',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          chatRepositoryProvider.overrideWithValue(FakeChatRepository()),
+          apiKeyStoreProvider.overrideWithValue(FakeApiKeyStore()),
+          connectionCheckerProvider.overrideWithValue(
+            fakeChecker(online: true),
+          ),
+        ],
+        child: const MaterialApp(
+          home: ChatScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Chat AI butuh kunci API'), findsOneWidget);
+    expect(find.text('Atur Kunci API'), findsOneWidget);
+    // Kolom ketik disembunyikan selama kunci belum diatur.
+    expect(find.byType(TextField), findsNothing);
+    // Empty state biasa tidak ditampilkan.
+    expect(find.text('Selamat Datang di MotoAI!'), findsNothing);
+  });
+
+  testWidgets('Chat normal saat kunci sudah diatur',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          chatRepositoryProvider.overrideWithValue(FakeChatRepository()),
+          apiKeyStoreProvider.overrideWithValue(
+            FakeApiKeyStore('gsk_sudah_diatur'),
+          ),
+          connectionCheckerProvider.overrideWithValue(
+            fakeChecker(online: true),
+          ),
+        ],
+        child: const MaterialApp(
+          home: ChatScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Selamat Datang di MotoAI!'), findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('Chat AI butuh kunci API'), findsNothing);
   });
 }

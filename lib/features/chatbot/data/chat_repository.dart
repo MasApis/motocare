@@ -59,7 +59,7 @@ class GroqChatRepository implements ChatRepository {
     final cleanKey = apiKey.trim();
     if (cleanKey.isEmpty) {
       throw const ChatException(
-        'Kunci API Groq belum dikonfigurasi. Jalankan aplikasi dengan argumen: --dart-define-from-file=dart_defines.json',
+        'Kunci API Groq belum diatur. Tekan "Atur kunci" lalu tempel kunci dari console.groq.com/keys.',
       );
     }
 

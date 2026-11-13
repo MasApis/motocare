@@ -6,9 +6,12 @@ import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/theme/app_shapes.dart';
 import '../../../../shared/theme/app_spacing.dart';
 import '../../../../shared/theme/app_typography.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
+import '../providers/api_key_providers.dart';
 import '../providers/chat_providers.dart';
 import '../providers/connection_providers.dart';
+import 'widgets/api_key_dialog.dart';
 import 'widgets/chat_bubble.dart';
 import 'widgets/chat_input_bar.dart';
 
@@ -59,6 +62,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     final chatState = ref.watch(chatNotifierProvider);
     final connectionStatus = ref.watch(connectionStatusProvider);
+    final apiKeyState = ref.watch(apiKeyProvider);
     final activeVehicle = ref.watch(selectedVehicleProvider);
     final vehicleDisplayName = activeVehicle?.displayName ?? 'Motor Matic';
 
@@ -161,6 +165,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Symbols.key),
+            tooltip: 'Kunci API',
+            onPressed: () => ApiKeyDialog.show(context),
+          ),
           if (chatState.messages.isNotEmpty)
             IconButton(
               icon: const Icon(Symbols.refresh),
@@ -222,34 +231,93 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
           // Daftar Pesan
           Expanded(
-            child: chatState.messages.isEmpty
-                ? _buildEmptyState(vehicleDisplayName)
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.md,
-                      horizontal: AppSpacing.xs,
-                    ),
-                    itemCount: chatState.messages.length +
-                        (chatState.isLoading ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index < chatState.messages.length) {
-                        return ChatBubble(
-                          message: chatState.messages[index],
-                        );
-                      }
-                      // Indikator Loading / Mengetik
-                      return _buildLoadingBubble();
-                    },
-                  ),
+            child: apiKeyState.status == ApiKeyStatus.checking
+                ? const Center(child: CircularProgressIndicator())
+                : apiKeyState.status == ApiKeyStatus.missing
+                    ? _buildMissingKeyState()
+                    : chatState.messages.isEmpty
+                        ? _buildEmptyState(vehicleDisplayName)
+                        : ListView.builder(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.md,
+                              horizontal: AppSpacing.xs,
+                            ),
+                            itemCount: chatState.messages.length +
+                                (chatState.isLoading ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (index < chatState.messages.length) {
+                                return ChatBubble(
+                                  message: chatState.messages[index],
+                                );
+                              }
+                              // Indikator Loading / Mengetik
+                              return _buildLoadingBubble();
+                            },
+                          ),
           ),
 
-          // Input Bar Bawah
-          ChatInputBar(
-            isLoading: chatState.isLoading,
-            onSend: (text) {
-              ref.read(chatNotifierProvider.notifier).sendMessage(text);
-            },
+          // Input Bar Bawah (disembunyikan selama kunci belum siap)
+          if (apiKeyState.status == ApiKeyStatus.ready)
+            ChatInputBar(
+              isLoading: chatState.isLoading,
+              onSend: (text) {
+                ref.read(chatNotifierProvider.notifier).sendMessage(text);
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Tampilan saat pengguna belum mengatur kunci API di perangkat.
+  Widget _buildMissingKeyState() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 24),
+          Container(
+            width: 72,
+            height: 72,
+            decoration: const BoxDecoration(
+              color: AppColors.primaryFixed,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Symbols.key,
+              size: 36,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'Chat AI butuh kunci API',
+            style: AppTypography.headlineSm(),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Kunci gratis dari Groq dipakai agar biaya AI dibebankan ke akun '
+            'Anda sendiri, bukan ke pembuat aplikasi. Kunci disimpan hanya di '
+            'HP ini.',
+            style: AppTypography.bodyMd(color: AppColors.onSurfaceVariant),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          AppButton(
+            text: 'Atur Kunci API',
+            icon: const Icon(Symbols.key, size: 20),
+            onPressed: () => ApiKeyDialog.show(context),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'Langkah: buka console.groq.com/keys di browser, masuk dengan '
+            'akun Google, tekan "Create API Key", lalu tempel di sini. Gratis, '
+            'tanpa kartu kredit.',
+            style: AppTypography.bodySm(color: AppColors.outline),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

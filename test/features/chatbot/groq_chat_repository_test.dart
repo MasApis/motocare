@@ -7,7 +7,7 @@ import 'package:motocare/features/chatbot/data/chat_repository.dart';
 
 void main() {
   group('GroqChatRepository Unit Tests', () {
-    test('Melempar ChatException ramah jika GROQ_API_KEY belum dikonfigurasi', () async {
+    test('Melempar ChatException ramah jika kunci API belum diatur', () async {
       final repo = GroqChatRepository(apiKey: '');
 
       expect(
@@ -20,7 +20,7 @@ void main() {
           isA<ChatException>().having(
             (e) => e.userFriendlyMessage,
             'userFriendlyMessage',
-            contains('Kunci API Groq belum dikonfigurasi'),
+            contains('Kunci API Groq belum diatur'),
           ),
         ),
       );
@@ -39,7 +39,7 @@ void main() {
           isA<ChatException>().having(
             (e) => e.userFriendlyMessage,
             'userFriendlyMessage',
-            contains('dart_defines.json'),
+            contains('Kunci API Groq belum diatur'),
           ),
         ),
       );

@@ -56,11 +56,16 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (keystorePropertiesFile.exists()) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
+            // Build rilis tanpa keystore harus gagal, bukan diam-diam memakai
+            // kunci debug: APK debug tidak bisa dipakai memperbarui aplikasi
+            // yang sudah dipasang dari Play Store.
+            if (!keystorePropertiesFile.exists()) {
+                throw GradleException(
+                    "android/key.properties tidak ditemukan. Build rilis butuh " +
+                    "keystore. Lihat CONTRIBUTING.md bagian 3."
+                )
             }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }

@@ -5,10 +5,15 @@ import '../../../core/vehicle_components.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
 import '../data/chat_repository.dart';
 import '../data/models/chat_message_model.dart';
+import 'api_key_providers.dart';
 
-/// Provider instance repository chatbot (default menggunakan Groq API)
+/// Provider instance repository chatbot (default menggunakan Groq API).
+///
+/// Kunci diambil dari pengaturan pengguna di perangkat; berubah saat kunci
+/// disimpan atau dihapus sehingga repository ikut dibuat ulang.
 final chatRepositoryProvider = Provider<ChatRepository>((ref) {
-  return GroqChatRepository();
+  final key = ref.watch(apiKeyProvider.select((state) => state.key)) ?? '';
+  return GroqChatRepository(apiKey: key);
 });
 
 /// State untuk sesi obrolan chatbot

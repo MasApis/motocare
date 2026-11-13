@@ -38,7 +38,7 @@ Pemilik motor matic harian: mahasiswa, pekerja, pengemudi ojek online.
 | State management | **Riverpod** (`flutter_riverpod`) |
 | Backend | **Firebase**: Authentication (email + password) dan Cloud Firestore (offline persistence aktif) |
 | Navigasi | `go_router` |
-| AI | LLM via **Groq Cloud API** (model default `openai/gpt-oss-120b`, daftar fallback lain ada di `chat_repository.dart`) gratis tanpa kartu kredit; kunci API diinjeksi via `--dart-define-from-file=dart_defines.json` saat menjalankan aplikasi. **Kunci API tidak disimpan di kode aplikasi maupun repositori.** Firebase AI Logic (Gemini) dan Cloud Functions/Vertex AI tidak dipakai |
+| AI | LLM via **Groq Cloud API** (model default `openai/gpt-oss-120b`, daftar fallback lain ada di `chat_repository.dart`) gratis tanpa kartu kredit; **kunci API diisi pengguna di layar Chat** dan disimpan terenkripsi di perangkat (`flutter_secure_storage`), bukan di dalam APK. Untuk pengembangan, `--dart-define-from-file=dart_defines.json` masih dipakai sebagai nilai cadangan. Firebase AI Logic (Gemini) dan Cloud Functions/Vertex AI tidak dipakai |
 | Notifikasi | `flutter_local_notifications`, notifikasi dijadwalkan pada tanggal tertentu (tanpa background service) |
 | PDF | `pdf` + `printing` (atau `share_plus`) |
 | UI/UX | Desain dari **Google Stitch** (export zip) di `docs/design/` (tiap layar: `screen.png` + `code.html`); peta layar ke fitur di `docs/design/SCREENS.md`; aturan visual di `docs/DESIGN.md` (MotoSense Design System). `code.html` hanya acuan nilai dan tata letak, bukan kode yang disalin ke Flutter |
@@ -207,7 +207,7 @@ Fitur dianggap **selesai** jika semua kriterianya terpenuhi, test terkait lulus,
 - AI diberi peran ahli mekanik motor matic dan konteks motor aktif (model, KM sekarang, status komponen).
 - Setiap jawaban disertai pengingat singkat bahwa ini dugaan dan perlu dicek bengkel untuk masalah serius; pertanyaan di luar topik motor ditolak dengan sopan.
 - Ada status mengetik/loading, pesan gagal yang ramah saat offline atau API error, dan batas panjang pesan.
-- **Kunci API tidak ada di kode aplikasi maupun repositori** (dioper via `--dart-define-from-file=dart_defines.json`).
+- **Kunci API diisi pengguna sendiri** dan disimpan di perangkat (Android Keystore), bukan di dalam aplikasi. Build publik dibuat tanpa kunci. Saat kunci belum diatur, layar Chat menampilkan ajakan "Atur Kunci API", bukan error teknis.
 - Berjalan 100% gratis tanpa kartu kredit: tidak ada layanan yang membutuhkan Blaze atau langganan berbayar.
 - Hemat kuota gratis: batas panjang pesan (300 karakter), hanya beberapa pesan terakhir (10 pesan) yang dikirim sebagai konteks, tombol kirim nonaktif saat menunggu jawaban.
 - Saat kuota atau batas laju tercapai, tampil pesan ramah ("coba lagi nanti"), bukan error teknis.

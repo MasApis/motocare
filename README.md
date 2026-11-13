@@ -4,7 +4,7 @@
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Spark%20Plan-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com)
 [![State Management](https://img.shields.io/badge/State-Riverpod%20v3-00599C)](https://riverpod.dev)
-[![Tests](https://img.shields.io/badge/Tests-189%20Passed-brightgreen)](https://github.com)
+[![Tests](https://img.shields.io/badge/Tests-197%20Passed-brightgreen)](https://github.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **MotoCare** adalah aplikasi mobile Android berbasis Flutter yang dirancang khusus untuk membantu pemilik **sepeda motor matic** memantau kesehatan komponen kendaraan (oli mesin, oli gardan, V-belt), mencatat riwayat servis berkala, menjadwalkan pengingat servis otomatis, serta berkonsultasi seputar kendala motor dengan asisten cerdas berbasis AI (**MotoAI**).
@@ -80,11 +80,11 @@ UI (Widgets & Pages) ──► Providers (Riverpod) ──► Repositories ─�
 | **State Management** | `flutter_riverpod` |
 | **Routing / Navigasi** | `go_router` |
 | **Backend & Database** | Firebase Authentication & Cloud Firestore (Offline Persistence) |
-| **AI Engine** | Groq Cloud API (`openai/gpt-oss-120b`, kunci lewat `--dart-define-from-file`) |
+| **AI Engine** | Groq Cloud API (`openai/gpt-oss-120b`); kunci diisi pengguna di aplikasi, disimpan dengan `flutter_secure_storage` |
 | **Notifikasi** | `flutter_local_notifications` + `timezone` |
 | **Laporan & Dokumen** | `pdf` + `printing` |
 | **Ikon & Font** | `google_fonts` (Plus Jakarta Sans) & `material_symbols_icons` |
-| **Pengujian** | `flutter_test` (189 Unit & Widget Tests) |
+| **Pengujian** | `flutter_test` (197 Unit & Widget Tests) |
 
 ---
 
@@ -105,7 +105,7 @@ motocare/
 │   │   └── vehicles/          # Tambah, kelola, & ganti kendaraan
 │   ├── shared/                # Tema warna, tipografi, komponen bersama
 │   └── main.dart              # Entrypoint aplikasi
-├── test/                      # 189 Unit & Widget test
+├── test/                      # 197 Unit & Widget test
 ├── docs/                      # Spesifikasi & desain
 │   ├── SPEC.md                #   daftar fitur resmi (sumber kebenaran)
 │   ├── DESIGN.md              #   aturan visual (warna, font, ukuran)
@@ -115,6 +115,31 @@ motocare/
 ├── CONTRIBUTING.md            # Panduan untuk kontributor
 └── README.md
 ```
+
+---
+
+## 📥 Unduh & Pasang (tanpa membangun sendiri)
+
+Rilis siap pakai tersedia di halaman **Releases** repositori ini.
+
+1. Unduh `app-arm64-v8a-release.apk` (HP modern, hampir semua HP keluaran 2018 ke atas).
+   Kalau HP Anda lama/32-bit, pakai `app-armeabi-v7a-release.apk`.
+2. Buka file yang terunduh → Android akan bertanya soal **izin sumber tidak dikenal** → izinkan untuk aplikasi browser/file manager Anda.
+3. Pasang, lalu buka **MotoCare** dan daftar akun.
+
+> APK dari GitHub **tidak diperbarui otomatis**. Untuk versi baru, unduh lagi dan pasang menimpa versi lama — data Anda tidak hilang karena tersimpan di akun, bukan di HP.
+
+### Mengaktifkan Chat AI (sekali saja, gratis)
+
+APK publik **tidak berisi kunci API apa pun**. Chat AI memakai kunci Groq milik Anda sendiri, supaya kuota gratis Anda yang terpakai dan pembuat aplikasi tidak menanggung biaya siapa pun.
+
+1. Buka [console.groq.com/keys](https://console.groq.com/keys) di browser, masuk dengan akun Google. Gratis, tanpa kartu kredit.
+2. Tekan **Create API Key**, beri nama bebas, lalu **salin** kuncinya (hanya ditampilkan sekali).
+3. Di aplikasi: buka tab **Chat AI** → tekan **Atur Kunci API** → tempel → **Simpan**.
+
+Kunci disimpan terenkripsi di HP Anda (Android Keystore) dan hanya dikirim ke Groq saat chat dipakai. Tidak pernah dikirim ke pembuat aplikasi. Tombol **Hapus kunci** ada di dialog yang sama.
+
+Tanpa kunci, semua fitur lain tetap berjalan normal: dashboard, odometer, catatan servis, notifikasi, dan laporan PDF.
 
 ---
 
@@ -200,7 +225,7 @@ flutter run --dart-define-from-file=dart_defines.json
 
 > **File `dart_defines.json` sudah masuk `.gitignore`**, jadi kunci Anda tidak akan ikut ter-commit. Jangan hapus baris itu dari `.gitignore`.
 
-> **Kenapa tidak disimpan di aplikasi?** Kunci dari `--dart-define` **ditempel ke dalam APK saat build**, bukan disimpan sebagai file. Artinya Anda harus menyertakan flag ini **setiap kali** build atau menjalankan aplikasi — kalau lupa, chatbot mati sementara fitur lain tetap jalan.
+> **Untuk build yang dibagikan ke orang lain, jangan sertakan flag ini.** Kunci dari `--dart-define` **ditempel ke dalam APK saat build**, jadi siapa pun yang memegang APK bisa mengambilnya. Build publik dibuat tanpa kunci; pengguna mengisi kuncinya sendiri di layar Chat AI.
 >
 > Tanpa kunci, seluruh fitur pemantauan motor, servis, odometer, notifikasi, dan PDF tetap berfungsi normal. Hanya fitur chatbot yang menampilkan panduan konfigurasi.
 
@@ -234,7 +259,7 @@ MotoCare memakai **Firebase App Check**. Pada mode debug, aplikasi membuat *debu
 > Perintah `firebase appcheck:debugtokens:create` **tidak bisa** dipakai untuk mendaftarkan token pilihan Anda — perintah itu membuat token acak baru. Gunakan halaman web di atas.
 
 ### 8. Build APK Rilis (opsional)
-Build rilis memerlukan berkas `android/key.properties` berisi lokasi keystore:
+Build rilis memerlukan berkas `android/key.properties` berisi lokasi keystore. Tanpa berkas itu build **akan gagal** dengan pesan yang jelas — bukan diam-diam memakai kunci debug.
 
 ```properties
 storePassword=...
@@ -243,11 +268,19 @@ keyAlias=...
 storeFile=/jalur/lengkap/ke/keystore.jks
 ```
 
-Lalu:
+Untuk build yang dibagikan (tanpa kunci API di dalamnya):
 
 ```bash
-flutter build apk --release --dart-define-from-file=dart_defines.json
+flutter build apk --release --split-per-abi
 ```
+
+Untuk build pribadi yang ingin langsung memakai kunci Anda:
+
+```bash
+flutter build apk --release --split-per-abi --dart-define-from-file=dart_defines.json
+```
+
+> **Jangan bagikan APK hasil perintah kedua.** Kuncinya ikut tercetak di dalam APK.
 
 > **Peringatan:** build rilis memakai **Play Integrity**, bukan debug token. APK rilis yang dipasang manual (sideload, bukan lewat Play Store) umumnya **gagal** pemeriksaan App Check.
 >
@@ -331,7 +364,7 @@ Proyek ini dilengkapi dengan cakupan pengujian komprehensif pada fungsi inti (*c
 # Menjalankan analisis statis kode
 flutter analyze
 
-# Menjalankan seluruh pengujian (189 test cases)
+# Menjalankan seluruh pengujian (197 test cases)
 flutter test
 ```
 
@@ -339,12 +372,12 @@ flutter test
 
 ## 🔒 Keamanan & Kebijakan Privasi
 
-- Kunci API tidak disimpan di dalam repositori. Kunci Groq diambil dari `dart_defines.json` (sudah di-`.gitignore`) lewat `--dart-define-from-file`.
+- Kunci API tidak disimpan di dalam repositori **maupun di dalam APK publik**. Kunci Groq diisi pengguna di layar Chat AI dan disimpan terenkripsi di perangkat (`flutter_secure_storage`). Saat pengembangan, `dart_defines.json` (sudah di-`.gitignore`) masih bisa dipakai lewat `--dart-define-from-file`.
 - Data pengguna diisolasi pada tingkat sub-koleksi Firestore (`users/{uid}/vehicles/...`) sehingga tiap pengguna hanya dapat membaca dan menulis data miliknya sendiri. Aturannya ada di `firestore.rules` — lihat [langkah 5](#5-pasang-firestore-security-rules).
 - **Firebase App Check** memastikan permintaan ke Firestore hanya datang dari aplikasi asli, bukan dari skrip pihak lain.
 - Berkas berisi kunci (`google-services.json`, `firebase_options.dart`, `key.properties`, `dart_defines.json`, `*.jks`) tidak disimpan di repo. Daftar lengkapnya ada di [CONTRIBUTING.md](CONTRIBUTING.md#lampiran-b-daftar-berkas-rahasia).
 
-> **Yang perlu diketahui:** kunci Groq yang diberikan lewat `--dart-define` **tertanam di dalam APK** saat build. Siapa pun yang memegang APK Anda secara teknis bisa mengambilnya. Karena itu **jangan bagikan APK hasil build dengan kunci Anda** ke orang lain, dan jangan unggah ke Play Store. Penjelasan lengkap ada di [CONTRIBUTING.md bagian 3b](CONTRIBUTING.md#3b-kunci-groq-tidak-tersimpan-di-aplikasi).
+> **Yang perlu diketahui:** kalau Anda menjalankan `flutter build` **dengan** `--dart-define-from-file`, kunci Groq Anda **tertanam di dalam APK** dan bisa diambil siapa pun yang memegang file itu. Untuk dibagikan, build **tanpa** flag tersebut. Penjelasan lengkap ada di [CONTRIBUTING.md bagian 3b](CONTRIBUTING.md#3b-kunci-groq-tidak-tersimpan-di-aplikasi).
 
 ---
 
