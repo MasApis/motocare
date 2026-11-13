@@ -16,6 +16,11 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+// True bila perintah build meminta varian rilis (mis. assembleRelease, bundleRelease)
+val isReleaseBuildRequested = gradle.startParameter.taskNames.any {
+    it.contains("Release", ignoreCase = true)
+}
+
 android {
     namespace = "com.hdp.motocare"
     compileSdk = flutter.compileSdkVersion
@@ -59,13 +64,16 @@ android {
             // Build rilis tanpa keystore harus gagal, bukan diam-diam memakai
             // kunci debug: APK debug tidak bisa dipakai memperbarui aplikasi
             // yang sudah dipasang dari Play Store.
-            if (!keystorePropertiesFile.exists()) {
+            // Blok ini selalu dibaca Gradle, termasuk saat `flutter run` (debug),
+            // jadi error hanya dilempar bila yang diminta memang build rilis.
+            if (keystorePropertiesFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            } else if (isReleaseBuildRequested) {
                 throw GradleException(
                     "android/key.properties tidak ditemukan. Build rilis butuh " +
                     "keystore. Lihat CONTRIBUTING.md bagian 3."
                 )
             }
-            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
