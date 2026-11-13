@@ -240,7 +240,7 @@ Detail tambahan ada di [`docs/FIRESTORE_RULES_SETUP.md`](docs/FIRESTORE_RULES_SE
 1. **Satu fitur per PR.** Jangan campur perbaikan bug dengan fitur baru. PR kecil lebih cepat ditinjau.
 2. **Jangan menambah fitur di luar `docs/SPEC.md`.** Kalau punya ide, buka *issue* dulu. Ini bukan untuk membatasi — tapi supaya aplikasi tetap fokus pada satu masalah.
 3. **`flutter analyze` harus bersih.** Nol peringatan, bukan "hanya satu-dua".
-4. **`flutter test` harus lulus semua** (177 test saat dokumen ini ditulis).
+4. **`flutter test` harus lulus semua** (189 test saat dokumen ini ditulis).
 5. **Tulis test** untuk logika baru di `lib/core/`, dan untuk perilaku widget yang penting.
 6. **Ubah dulu, jalankan, baru lanjut.** Langkah kecil lebih mudah diperbaiki daripada satu perubahan besar.
 
@@ -448,6 +448,8 @@ Aplikasi tetap jalan penuh; hanya Chat AI yang meminta konfigurasi.
 | "KM baru tidak boleh lebih kecil dari KM terakhir" | Memang validasi, bukan bug | Isi odometer ≥ angka terakhir |
 | Chat AI bilang kunci API belum dikonfigurasi | `dart_defines.json` belum ada, atau flag `--dart-define-from-file` tidak disertakan saat build/run | Lihat [3b](#3b-kunci-groq-tidak-tersimpan-di-aplikasi). Kunci **tidak** tersimpan di aplikasi — harus disertakan setiap build |
 | Chat AI bilang kunci tidak valid | Kunci Groq salah atau sudah dicabut | Buat kunci baru di [console.groq.com/keys](https://console.groq.com/keys) |
+| Data tidak muncul di HP baru atau setelah install ulang | Salinan lokal Firestore hanya ada di HP yang pernah membuka aplikasi | Buka sekali dengan internet, setelah itu bisa dipakai offline |
+| Catatan bertanda "Menunggu dikirim" lama hilang | Belum terkirim ke server | Tunggu internet tersambung; penanda hilang sendiri |
 | Perubahan di `docs/` tidak ikut ter-commit | `.gitignore` memuat `docs/*` | `git add -f docs/nama_file.md` |
 | `flutter analyze` bersih tapi `flutter test` gagal | Test lama menyesuaikan perilaku lama | Perbaiki kodenya, bukan testnya — kecuali memang perilakunya sengaja diubah |
 

@@ -130,11 +130,17 @@
     color: #f8fafc;
     padding: 10px 12px;
     border-radius: 6px;
-    overflow-x: auto;
+    box-sizing: border-box;
+    width: 100%;
+    white-space: pre-wrap;
+    word-break: break-word;
     line-height: 1.35;
-    page-break-inside: avoid;
     margin-top: 6px;
     margin-bottom: 12px;
+  }
+  pre.wide {
+    font-size: 6.5pt;
+    line-height: 1.3;
   }
   .badge {
     display: inline-block;
@@ -191,7 +197,7 @@
       </tr>
       <tr>
         <td style="font-weight: bold;">Status Pengujian</td>
-        <td>: 174 Unit & Widget Tests Lulus 100% (Clean Analysis)</td>
+        <td>: 189 Unit & Widget Tests Lulus 100% (Clean Analysis)</td>
       </tr>
       <tr>
         <td style="font-weight: bold;">Waktu Rilis</td>
@@ -354,7 +360,7 @@
 </table>
 
 <h3>2.3 Struktur Direktori Proyek</h3>
-<pre>
+<pre class="wide">
 motocare/
 ├── android/                   # Kode native Android, build.gradle.kts, manifes, drawable, splash
 ├── assets/
@@ -373,7 +379,7 @@ motocare/
 │   │   └── reports/           # Fitur F8: Ringkasan bulanan, generator dokumen laporan PDF
 │   ├── shared/                # Sistem tema global (AppColors, AppTypography, AppSpacing)
 │   └── main.dart              # Entrypoint aplikasi, inisialisasi Firebase & dependency injection
-└── test/                      # 174 Unit & Widget test cases menyeluruh
+└── test/                      # 189 Unit & Widget test cases menyeluruh
 </pre>
 
 <div class="page-break"></div>
@@ -383,7 +389,7 @@ motocare/
 <h3>3.1 Struktur Koleksi NoSQL Cloud Firestore</h3>
 <p>Data pengguna disimpan dalam pola hierarki bersarang (nested subcollections) di bawah dokumen pengguna. Hal ini memastikan isolasi data yang sangat ketat dan performa query yang optimal.</p>
 
-<pre>
+<pre class="wide">
 users (koleksi utama)
  └── {uid} (ID Dokumen Pengguna Firebase Auth)
       │
@@ -431,7 +437,7 @@ service cloud.firestore {
 </pre>
 
 <h3>3.3 Fitur Offline Persistence</h3>
-<p>Cloud Firestore pada MotoCare dikonfigurasi dengan cache offline aktif secara default. Pengguna dapat membuka dashboard, melihat status kesehatan motor, memperbarui KM, serta mencatat servis ketika berada di ruang bawah tanah (basement) atau daerah tanpa sinyal internet. Seluruh perubahan akan otomatis disinkronkan ke cloud begitu koneksi internet pulih.</p>
+<p>Cloud Firestore pada MotoCare dikonfigurasi dengan cache offline aktif secara default. Pengguna dapat membuka dashboard, melihat status kesehatan motor, memperbarui KM, serta mencatat servis ketika berada di ruang bawah tanah (basement) atau daerah tanpa sinyal internet. Seluruh perubahan akan otomatis disinkronkan ke cloud begitu koneksi internet pulih. Selama belum terkirim, catatan tersebut ditandai <strong>Menunggu dikirim</strong>; penanda hilang sendiri setelah server menerimanya.</p>
 
 <div class="page-break"></div>
 
@@ -684,8 +690,8 @@ tanggal_target   = tanggal_hari_ini + hari_menuju_merah
   <strong>Status Analisis Statis:</strong> <code>flutter analyze</code> &rarr; <strong>No issues found! (0 Warnings, 0 Errors).</strong> Kode null-safe 100%, bebas dari tipe dynamic yang tidak perlu, dan mematuhi konvensi arsitektur.
 </div>
 
-<h3>7.2 Cakupan Pengujian Otomatis (174 Unit & Widget Tests)</h3>
-<p>Seluruh fungsi matematika pada <code>lib/core/</code> dan skenario antarmuka widget diuji secara menyeluruh melalui <code>flutter test</code> dengan total <strong>174 pengujian yang lulus 100%</strong>:</p>
+<h3>7.2 Cakupan Pengujian Otomatis (189 Unit & Widget Tests)</h3>
+<p>Seluruh fungsi matematika pada <code>lib/core/</code> dan skenario antarmuka widget diuji secara menyeluruh melalui <code>flutter test</code> dengan total <strong>189 pengujian yang lulus 100%</strong>:</p>
 
 <table>
   <tr>
@@ -694,59 +700,84 @@ tanggal_target   = tanggal_hari_ini + hari_menuju_merah
     <th>Skenario yang Diverifikasi</th>
   </tr>
   <tr>
-    <td><code>core_calculator_test.dart</code></td>
-    <td>38 Tests</td>
-    <td>Formula sisa KM, clamping persentase 0-100%, status batas 30%, 10%, kondisi lewat KM, rata-rata harian dengan selisih &ge;3 hari, estimasi zona merah.</td>
-  </tr>
-  <tr>
-    <td><code>service_calculator_test.dart</code></td>
+    <td><code>core/component_health_test.dart</code></td>
     <td>24 Tests</td>
-    <td>Aturan servis multi-item: komponen diganti vs dibersihkan, pengaruh part lain, aturan rollback saat servis dihapus, pemulihan ke baselineKm.</td>
+    <td>Formula sisa KM, clamping persentase 0-100%, status batas 30% dan 10%, kondisi lewat KM.</td>
   </tr>
   <tr>
-    <td><code>vehicle_model_test.dart</code></td>
-    <td>16 Tests</td>
-    <td>Serialisasi model kendaraan, parsing Firestore, inisialisasi default komponen motor baru, interval kustom per motor.</td>
+    <td><code>core/service_calculator_test.dart</code></td>
+    <td>23 Tests</td>
+    <td>Aturan servis multi-item: komponen diganti vs dibersihkan, pengaruh part lain, rollback saat servis dihapus, pemulihan ke baselineKm.</td>
   </tr>
   <tr>
-    <td><code>component_health_card_test.dart</code></td>
-    <td>18 Tests</td>
-    <td>Pewarnaan dinamis kartu (Aman, Peringatan, Habis), teks status, progress bar, event tap to record service.</td>
+    <td><code>core/validators_test.dart</code></td>
+    <td>28 Tests</td>
+    <td>Validasi input: KM, harga, nama motor, plat, panjang teks.</td>
   </tr>
   <tr>
-    <td><code>update_odometer_dialog_test.dart</code></td>
-    <td>12 Tests</td>
-    <td>Validasi angka KM tidak boleh mundur, penolakan karakter non-angka, penanganan error form.</td>
+    <td><code>core/odometer_calculator_test.dart</code><br><code>core/red_zone_calculator_test.dart</code></td>
+    <td>19 Tests</td>
+    <td>Rata-rata KM harian 30 hari, ambang selisih &ge;3 hari, estimasi tanggal zona merah.</td>
   </tr>
   <tr>
-    <td><code>service_form_screen_test.dart</code></td>
+    <td><code>core/report_calculator_test.dart</code></td>
+    <td>9 Tests</td>
+    <td>Total pengeluaran servis per bulan dan rekap per komponen.</td>
+  </tr>
+  <tr>
+    <td><code>core/save_status_test.dart</code></td>
+    <td>4 Tests</td>
+    <td>Batas tunggu konfirmasi server: status terkirim, masuk antrean, error asli tetap dilempar.</td>
+  </tr>
+  <tr>
+    <td><code>core/vehicle_components_test.dart</code><br><code>core/chat_prompt_builder_test.dart</code><br><code>core/connection_checker_test.dart</code></td>
     <td>20 Tests</td>
-    <td>Komponen default terpilih, penambahan baris part lain, tombol 'Gunakan KM Terkini', validasi submit wajib isi, uji anti-overflow pada resolusi 360dp dan 392dp.</td>
+    <td>Komponen default dan interval kustom, penyusunan konteks prompt MotoAI, deteksi status online.</td>
   </tr>
   <tr>
-    <td><code>service_history_screen_test.dart</code></td>
-    <td>14 Tests</td>
-    <td>Linimasa servis terurut tanggal terbaru, format Rupiah dan tanggal Indonesia, dialog konfirmasi hapus, empty state.</td>
+    <td><code>features/vehicles/vehicle_model_test.dart</code></td>
+    <td>5 Tests</td>
+    <td>Serialisasi model kendaraan, parsing Firestore, nilai awal komponen motor baru.</td>
   </tr>
   <tr>
-    <td><code>chat_screen_test.dart</code> & <code>groq_test</code></td>
-    <td>12 Tests</td>
-    <td>UI chat bubble, penanganan error jaringan, pemotongan riwayat pesan (hemat token), dukungan karakter Unicode/bullet.</td>
+    <td><code>features/dashboard/component_health_card_test.dart</code><br><code>features/dashboard/vehicle_hero_card_test.dart</code></td>
+    <td>7 Tests</td>
+    <td>Pewarnaan dinamis kartu (Aman, Peringatan, Habis), teks status, progress bar, event tap, penanda belum terkirim.</td>
   </tr>
   <tr>
-    <td><code>pdf_report_generator_test.dart</code></td>
-    <td>10 Tests</td>
-    <td>Validasi pembuatan bytes dokumen PDF laporan bulanan, tabel kunjungan servis, penanganan bulan tanpa servis.</td>
+    <td><code>features/odometer/update_odometer_dialog_test.dart</code></td>
+    <td>5 Tests</td>
+    <td>Validasi KM tidak boleh mundur, penolakan karakter non-angka, tombol batal.</td>
   </tr>
   <tr>
-    <td><code>notification_service_test.dart</code></td>
-    <td>10 Tests</td>
-    <td>ID deterministik per motor & komponen, perhitungan alarm zona merah jam 08:00, konfigurasi zona waktu lokal.</td>
+    <td><code>features/service/service_form_screen_test.dart</code><br><code>features/service/service_history_screen_test.dart</code></td>
+    <td>11 Tests</td>
+    <td>Komponen default terpilih, part lain, tombol Gunakan KM Terkini, validasi submit, linimasa terurut, format Rupiah dan tanggal Indonesia, dialog hapus, empty state.</td>
+  </tr>
+  <tr>
+    <td><code>features/chatbot/chat_screen_test.dart</code><br><code>features/chatbot/groq_chat_repository_test.dart</code></td>
+    <td>9 Tests</td>
+    <td>UI chat bubble, penanganan error jaringan dan batas waktu, pemotongan riwayat pesan, karakter Unicode.</td>
+  </tr>
+  <tr>
+    <td><code>features/reports/monthly_report_screen_test.dart</code><br><code>features/reports/pdf_report_generator_test.dart</code></td>
+    <td>6 Tests</td>
+    <td>Ringkasan pengeluaran bulanan, ganti bulan, pembuatan bytes PDF, bulan tanpa servis.</td>
+  </tr>
+  <tr>
+    <td><code>features/notifications/notification_service_test.dart</code><br><code>features/notifications/notification_permission_banner_test.dart</code></td>
+    <td>8 Tests</td>
+    <td>ID notifikasi deterministik, jadwal zona merah jam 08:00, konfigurasi zona waktu, banner izin.</td>
+  </tr>
+  <tr>
+    <td><code>shared/widgets_test.dart</code><br><code>widget_test.dart</code></td>
+    <td>11 Tests</td>
+    <td>Komponen bersama (tombol, kartu, badge, progress bar) dan smoke test aplikasi.</td>
   </tr>
   <tr>
     <td><strong>TOTAL KESELURUHAN</strong></td>
-    <td><strong>174 Tests</strong></td>
-    <td><strong>STATUS: ALL 174 TESTS PASSED (100% SUKSES)</strong></td>
+    <td><strong>189 Tests</strong></td>
+    <td><strong>STATUS: ALL 189 TESTS PASSED (100% SUKSES)</strong></td>
   </tr>
 </table>
 
@@ -787,7 +818,7 @@ flutter run
 <h3>8.4 Konfigurasi Kunci Asisten AI (MotoAI)</h3>
 <p>Kunci API Groq tidak pernah disimpan di dalam repositori kode demi keamanan. Kunci dapat diinjeksi saat build/run:</p>
 <pre>
-flutter run --dart-define=GROQ_API_KEY="gsk_kunci_groq_anda_disini"
+flutter run --dart-define-from-file=dart_defines.json
 </pre>
 
 <h3>8.5 Panduan Build & Publikasi APK Release ke GitHub</h3>
@@ -873,7 +904,7 @@ flutter build apk --release
 </table>
 
 <h3>9.2 Kesimpulan</h3>
-<p>Proyek aplikasi <strong>MotoCare</strong> telah berhasil dibangun dan diselesaikan 100% sesuai dengan seluruh spesifikasi kebutuhan yang tertuang pada dokumen <code>docs/SPEC.md</code> dan aturan visual <code>docs/DESIGN.md</code>. Aplikasi telah mengimplementasikan arsitektur bersih yang kokoh, logika perhitungan murni yang teruji secara komprehensif (174/174 unit dan widget tests lulus), penanganan offline yang tangguh melalui Cloud Firestore, asisten diagnosa cerdas MotoAI, serta identitas visual resmi (logo tajam dan splash screen Android 12+).</p>
+<p>Proyek aplikasi <strong>MotoCare</strong> telah berhasil dibangun dan diselesaikan 100% sesuai dengan seluruh spesifikasi kebutuhan yang tertuang pada dokumen <code>docs/SPEC.md</code> dan aturan visual <code>docs/DESIGN.md</code>. Aplikasi telah mengimplementasikan arsitektur bersih yang kokoh, logika perhitungan murni yang teruji secara komprehensif (189/189 unit dan widget tests lulus), penanganan offline yang tangguh melalui Cloud Firestore, asisten diagnosa cerdas MotoAI, serta identitas visual resmi (logo tajam dan splash screen Android 12+).</p>
 <p>Dengan selesainya seluruh kriteria fungsional dan non-fungsional, aplikasi MotoCare dinyatakan <strong>siap untuk digunakan secara luas oleh pemilik sepeda motor matic</strong> serta siap didistribusikan melalui rilis publik GitHub Releases.</p>
 
 <div style="margin-top: 40px; text-align: right; font-size: 9.5pt; color: #64748b;">

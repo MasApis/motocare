@@ -38,7 +38,7 @@ Pemilik motor matic harian: mahasiswa, pekerja, pengemudi ojek online.
 | State management | **Riverpod** (`flutter_riverpod`) |
 | Backend | **Firebase**: Authentication (email + password) dan Cloud Firestore (offline persistence aktif) |
 | Navigasi | `go_router` |
-| AI | LLM via **Groq Cloud API** (model default `openai/gpt-oss-120b`, daftar fallback lain ada di `chat_repository.dart`) gratis tanpa kartu kredit; kunci API diinjeksi via `--dart-define=GROQ_API_KEY` saat menjalankan aplikasi. **Kunci API tidak disimpan di kode aplikasi maupun repositori.** Firebase AI Logic (Gemini) dan Cloud Functions/Vertex AI tidak dipakai |
+| AI | LLM via **Groq Cloud API** (model default `openai/gpt-oss-120b`, daftar fallback lain ada di `chat_repository.dart`) gratis tanpa kartu kredit; kunci API diinjeksi via `--dart-define-from-file=dart_defines.json` saat menjalankan aplikasi. **Kunci API tidak disimpan di kode aplikasi maupun repositori.** Firebase AI Logic (Gemini) dan Cloud Functions/Vertex AI tidak dipakai |
 | Notifikasi | `flutter_local_notifications`, notifikasi dijadwalkan pada tanggal tertentu (tanpa background service) |
 | PDF | `pdf` + `printing` (atau `share_plus`) |
 | UI/UX | Desain dari **Google Stitch** (export zip) di `docs/design/` (tiap layar: `screen.png` + `code.html`); peta layar ke fitur di `docs/design/SCREENS.md`; aturan visual di `docs/DESIGN.md` (MotoSense Design System). `code.html` hanya acuan nilai dan tata letak, bukan kode yang disalin ke Flutter |

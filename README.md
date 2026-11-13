@@ -4,7 +4,7 @@
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Spark%20Plan-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com)
 [![State Management](https://img.shields.io/badge/State-Riverpod%20v3-00599C)](https://riverpod.dev)
-[![Tests](https://img.shields.io/badge/Tests-177%20Passed-brightgreen)](https://github.com)
+[![Tests](https://img.shields.io/badge/Tests-189%20Passed-brightgreen)](https://github.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **MotoCare** adalah aplikasi mobile Android berbasis Flutter yang dirancang khusus untuk membantu pemilik **sepeda motor matic** memantau kesehatan komponen kendaraan (oli mesin, oli gardan, V-belt), mencatat riwayat servis berkala, menjadwalkan pengingat servis otomatis, serta berkonsultasi seputar kendala motor dengan asisten cerdas berbasis AI (**MotoAI**).
@@ -37,6 +37,12 @@
   - Tambah suku cadang tambahan (*spare part lain*, misal: kampas rem, busi, filter udara, roller CVT).
   - Riwayat servis lengkap dengan format tanggal Indonesia dan mata uang Rupiah (`id_ID`).
   - Hapus catatan servis dengan fitur pemulihan status komponen otomatis (*rollback* ke servis sebelumnya atau baseline).
+
+- 📶 **Tetap Bisa Dipakai Tanpa Internet**
+  - Dashboard, riwayat, dan odometer tetap terbuka tanpa sinyal.
+  - Menyimpan servis atau KM saat offline tetap berhasil, lalu dikirim otomatis saat internet kembali.
+  - Catatan yang belum terkirim ditandai **Menunggu dikirim**.
+  - Batasnya: login pertama dan Chat AI tetap butuh internet.
 
 - 🔔 **Smart Push Notification (Lokal)**
   - Pengingat otomatis saat komponen memasuki *zona merah* (sisa < 10%).
@@ -78,7 +84,7 @@ UI (Widgets & Pages) ──► Providers (Riverpod) ──► Repositories ─�
 | **Notifikasi** | `flutter_local_notifications` + `timezone` |
 | **Laporan & Dokumen** | `pdf` + `printing` |
 | **Ikon & Font** | `google_fonts` (Plus Jakarta Sans) & `material_symbols_icons` |
-| **Pengujian** | `flutter_test` (177 Unit & Widget Tests) |
+| **Pengujian** | `flutter_test` (189 Unit & Widget Tests) |
 
 ---
 
@@ -99,7 +105,7 @@ motocare/
 │   │   └── vehicles/          # Tambah, kelola, & ganti kendaraan
 │   ├── shared/                # Tema warna, tipografi, komponen bersama
 │   └── main.dart              # Entrypoint aplikasi
-├── test/                      # 177 Unit & Widget test
+├── test/                      # 189 Unit & Widget test
 ├── docs/                      # Spesifikasi & desain
 │   ├── SPEC.md                #   daftar fitur resmi (sumber kebenaran)
 │   ├── DESIGN.md              #   aturan visual (warna, font, ukuran)
@@ -325,7 +331,7 @@ Proyek ini dilengkapi dengan cakupan pengujian komprehensif pada fungsi inti (*c
 # Menjalankan analisis statis kode
 flutter analyze
 
-# Menjalankan seluruh pengujian (177 test cases)
+# Menjalankan seluruh pengujian (189 test cases)
 flutter test
 ```
 
