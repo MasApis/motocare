@@ -28,10 +28,15 @@ class PendingSyncBadge extends StatelessWidget {
             color: AppColors.statusWarningText,
           ),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: AppTypography.labelCaps(
-              color: AppColors.statusWarningText,
+          // Flexible agar badge tidak meluber bila ruangnya sempit
+          Flexible(
+            child: Text(
+              label,
+              style: AppTypography.labelCaps(
+                color: AppColors.statusWarningText,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

@@ -92,6 +92,28 @@ void main() {
       expect(find.text('Menunggu dikirim'), findsOneWidget);
     });
 
+    testWidgets(
+        'penanda "Menunggu dikirim" tidak membuat overflow di layar sempit',
+        (tester) async {
+      // Lebar 360 dp, seperti kasus di HP pengguna (badge menabrak harga)
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        buildTestableHistoryScreen(
+          records: [
+            testRecords.first.copyWith(hasPendingWrites: true),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Overflow dilaporkan Flutter sebagai exception saat test
+      expect(tester.takeException(), isNull);
+      expect(find.text('Menunggu dikirim'), findsOneWidget);
+    });
+
     testWidgets('tidak menampilkan penanda untuk catatan yang sudah terkirim',
         (tester) async {
       await tester.pumpWidget(buildTestableHistoryScreen());

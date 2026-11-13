@@ -374,11 +374,14 @@ class ServiceHistoryScreen extends ConsumerWidget {
                           children: [
                             Row(
                               children: [
-                                Text(
-                                  record.formattedDate,
-                                  style: AppTypography.labelCaps(
-                                    color: AppColors.primary,
-                                  ).copyWith(fontWeight: FontWeight.w700),
+                                Flexible(
+                                  child: Text(
+                                    record.formattedDate,
+                                    style: AppTypography.labelCaps(
+                                      color: AppColors.primary,
+                                    ).copyWith(fontWeight: FontWeight.w700),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                                 const SizedBox(width: 6),
                                 Container(
@@ -390,16 +393,15 @@ class ServiceHistoryScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 6),
-                                Text(
-                                  record.formattedKm,
-                                  style: AppTypography.labelCaps(
-                                    color: AppColors.onSurfaceVariant,
+                                Flexible(
+                                  child: Text(
+                                    record.formattedKm,
+                                    style: AppTypography.labelCaps(
+                                      color: AppColors.onSurfaceVariant,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                if (record.hasPendingWrites) ...[
-                                  const SizedBox(width: 6),
-                                  const PendingSyncBadge(),
-                                ],
                               ],
                             ),
                             if (vehicle != null) ...[
@@ -409,11 +411,19 @@ class ServiceHistoryScreen extends ConsumerWidget {
                                 style: AppTypography.labelCaps(
                                   color: AppColors.outline,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
+                            ],
+                            // Badge di baris sendiri agar tidak menabrak harga di layar sempit
+                            if (record.hasPendingWrites) ...[
+                              const SizedBox(height: 4),
+                              const PendingSyncBadge(),
                             ],
                           ],
                         ),
                       ),
+                      const SizedBox(width: AppSpacing.sm),
                       Text(
                         record.formattedPrice,
                         style: AppTypography.headlineSm().copyWith(
