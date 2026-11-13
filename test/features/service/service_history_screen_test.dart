@@ -78,6 +78,28 @@ void main() {
   }
 
   group('ServiceHistoryScreen Widget Tests', () {
+    testWidgets('menampilkan penanda "Menunggu dikirim" untuk catatan yang belum terkirim',
+        (tester) async {
+      await tester.pumpWidget(
+        buildTestableHistoryScreen(
+          records: [
+            testRecords.first.copyWith(hasPendingWrites: true),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Menunggu dikirim'), findsOneWidget);
+    });
+
+    testWidgets('tidak menampilkan penanda untuk catatan yang sudah terkirim',
+        (tester) async {
+      await tester.pumpWidget(buildTestableHistoryScreen());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Menunggu dikirim'), findsNothing);
+    });
+
     testWidgets('menampilkan linimasa servis lengkap, format rupiah, dan tanggal Indonesia', (tester) async {
       await tester.pumpWidget(buildTestableHistoryScreen());
       await tester.pumpAndSettle();

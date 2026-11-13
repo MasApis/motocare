@@ -8,11 +8,15 @@ class OdometerLog {
     required this.id,
     required this.km,
     required this.date,
+    this.hasPendingWrites = false,
   });
 
   final String id;
   final int km;
   final DateTime date;
+
+  /// True bila catatan masih menunggu dikirim ke server (disimpan di HP saja).
+  final bool hasPendingWrites;
 
   /// Konversi ke entri murni [OdometerEntry] untuk kalkulasi di core/
   OdometerEntry toOdometerEntry() {
@@ -26,7 +30,7 @@ class OdometerLog {
     };
   }
 
-  factory OdometerLog.fromMap(Map<String, dynamic> map, String id) {
+  factory OdometerLog.fromMap(Map<String, dynamic> map, String id, {bool hasPendingWrites = false}) {
     final rawDate = map['date'];
     final DateTime parsedDate;
     if (rawDate is Timestamp) {
@@ -41,22 +45,29 @@ class OdometerLog {
       id: id,
       km: (map['km'] as num?)?.toInt() ?? 0,
       date: parsedDate,
+      hasPendingWrites: hasPendingWrites,
     );
   }
 
   factory OdometerLog.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    return OdometerLog.fromMap(doc.data() ?? {}, doc.id);
+    return OdometerLog.fromMap(
+      doc.data() ?? {},
+      doc.id,
+      hasPendingWrites: doc.metadata.hasPendingWrites,
+    );
   }
 
   OdometerLog copyWith({
     String? id,
     int? km,
     DateTime? date,
+    bool? hasPendingWrites,
   }) {
     return OdometerLog(
       id: id ?? this.id,
       km: km ?? this.km,
       date: date ?? this.date,
+      hasPendingWrites: hasPendingWrites ?? this.hasPendingWrites,
     );
   }
 }

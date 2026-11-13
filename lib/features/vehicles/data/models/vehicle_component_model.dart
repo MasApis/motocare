@@ -11,12 +11,16 @@ class VehicleComponent {
     required this.lastServiceKm,
     required this.baselineKm,
     this.lastRedNotifiedKm,
+    this.hasPendingWrites = false,
   });
 
   final String type;
   final int intervalKm;
   final int lastServiceKm;
   final int baselineKm;
+
+  /// True bila dokumen masih menunggu dikirim ke server (disimpan di HP saja).
+  final bool hasPendingWrites;
 
   /// KM saat notifikasi "sudah masuk zona merah" terakhir ditampilkan.
   /// Dipakai agar notifikasi itu tidak muncul berulang tiap aplikasi dibuka.
@@ -50,6 +54,7 @@ class VehicleComponent {
       lastServiceKm: lastServiceKm,
       baselineKm: baselineKm,
       lastRedNotifiedKm: (data['lastRedNotifiedKm'] as num?)?.toInt(),
+      hasPendingWrites: doc.metadata.hasPendingWrites,
     );
   }
 
@@ -59,6 +64,7 @@ class VehicleComponent {
     int? lastServiceKm,
     int? baselineKm,
     int? lastRedNotifiedKm,
+    bool? hasPendingWrites,
   }) {
     return VehicleComponent(
       type: type ?? this.type,
@@ -66,6 +72,7 @@ class VehicleComponent {
       lastServiceKm: lastServiceKm ?? this.lastServiceKm,
       baselineKm: baselineKm ?? this.baselineKm,
       lastRedNotifiedKm: lastRedNotifiedKm ?? this.lastRedNotifiedKm,
+      hasPendingWrites: hasPendingWrites ?? this.hasPendingWrites,
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/save_status.dart';
 import '../../../../core/service_calculator.dart';
 import '../../notifications/providers/notification_providers.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
@@ -102,21 +103,27 @@ class ServiceControllerState {
     this.isLoading = false,
     this.errorMessage,
     this.successMessage,
+    this.saveStatus,
   });
 
   final bool isLoading;
   final String? errorMessage;
   final String? successMessage;
 
+  /// Status penyimpanan terakhir: null berarti belum ada / gagal.
+  final SaveStatus? saveStatus;
+
   ServiceControllerState copyWith({
     bool? isLoading,
     String? errorMessage,
     String? successMessage,
+    SaveStatus? saveStatus,
   }) {
     return ServiceControllerState(
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
       successMessage: successMessage,
+      saveStatus: saveStatus,
     );
   }
 }
@@ -137,7 +144,7 @@ class ServiceController extends Notifier<ServiceControllerState> {
     state = state.copyWith(isLoading: true, errorMessage: null, successMessage: null);
     try {
       final repo = ref.read(serviceRepositoryProvider);
-      await repo.addServiceRecord(
+      final result = await repo.addServiceRecord(
         vehicleId: vehicleId,
         items: items,
         date: date,
@@ -154,6 +161,7 @@ class ServiceController extends Notifier<ServiceControllerState> {
 
       state = state.copyWith(
         isLoading: false,
+        saveStatus: result.status,
         successMessage: 'Catatan servis berhasil disimpan.',
       );
       return true;
@@ -174,7 +182,7 @@ class ServiceController extends Notifier<ServiceControllerState> {
     state = state.copyWith(isLoading: true, errorMessage: null, successMessage: null);
     try {
       final repo = ref.read(serviceRepositoryProvider);
-      await repo.deleteServiceRecord(
+      final status = await repo.deleteServiceRecord(
         vehicleId: vehicleId,
         recordId: recordId,
         vehicleInitialKm: vehicleInitialKm,
@@ -187,6 +195,7 @@ class ServiceController extends Notifier<ServiceControllerState> {
 
       state = state.copyWith(
         isLoading: false,
+        saveStatus: status,
         successMessage: 'Catatan servis berhasil dihapus.',
       );
       return true;

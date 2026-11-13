@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../core/save_status.dart';
 import '../../../core/service_calculator.dart';
 import '../../../shared/theme/app_colors.dart';
 import '../../../shared/theme/app_shapes.dart';
 import '../../../shared/theme/app_spacing.dart';
 import '../../../shared/theme/app_typography.dart';
 import '../../../shared/widgets/app_button.dart';
+import '../../../shared/widgets/pending_sync_badge.dart';
 import '../../vehicles/data/models/vehicle_model.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
 import '../data/models/service_record_model.dart';
@@ -76,9 +78,15 @@ class ServiceHistoryScreen extends ConsumerWidget {
 
       if (context.mounted) {
         if (success) {
+          final queued =
+              ref.read(serviceControllerProvider).saveStatus == SaveStatus.queued;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Catatan servis dihapus. Perhitungan kartu disesuaikan.'),
+            SnackBar(
+              content: Text(
+                queued
+                    ? 'Penghapusan tersimpan di HP. Akan dikirim otomatis saat internet tersedia.'
+                    : 'Catatan servis dihapus. Perhitungan kartu disesuaikan.',
+              ),
             ),
           );
         } else {
@@ -388,6 +396,10 @@ class ServiceHistoryScreen extends ConsumerWidget {
                                     color: AppColors.onSurfaceVariant,
                                   ),
                                 ),
+                                if (record.hasPendingWrites) ...[
+                                  const SizedBox(width: 6),
+                                  const PendingSyncBadge(),
+                                ],
                               ],
                             ),
                             if (vehicle != null) ...[

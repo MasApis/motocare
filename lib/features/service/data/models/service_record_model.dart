@@ -18,6 +18,7 @@ class ServiceRecord {
     required this.location,
     this.note,
     this.createdAt,
+    this.hasPendingWrites = false,
   });
 
   /// ID unik dokumen di subkoleksi serviceRecords
@@ -46,6 +47,9 @@ class ServiceRecord {
 
   /// Timestamp pencatatan dibuat
   final DateTime? createdAt;
+
+  /// True bila catatan masih menunggu dikirim ke server (disimpan di HP saja).
+  final bool hasPendingWrites;
 
   /// Ringkasan teks item sesuai SPEC: "Oli Mesin (diganti), V-Belt (dibersihkan), Roller (diganti)"
   String get itemsSummary => ServiceCalculator.formatItemsSummary(items);
@@ -115,6 +119,7 @@ class ServiceRecord {
           ? (data['note'] as String).trim()
           : null,
       createdAt: data['createdAt'] != null ? parseTimestamp(data['createdAt']) : null,
+      hasPendingWrites: doc.metadata.hasPendingWrites,
     );
   }
 
@@ -142,6 +147,7 @@ class ServiceRecord {
     String? location,
     String? note,
     DateTime? createdAt,
+    bool? hasPendingWrites,
   }) {
     return ServiceRecord(
       id: id ?? this.id,
@@ -153,6 +159,7 @@ class ServiceRecord {
       location: location ?? this.location,
       note: note ?? this.note,
       createdAt: createdAt ?? this.createdAt,
+      hasPendingWrites: hasPendingWrites ?? this.hasPendingWrites,
     );
   }
 }

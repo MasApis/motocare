@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../core/save_status.dart';
 import '../../../core/vehicle_components.dart';
 import '../../../shared/theme/app_colors.dart';
 import '../../../shared/theme/app_shapes.dart';
@@ -108,10 +109,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     if (confirmed == true) {
       try {
-        await ref.read(vehicleControllerProvider).deleteVehicle(vehicle.id);
+        final status =
+            await ref.read(vehicleControllerProvider).deleteVehicle(vehicle.id);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Motor "${vehicle.displayName}" berhasil dihapus.')),
+          SnackBar(
+            content: Text(
+              status == SaveStatus.queued
+                  ? 'Penghapusan motor "${vehicle.displayName}" tersimpan di HP. Akan dikirim otomatis saat internet tersedia.'
+                  : 'Motor "${vehicle.displayName}" berhasil dihapus.',
+            ),
+          ),
         );
       } catch (e) {
         if (!mounted) return;
@@ -569,6 +577,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               intervalKm: comp.intervalKm,
               lastServiceKm: comp.lastServiceKm,
               currentKm: activeVehicle.currentKm,
+              hasPendingWrites: comp.hasPendingWrites,
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(

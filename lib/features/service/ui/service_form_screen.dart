@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../core/save_status.dart';
 import '../../../core/service_calculator.dart';
 import '../../../core/vehicle_components.dart';
 import '../../../shared/theme/app_colors.dart';
@@ -312,9 +313,15 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
     if (!mounted) return;
 
     if (success) {
+      final queued =
+          ref.read(serviceControllerProvider).saveStatus == SaveStatus.queued;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Catatan servis tersimpan! Perhitungan status motor telah diperbarui.'),
+        SnackBar(
+          content: Text(
+            queued
+                ? 'Tersimpan di HP. Akan dikirim otomatis saat internet tersedia.'
+                : 'Catatan servis tersimpan! Perhitungan status motor telah diperbarui.',
+          ),
           backgroundColor: AppColors.tertiary,
         ),
       );

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/odometer_calculator.dart';
+import '../../../core/save_status.dart';
 import '../../notifications/providers/notification_providers.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
 import '../data/models/odometer_log_model.dart';
@@ -46,12 +47,12 @@ class OdometerController {
 
   /// Menyimpan log odometer baru dan memperbarui currentKm kendaraan
   /// serta memicu penjadwalan ulang notifikasi F6 sesuai docs/SPEC.md
-  Future<String> updateOdometer({
+  Future<SaveResult<String>> updateOdometer({
     required String vehicleId,
     required int km,
     required DateTime date,
   }) async {
-    final logId = await _repository.addOdometerLog(
+    final result = await _repository.addOdometerLog(
       vehicleId: vehicleId,
       km: km,
       date: date,
@@ -78,7 +79,7 @@ class OdometerController {
       // Kegagalan penjadwalan notifikasi tidak boleh membatalkan penyimpanan odometer
     }
 
-    return logId;
+    return result;
   }
 }
 

@@ -207,7 +207,7 @@ Fitur dianggap **selesai** jika semua kriterianya terpenuhi, test terkait lulus,
 - AI diberi peran ahli mekanik motor matic dan konteks motor aktif (model, KM sekarang, status komponen).
 - Setiap jawaban disertai pengingat singkat bahwa ini dugaan dan perlu dicek bengkel untuk masalah serius; pertanyaan di luar topik motor ditolak dengan sopan.
 - Ada status mengetik/loading, pesan gagal yang ramah saat offline atau API error, dan batas panjang pesan.
-- **Kunci API tidak ada di kode aplikasi maupun repositori** (dioper via `--dart-define=GROQ_API_KEY`).
+- **Kunci API tidak ada di kode aplikasi maupun repositori** (dioper via `--dart-define-from-file=dart_defines.json`).
 - Berjalan 100% gratis tanpa kartu kredit: tidak ada layanan yang membutuhkan Blaze atau langganan berbayar.
 - Hemat kuota gratis: batas panjang pesan (300 karakter), hanya beberapa pesan terakhir (10 pesan) yang dikirim sebagai konteks, tombol kirim nonaktif saat menunggu jawaban.
 - Saat kuota atau batas laju tercapai, tampil pesan ramah ("coba lagi nanti"), bukan error teknis.
@@ -229,7 +229,7 @@ Tata letak layar mengikuti `docs/design/` (10 layar; lihat `docs/design/SCREENS.
 ## 6. Kebutuhan Non-Fungsional
 
 - **Performa:** dashboard tampil kurang dari 2 detik; gulir dan carousel lancar di HP kelas menengah.
-- **Offline:** dashboard, odometer, dan riwayat tetap bisa dipakai tanpa internet (Firestore offline persistence); chatbot butuh internet.
+- **Offline:** dashboard, odometer, dan riwayat tetap bisa dipakai tanpa internet (Firestore offline persistence). Menyimpan data saat offline juga bisa: data langsung tersimpan di HP, tampil di layar, lalu dikirim ke Firestore otomatis saat internet tersambung (termasuk kalau aplikasi ditutup dulu). Batasnya: login pertama dan Chat AI tetap butuh internet, dan HP yang belum pernah membuka aplikasi ini tidak punya salinan data untuk ditampilkan.
 - **Keamanan:** security rules, tidak ada rahasia di repositori, validasi semua input.
 - **Aksesibilitas:** kontras memadai, teks mengikuti ukuran font sistem, target sentuh ≥ 48dp.
 - **Lokalisasi:** seluruh teks bahasa Indonesia; format rupiah dan tanggal `id_ID`.

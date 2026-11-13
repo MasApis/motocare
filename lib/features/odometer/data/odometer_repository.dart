@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../core/save_status.dart';
 import '../../../core/validators.dart';
 import 'models/odometer_log_model.dart';
 
@@ -50,7 +51,7 @@ class OdometerRepository {
       final uid = _getRequiredUid();
       return _odometerLogsRef(vehicleId, uid)
           .orderBy('date', descending: true)
-          .snapshots()
+          .snapshots(includeMetadataChanges: true)
           .map((snapshot) {
         return snapshot.docs
             .map((doc) => OdometerLog.fromFirestore(doc))
@@ -82,7 +83,7 @@ class OdometerRepository {
 
   /// Menambahkan catatan odometer baru dan sekaligus memperbarui currentKm kendaraan
   /// sesuai docs/SPEC.md (F4 & 2.1)
-  Future<String> addOdometerLog({
+  Future<SaveResult<String>> addOdometerLog({
     required String vehicleId,
     required int km,
     required DateTime date,
@@ -118,8 +119,8 @@ class OdometerRepository {
         'currentKm': km,
       });
 
-      await batch.commit();
-      return newLogDoc.id;
+      final status = await awaitServerAck(batch.commit());
+      return (value: newLogDoc.id, status: status);
     } on FirebaseException catch (e) {
       throw OdometerException(e.message ?? 'Gagal menyimpan angka odometer.');
     } catch (e) {

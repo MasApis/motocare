@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../core/save_status.dart';
 import '../../../core/service_calculator.dart';
 import '../../../core/validators.dart';
 import '../../../shared/theme/app_colors.dart';
@@ -21,8 +22,8 @@ class UpdateOdometerDialog extends ConsumerStatefulWidget {
 
   final Vehicle vehicle;
 
-  static Future<bool?> show(BuildContext context, Vehicle vehicle) {
-    return showDialog<bool>(
+  static Future<SaveStatus?> show(BuildContext context, Vehicle vehicle) {
+    return showDialog<SaveStatus>(
       context: context,
       barrierDismissible: true,
       builder: (ctx) => UpdateOdometerDialog(vehicle: vehicle),
@@ -101,14 +102,14 @@ class _UpdateOdometerDialogState extends ConsumerState<UpdateOdometerDialog> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(odometerControllerProvider).updateOdometer(
+      final result = await ref.read(odometerControllerProvider).updateOdometer(
             vehicleId: widget.vehicle.id,
             km: newKm,
             date: _selectedDate,
           );
 
       if (!mounted) return;
-      Navigator.of(context).pop(true);
+      Navigator.of(context).pop(result.status);
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -164,7 +165,7 @@ class _UpdateOdometerDialogState extends ConsumerState<UpdateOdometerDialog> {
                         visualDensity: VisualDensity.compact,
                         icon: const Icon(Symbols.close, size: 20),
                         tooltip: 'Tutup',
-                        onPressed: _isLoading ? null : () => Navigator.of(context).pop(false),
+                        onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
                       ),
                     ],
                   ),
@@ -310,7 +311,7 @@ class _UpdateOdometerDialogState extends ConsumerState<UpdateOdometerDialog> {
                     children: [
                       Expanded(
                         child: OutlinedButton(
-                          onPressed: _isLoading ? null : () => Navigator.of(context).pop(false),
+                          onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size.fromHeight(48),
                             side: const BorderSide(color: AppColors.outlineVariant),

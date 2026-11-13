@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../../core/save_status.dart';
 import '../../../../core/service_calculator.dart';
 import '../../../../core/vehicle_components.dart';
 import 'models/service_record_model.dart';
@@ -55,7 +56,7 @@ class ServiceRepository {
       final uid = _getRequiredUid();
       return _serviceRecordsRef(vehicleId, uid)
           .orderBy('date', descending: true)
-          .snapshots()
+          .snapshots(includeMetadataChanges: true)
           .map((snapshot) {
         return snapshot.docs
             .map((doc) => ServiceRecord.fromFirestore(doc, fallbackVehicleId: vehicleId))
@@ -90,7 +91,7 @@ class ServiceRepository {
   /// - Hanya komponen yang "replaced" (diganti) yang mereset kartunya (`lastServiceKm = km`)
   /// - Komponen yang "cleaned" atau part lain tidak mengubah kartu komponen
   /// - Jika KM servis melebihi currentKm motor, currentKm ikut diperbarui
-  Future<String> addServiceRecord({
+  Future<SaveResult<String>> addServiceRecord({
     required String vehicleId,
     required List<ServiceItem> items,
     required DateTime date,
@@ -167,8 +168,8 @@ class ServiceRepository {
         });
       }
 
-      await batch.commit();
-      return newRecordDoc.id;
+      final status = await awaitServerAck(batch.commit());
+      return (value: newRecordDoc.id, status: status);
     } on FirebaseException catch (e) {
       throw ServiceException(e.message ?? 'Gagal menyimpan catatan servis.');
     } catch (e) {
@@ -180,7 +181,7 @@ class ServiceRepository {
   /// Menghapus catatan servis (dengan konfirmasi di UI)
   /// dan memperbarui kartu komponen agar kembali menghitung dari servis sebelumnya
   /// atau kembali ke baselineKm sesuai docs/SPEC.md Bagian 2.1 & F5.
-  Future<void> deleteServiceRecord({
+  Future<SaveStatus> deleteServiceRecord({
     required String vehicleId,
     required String recordId,
     int? vehicleInitialKm,
@@ -243,7 +244,8 @@ class ServiceRepository {
         }, SetOptions(merge: true));
       }
 
-      await batch.commit();
+      final status = await awaitServerAck(batch.commit());
+      return status;
     } on FirebaseException catch (e) {
       throw ServiceException(e.message ?? 'Gagal menghapus catatan servis.');
     } catch (e) {

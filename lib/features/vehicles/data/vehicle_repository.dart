@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../core/save_status.dart';
 import '../../../core/vehicle_components.dart';
 import 'models/vehicle_component_model.dart';
 import 'models/vehicle_model.dart';
@@ -40,7 +41,7 @@ class VehicleRepository {
   }
 
   /// Menambahkan motor baru beserta 3 komponen default otomatis (SPEC F2 & SPEC 2.1)
-  Future<String> addVehicle({
+  Future<SaveResult<String>> addVehicle({
     required String brand,
     required String model,
     String? name,
@@ -95,8 +96,8 @@ class VehicleRepository {
         'date': Timestamp.fromDate(now),
       });
 
-      await batch.commit();
-      return vehicleId;
+      final status = await awaitServerAck(batch.commit());
+      return (value: vehicleId, status: status);
     } on FirebaseException catch (e) {
       throw VehicleException(e.message ?? 'Gagal menambahkan motor.');
     } catch (e) {
@@ -106,7 +107,7 @@ class VehicleRepository {
   }
 
   /// Memperbarui informasi motor
-  Future<void> updateVehicle({
+  Future<SaveStatus> updateVehicle({
     required String vehicleId,
     required String brand,
     required String model,
@@ -133,7 +134,8 @@ class VehicleRepository {
         dataToUpdate['currentKm'] = currentKm;
       }
 
-      await vehicleDoc.update(dataToUpdate);
+      final status = await awaitServerAck(vehicleDoc.update(dataToUpdate));
+      return status;
     } on FirebaseException catch (e) {
       throw VehicleException(e.message ?? 'Gagal memperbarui data motor.');
     } catch (e) {
@@ -143,7 +145,7 @@ class VehicleRepository {
   }
 
   /// Mengubah interval komponen tertentu per motor
-  Future<void> updateComponentInterval({
+  Future<SaveStatus> updateComponentInterval({
     required String vehicleId,
     required String componentType,
     required int intervalKm,
@@ -155,10 +157,11 @@ class VehicleRepository {
       final uid = _getRequiredUid();
       final compDoc = _componentsRef(vehicleId, uid).doc(componentType);
 
-      await compDoc.set({
+      final status = await awaitServerAck(compDoc.set({
         'type': componentType,
         'intervalKm': intervalKm,
-      }, SetOptions(merge: true));
+      }, SetOptions(merge: true)));
+      return status;
     } on FirebaseException catch (e) {
       throw VehicleException(e.message ?? 'Gagal memperbarui interval komponen.');
     } catch (e) {
@@ -168,7 +171,7 @@ class VehicleRepository {
   }
 
   /// Menghapus motor beserta seluruh subkoleksinya sesuai SPEC bagian 4
-  Future<void> deleteVehicle(String vehicleId) async {
+  Future<SaveStatus> deleteVehicle(String vehicleId) async {
     try {
       final uid = _getRequiredUid();
       final vehicleDoc = _vehiclesRef(uid).doc(vehicleId);
@@ -192,7 +195,8 @@ class VehicleRepository {
       }
       batch.delete(vehicleDoc);
 
-      await batch.commit();
+      final status = await awaitServerAck(batch.commit());
+      return status;
     } on FirebaseException catch (e) {
       throw VehicleException(e.message ?? 'Gagal menghapus motor.');
     } catch (e) {
@@ -210,7 +214,7 @@ class VehicleRepository {
 
     return _vehiclesRef(uid)
         .orderBy('createdAt', descending: false)
-        .snapshots()
+        .snapshots(includeMetadataChanges: true)
         .map((snapshot) {
       return snapshot.docs.map((doc) => Vehicle.fromFirestore(doc)).toList();
     });
@@ -223,7 +227,9 @@ class VehicleRepository {
       return Stream.value([]);
     }
 
-    return _componentsRef(vehicleId, uid).snapshots().map((snapshot) {
+    return _componentsRef(vehicleId, uid)
+        .snapshots(includeMetadataChanges: true)
+        .map((snapshot) {
       return snapshot.docs
           .map((doc) => VehicleComponent.fromFirestore(doc))
           .toList();
@@ -265,10 +271,10 @@ class VehicleRepository {
   }) async {
     try {
       final uid = _getRequiredUid();
-      await _componentsRef(vehicleId, uid).doc(componentType).set(
+      await awaitServerAck(_componentsRef(vehicleId, uid).doc(componentType).set(
         {'lastRedNotifiedKm': km},
         SetOptions(merge: true),
-      );
+      ));
     } on FirebaseException catch (e) {
       throw VehicleException(e.message ?? 'Gagal menyimpan status notifikasi.');
     }

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/save_status.dart';
 import '../../notifications/providers/notification_providers.dart';
 import '../data/models/vehicle_component_model.dart';
 import '../data/models/vehicle_model.dart';
@@ -75,7 +76,7 @@ class VehicleController {
 
   VehicleRepository get _repository => _ref.read(vehicleRepositoryProvider);
 
-  Future<String> addVehicle({
+  Future<SaveResult<String>> addVehicle({
     required String brand,
     required String model,
     String? name,
@@ -93,7 +94,7 @@ class VehicleController {
     );
   }
 
-  Future<void> updateVehicle({
+  Future<SaveStatus> updateVehicle({
     required String vehicleId,
     required String brand,
     required String model,
@@ -102,7 +103,7 @@ class VehicleController {
     int? currentKm,
     Map<String, int>? customIntervals,
   }) async {
-    await _repository.updateVehicle(
+    var status = await _repository.updateVehicle(
       vehicleId: vehicleId,
       brand: brand,
       model: model,
@@ -113,28 +114,32 @@ class VehicleController {
 
     if (customIntervals != null) {
       for (final entry in customIntervals.entries) {
-        await _repository.updateComponentInterval(
+        final intervalStatus = await _repository.updateComponentInterval(
           vehicleId: vehicleId,
           componentType: entry.key,
           intervalKm: entry.value,
         );
+        if (intervalStatus == SaveStatus.queued) status = SaveStatus.queued;
       }
     }
+
+    return status;
   }
 
-  Future<void> deleteVehicle(String vehicleId) async {
-    await _repository.deleteVehicle(vehicleId);
+  Future<SaveStatus> deleteVehicle(String vehicleId) async {
+    final status = await _repository.deleteVehicle(vehicleId);
     try {
       await _ref.read(notificationSchedulerProvider).cancelForVehicle(vehicleId);
     } catch (_) {}
+    return status;
   }
 
-  Future<void> updateComponentInterval({
+  Future<SaveStatus> updateComponentInterval({
     required String vehicleId,
     required String componentType,
     required int intervalKm,
   }) async {
-    await _repository.updateComponentInterval(
+    return _repository.updateComponentInterval(
       vehicleId: vehicleId,
       componentType: componentType,
       intervalKm: intervalKm,

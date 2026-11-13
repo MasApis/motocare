@@ -10,6 +10,7 @@ class Vehicle {
     this.plate,
     required this.currentKm,
     required this.createdAt,
+    this.hasPendingWrites = false,
   });
 
   final String id;
@@ -19,6 +20,9 @@ class Vehicle {
   final String? plate;
   final int currentKm;
   final DateTime createdAt;
+
+  /// True bila dokumen masih menunggu dikirim ke server (disimpan di HP saja).
+  final bool hasPendingWrites;
 
   /// Nama tampilan motor: jika name kosong, gunakan kombinasi brand + model
   String get displayName {
@@ -58,6 +62,7 @@ class Vehicle {
       plate: data['plate'] as String?,
       currentKm: (data['currentKm'] as num?)?.toInt() ?? 0,
       createdAt: createdAt,
+      hasPendingWrites: doc.metadata.hasPendingWrites,
     );
   }
 
@@ -69,6 +74,7 @@ class Vehicle {
     String? plate,
     int? currentKm,
     DateTime? createdAt,
+    bool? hasPendingWrites,
   }) {
     return Vehicle(
       id: id ?? this.id,
@@ -78,6 +84,7 @@ class Vehicle {
       plate: plate ?? this.plate,
       currentKm: currentKm ?? this.currentKm,
       createdAt: createdAt ?? this.createdAt,
+      hasPendingWrites: hasPendingWrites ?? this.hasPendingWrites,
     );
   }
 }

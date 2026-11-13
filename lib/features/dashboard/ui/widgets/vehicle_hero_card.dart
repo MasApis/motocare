@@ -4,10 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 import '../../../../core/odometer_calculator.dart';
+import '../../../../core/save_status.dart';
 import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/theme/app_shapes.dart';
 import '../../../../shared/theme/app_spacing.dart';
 import '../../../../shared/theme/app_typography.dart';
+import '../../../../shared/widgets/pending_sync_badge.dart';
 import '../../../odometer/providers/odometer_providers.dart';
 import '../../../odometer/ui/update_odometer_dialog.dart';
 import '../../../vehicles/data/models/vehicle_model.dart';
@@ -128,6 +130,10 @@ class VehicleHeroCard extends ConsumerWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
+          if (vehicle.hasPendingWrites) ...[
+            const SizedBox(height: 4),
+            const PendingSyncBadge(),
+          ],
           const SizedBox(height: 2),
           Text(
             vehicle.plate != null && vehicle.plate!.isNotEmpty
@@ -246,11 +252,15 @@ class VehicleHeroCard extends ConsumerWidget {
             height: 48,
             child: ElevatedButton.icon(
               onPressed: () async {
-                final updated = await UpdateOdometerDialog.show(context, vehicle);
-                if (updated == true && context.mounted) {
+                final status = await UpdateOdometerDialog.show(context, vehicle);
+                if (status != null && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Angka odometer "${vehicle.displayName}" berhasil diperbarui.'),
+                      content: Text(
+                        status == SaveStatus.queued
+                            ? 'Odometer "${vehicle.displayName}" tersimpan di HP. Akan dikirim otomatis saat internet tersedia.'
+                            : 'Angka odometer "${vehicle.displayName}" berhasil diperbarui.',
+                      ),
                     ),
                   );
                 }

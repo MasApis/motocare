@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../../../core/save_status.dart';
 import '../../../core/vehicle_components.dart';
 import '../../../shared/theme/app_colors.dart';
 import '../../../shared/theme/app_shapes.dart';
@@ -236,7 +237,7 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
       final controller = ref.read(vehicleControllerProvider);
 
       if (isEditMode) {
-        await controller.updateVehicle(
+        final status = await controller.updateVehicle(
           vehicleId: widget.vehicleId!,
           brand: brand,
           model: model,
@@ -247,12 +248,18 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Data motor berhasil diperbarui.')),
+            SnackBar(
+              content: Text(
+                status == SaveStatus.queued
+                    ? 'Perubahan tersimpan di HP. Akan dikirim otomatis saat internet tersedia.'
+                    : 'Data motor berhasil diperbarui.',
+              ),
+            ),
           );
           context.pop();
         }
       } else {
-        final newId = await controller.addVehicle(
+        final result = await controller.addVehicle(
           brand: brand,
           model: model,
           name: name.isNotEmpty ? name : '$brand $model',
@@ -260,11 +267,17 @@ class _VehicleFormScreenState extends ConsumerState<VehicleFormScreen> {
           currentKm: currentKm,
           customIntervals: customIntervals,
         );
-        ref.read(selectedVehicleIdProvider.notifier).select(newId);
+        ref.read(selectedVehicleIdProvider.notifier).select(result.value);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Motor berhasil didaftarkan!')),
+            SnackBar(
+              content: Text(
+                result.status == SaveStatus.queued
+                    ? 'Motor tersimpan di HP. Akan dikirim otomatis saat internet tersedia.'
+                    : 'Motor berhasil didaftarkan!',
+              ),
+            ),
           );
           context.pop();
         }

@@ -9,6 +9,7 @@ import '../../../../shared/theme/app_spacing.dart';
 import '../../../../shared/theme/app_typography.dart';
 import '../../../../shared/widgets/app_progress_bar.dart';
 import '../../../../shared/widgets/app_status_badge.dart';
+import '../../../../shared/widgets/pending_sync_badge.dart';
 
 /// Kartu status kesehatan komponen motor
 /// Menampilkan ikon, nama komponen, interval, badge status (Aman/Peringatan/Batas habis),
@@ -21,6 +22,7 @@ class ComponentHealthCard extends StatelessWidget {
     required this.intervalKm,
     required this.lastServiceKm,
     required this.currentKm,
+    this.hasPendingWrites = false,
     this.onTap,
   });
 
@@ -35,6 +37,9 @@ class ComponentHealthCard extends StatelessWidget {
 
   /// Kilometer odometer motor saat ini (km)
   final int currentKm;
+
+  /// True bila data komponen masih menunggu dikirim ke server.
+  final bool hasPendingWrites;
 
   /// Callback opsional saat kartu ditekan (untuk F5)
   final VoidCallback? onTap;
@@ -119,6 +124,10 @@ class ComponentHealthCard extends StatelessWidget {
                               color: AppColors.onSurfaceVariant,
                             ),
                           ),
+                          if (hasPendingWrites) ...[
+                            const SizedBox(height: 4),
+                            const PendingSyncBadge(),
+                          ],
                         ],
                       ),
                     ),
