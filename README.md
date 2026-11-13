@@ -4,7 +4,7 @@
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Spark%20Plan-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com)
 [![State Management](https://img.shields.io/badge/State-Riverpod%20v3-00599C)](https://riverpod.dev)
-[![Tests](https://img.shields.io/badge/Tests-197%20Passed-brightgreen)](https://github.com)
+[![Tests](https://img.shields.io/badge/Tests-201%20Passed-brightgreen)](https://github.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **MotoCare** adalah aplikasi mobile Android berbasis Flutter yang dirancang khusus untuk membantu pemilik **sepeda motor matic** memantau kesehatan komponen kendaraan (oli mesin, oli gardan, V-belt), mencatat riwayat servis berkala, menjadwalkan pengingat servis otomatis, serta berkonsultasi seputar kendala motor dengan asisten cerdas berbasis AI (**MotoAI**).
@@ -26,6 +26,7 @@
     - 🟡 **Peringatan** (10% – 30%)
     - 🔴 **Batas Habis** (< 10% atau melebihi interval).
   - Tampilan sisa kilometer dan estimasi kondisi suku cadang.
+  - Animasi halus di Beranda: kartu muncul bergantian, progress bar terisi pelan, angka odometer menghitung naik. Otomatis mati bila opsi **Hapus animasi** aktif di pengaturan aksesibilitas HP.
 
 - ⏱️ **Pencatatan Odometer & Rata-rata Harian**
   - Pembaruan kilometer motor secara berkala dengan validasi angka (KM tidak boleh mundur).
@@ -84,7 +85,7 @@ UI (Widgets & Pages) ──► Providers (Riverpod) ──► Repositories ─�
 | **Notifikasi** | `flutter_local_notifications` + `timezone` |
 | **Laporan & Dokumen** | `pdf` + `printing` |
 | **Ikon & Font** | `google_fonts` (Plus Jakarta Sans) & `material_symbols_icons` |
-| **Pengujian** | `flutter_test` (197 Unit & Widget Tests) |
+| **Pengujian** | `flutter_test` (201 Unit & Widget Tests) |
 
 ---
 
@@ -105,7 +106,7 @@ motocare/
 │   │   └── vehicles/          # Tambah, kelola, & ganti kendaraan
 │   ├── shared/                # Tema warna, tipografi, komponen bersama
 │   └── main.dart              # Entrypoint aplikasi
-├── test/                      # 197 Unit & Widget test
+├── test/                      # 201 Unit & Widget test
 ├── docs/                      # Spesifikasi & desain
 │   ├── SPEC.md                #   daftar fitur resmi (sumber kebenaran)
 │   ├── DESIGN.md              #   aturan visual (warna, font, ukuran)
@@ -178,7 +179,15 @@ dart pub global activate flutterfire_cli
 flutterfire configure
 ```
 
-Pilih project `motocare-d902e`, lalu platform **Android** saja. Perintah ini membaca `firebase.json` di repo dan membuat kedua berkas dengan isi yang benar.
+Pilih project `motocare-d902e`, lalu platform **Android** saja. Perintah ini membaca `firebase.json` di repo dan membuat kedua berkas dengan isi yang benar. Versi tanpa pertanyaan:
+
+```bash
+flutterfire configure --project=motocare-d902e --platforms=android
+```
+
+> **Belum punya akses ke `motocare-d902e`?** Minta pemilik project mengundang email Anda (**Project settings → Users and permissions → Add member**), terima undangannya, lalu pastikan Firebase CLI login dengan **email yang diundang**: `firebase login:list`. Kalau beda, tambahkan dengan `firebase login:add` lalu pindah dengan `firebase login:use email@anda.com`. Project sudah bisa diakses kalau muncul di `firebase projects:list`.
+
+> `flutterfire configure` menulis ulang `firebase.json` menjadi satu baris panjang walau isinya sama. Kembalikan dengan `git checkout -- firebase.json` supaya tidak ikut ter-commit.
 
 Kalau `flutterfire configure` tidak bisa dipakai, salin contoh yang sudah disiapkan lalu isi manual:
 
@@ -249,6 +258,8 @@ MotoCare memakai **Firebase App Check**. Pada mode debug, aplikasi membuat *debu
    adb shell setprop log.tag.com.google.firebase.appcheck.debug.internal.DebugAppCheckProvider 0
    ```
 
+   Cara lain: token yang belum terdaftar juga tercetak di peringatan `Failed to exchange debug token (xxxxxxxx-...)`. Token-nya adalah kode di dalam tanda kurung.
+
 2. Buka [Firebase Console → App Check → Apps](https://console.firebase.google.com/project/motocare-d902e/appcheck/apps)
 3. Kartu `com.hdp.motocare` → **⋮** → **Manage debug tokens** → **Add debug token**
 4. Tempel token tadi, beri nama bebas, **Save**
@@ -259,7 +270,7 @@ MotoCare memakai **Firebase App Check**. Pada mode debug, aplikasi membuat *debu
 > Perintah `firebase appcheck:debugtokens:create` **tidak bisa** dipakai untuk mendaftarkan token pilihan Anda — perintah itu membuat token acak baru. Gunakan halaman web di atas.
 
 ### 8. Build APK Rilis (opsional)
-Build rilis memerlukan berkas `android/key.properties` berisi lokasi keystore. Tanpa berkas itu build **akan gagal** dengan pesan yang jelas — bukan diam-diam memakai kunci debug.
+Build rilis memerlukan berkas `android/key.properties` berisi lokasi keystore. Tanpa berkas itu build **akan gagal** dengan pesan yang jelas — bukan diam-diam memakai kunci debug. Build debug (`flutter run`, `flutter build apk --debug`) **tidak** butuh berkas ini.
 
 ```properties
 storePassword=...
@@ -364,7 +375,7 @@ Proyek ini dilengkapi dengan cakupan pengujian komprehensif pada fungsi inti (*c
 # Menjalankan analisis statis kode
 flutter analyze
 
-# Menjalankan seluruh pengujian (197 test cases)
+# Menjalankan seluruh pengujian (201 test cases)
 flutter test
 ```
 

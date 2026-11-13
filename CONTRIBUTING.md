@@ -20,7 +20,20 @@ Ikuti dari atas ke bawah. Semua perintah diketik di terminal, dijalankan dari fo
 
 Proyek ini **tidak butuh emulator**. Justru lebih baik pakai HP asli, karena notifikasi dan penyimpanan offline hanya bisa diuji dengan benar di perangkat nyata.
 
-Belum punya Flutter? Ikuti [panduan resmi](https://docs.flutter.dev/get-started/install/linux) untuk Linux.
+Belum punya Flutter? Ikuti panduan resmi untuk [Linux](https://docs.flutter.dev/get-started/install/linux) atau [Windows](https://docs.flutter.dev/get-started/install/windows).
+
+### HP tidak muncul di `flutter devices`?
+
+1. **Setelan → Tentang ponsel →** ketuk **Nomor bentukan** 7 kali, lalu **Opsi pengembang → Debugging USB** nyalakan.
+2. Setelah kabel dicolok, ubah mode USB di notifikasi HP dari *Mengisi daya* ke **Transfer file**.
+3. Terima pop-up **Izinkan debugging USB?** (centang *Selalu izinkan*).
+4. Masih tidak muncul? Ganti kabel — banyak kabel hanya untuk mengecas, tidak bisa kirim data.
+
+Di Windows, `adb` biasanya tidak ada di PATH. Panggil langsung dari SDK:
+
+```powershell
+& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" devices
+```
 
 ---
 
@@ -41,7 +54,34 @@ Setelah aplikasi terbuka, **dashboard kemungkinan masih kosong**. Itu bukan bug:
 
 Kalau muncul error di salah satu langkah, lompat ke [tabel error](#10-error-yang-sering-muncul). Hampir semua masalah awal berasal dari bagian 3 dan 4 di bawah.
 
-> **Tidak punya akses ke project `motocare-d902e`?** Anda harus punya project Firebase sendiri. Lihat [Lampiran A](#lampiran-a-memakai-project-firebase-sendiri).
+> **Tidak punya akses ke project `motocare-d902e`?** Minta diundang dulu (lihat [2a](#2a-minta-akses-ke-project-firebase)). Kalau tidak bisa, pakai project Firebase sendiri: [Lampiran A](#lampiran-a-memakai-project-firebase-sendiri).
+
+### 2a. Minta akses ke project Firebase
+
+Anggota tim harus memakai project yang **sama** (`motocare-d902e`). Kalau masing-masing memakai project sendiri, akun dan data tidak tersambung antar anggota.
+
+1. **Pemilik project** membuka Firebase Console → ⚙️ **Project settings → Users and permissions → Add member**, mengisi email Anda, peran **Editor**.
+2. **Anda** menerima undangan dari email.
+3. Pastikan Firebase CLI login dengan **email yang diundang** — bukan email lain (misalnya email kampus):
+
+   ```bash
+   firebase login:list
+   ```
+
+   Kalau beda:
+
+   ```bash
+   firebase login:add                   # login dengan email yang diundang
+   firebase login:use email@anda.com    # jadikan akun aktif
+   ```
+
+4. Cek aksesnya. `motocare-d902e` harus muncul di daftar:
+
+   ```bash
+   firebase projects:list
+   ```
+
+5. Kirim **debug token App Check** HP Anda ke pemilik project lewat chat pribadi (bukan grup, bukan GitHub), atau daftarkan sendiri ([bagian 4](#4-app-check-sekali-pasang-tidak-dipikir-lagi)).
 
 ---
 
@@ -63,7 +103,28 @@ dart pub global activate flutterfire_cli
 flutterfire configure
 ```
 
-Perintah itu akan menanyakan project mana yang dipakai. Pilih `motocare-d902e`, lalu platform **Android** saja.
+Perintah itu akan menanyakan project mana yang dipakai. Pilih `motocare-d902e`, lalu platform **Android** saja. Atau langsung tanpa pertanyaan:
+
+```bash
+flutterfire configure --project=motocare-d902e --platforms=android
+```
+
+> Di Windows, kalau `flutterfire` tidak dikenali, jalankan lewat jalur lengkapnya: `& "$env:LOCALAPPDATA\Pub\Cache\bin\flutterfire.bat" configure ...`
+
+**Cek project-nya benar.** Kedua file harus menyebut `motocare-d902e`:
+
+```bash
+grep projectId lib/firebase_options.dart
+grep project_id android/app/google-services.json
+```
+
+Kalau yang tertulis project lain, aplikasi tetap jalan tapi data tidak pernah terkirim (lihat [tabel error](#10-error-yang-sering-muncul)). Jalankan ulang `flutterfire configure` dengan project yang benar, lalu **hentikan dan jalankan ulang** aplikasi (hot reload `r` tidak cukup).
+
+`flutterfire configure` juga menulis ulang `firebase.json` menjadi satu baris panjang, walau isinya sama. Kembalikan supaya tidak ikut ter-commit:
+
+```bash
+git checkout -- firebase.json
+```
 
 Setelah selesai, pastikan kedua file benar-benar ada:
 
@@ -176,7 +237,13 @@ Saat mode debug, App Check memakai **debug token**: kode acak yang dibuat otomat
                               xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
    ```
 
-   **Salin token itu.** Ini satu-satunya cara melihatnya.
+   **Salin token itu.**
+
+   Cara lebih cepat: selama token belum terdaftar, log selalu mencetak peringatan berisi token itu di dalam tanda kurung:
+
+   ```
+   W DebugAppCheckProvider: Failed to exchange debug token (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). ...
+   ```
 
 4. Matikan lagi log detail supaya tidak berisik:
 
@@ -243,7 +310,7 @@ Detail tambahan ada di [`docs/FIRESTORE_RULES_SETUP.md`](docs/FIRESTORE_RULES_SE
 1. **Satu fitur per PR.** Jangan campur perbaikan bug dengan fitur baru. PR kecil lebih cepat ditinjau.
 2. **Jangan menambah fitur di luar `docs/SPEC.md`.** Kalau punya ide, buka *issue* dulu. Ini bukan untuk membatasi — tapi supaya aplikasi tetap fokus pada satu masalah.
 3. **`flutter analyze` harus bersih.** Nol peringatan, bukan "hanya satu-dua".
-4. **`flutter test` harus lulus semua** (197 test saat dokumen ini ditulis).
+4. **`flutter test` harus lulus semua** (201 test saat dokumen ini ditulis).
 5. **Tulis test** untuk logika baru di `lib/core/`, dan untuk perilaku widget yang penting.
 6. **Ubah dulu, jalankan, baru lanjut.** Langkah kecil lebih mudah diperbaiki daripada satu perubahan besar.
 
@@ -302,6 +369,9 @@ lib/shared/                tema dan widget bersama
 - **Format rupiah dan tanggal pakai locale `id_ID`.**
 - **Hindari `dynamic`.** Pakai tipe yang jelas.
 - **Target sentuh minimal 48dp.** Status jangan dibedakan hanya dengan warna — sertakan teks atau ikon.
+- **Durasi dan gaya animasi hanya di `lib/shared/theme/app_motion.dart`.** Pakai `AppEntrance` (kartu muncul) dan `AppPressable` (efek tekan) dari `lib/shared/widgets/`. Animasi wajib mati bila `AppMotion.isReduced(context)` bernilai `true` (opsi *Hapus animasi* di HP).
+- **Jangan pakai animasi yang berulang tanpa henti** (mis. titik berdenyut). `pumpAndSettle()` di widget test akan menunggu selamanya.
+- **Teks dalam `Row` harus dibungkus `Expanded`/`Flexible`** bila panjangnya bisa berubah (tanggal, nama, badge). Uji di lebar 360 dp — garis kuning-hitam di HP berarti ada yang meluber.
 
 Detail lengkap ada di [`AGENTS.md`](AGENTS.md).
 
@@ -324,7 +394,7 @@ Detail lengkap ada di [`AGENTS.md`](AGENTS.md).
 
 ### Build rilis (hanya kalau perlu)
 
-Butuh `android/key.properties` berisi lokasi keystore:
+Butuh `android/key.properties` berisi lokasi keystore. Build debug (`flutter run`, `flutter build apk --debug`) **tidak** butuh berkas ini — pemeriksaannya hanya aktif saat yang diminta build rilis.
 
 ```properties
 storePassword=...
@@ -477,6 +547,14 @@ Aplikasi tetap jalan penuh; hanya Chat AI yang meminta konfigurasi.
 | Chat AI bilang kunci tidak valid | Kunci Groq salah atau sudah dicabut | Buat kunci baru di [console.groq.com/keys](https://console.groq.com/keys) |
 | Data tidak muncul di HP baru atau setelah install ulang | Salinan lokal Firestore hanya ada di HP yang pernah membuka aplikasi | Buka sekali dengan internet, setelah itu bisa dipakai offline |
 | Catatan bertanda "Menunggu dikirim" lama hilang | Belum terkirim ke server | Tunggu internet tersambung; penanda hilang sendiri |
+| "Menunggu dikirim" **tidak pernah** hilang padahal internet lancar | Server menolak atau tujuan salah | Baca log: `adb logcat -d \| grep -E "Firestore\|AppCheck"`, lalu cocokkan dengan dua baris di bawah |
+| Log: `The database (default) does not exist for project <nama>` | `firebase_options.dart` menunjuk project lain, atau database Firestore belum dibuat di project itu | Cek `grep projectId lib/firebase_options.dart`. Harus `motocare-d902e`; kalau bukan, ulangi [bagian 3](#3-file-rahasia-paling-sering-bikin-gagal) |
+| Log: `Failed to exchange debug token (xxxx...)` | Token App Check belum didaftarkan di project yang dipakai | Daftarkan kode di dalam tanda kurung itu ([bagian 4b](#4b-daftarkan-tokennya)) |
+| `android/key.properties tidak ditemukan` saat `flutter run` | Repo versi lama — pemeriksaan keystore ikut jalan di build debug | `git pull`; versi sekarang hanya memeriksa saat build rilis |
+| `firebase projects:list` tidak memuat `motocare-d902e` | Undangan belum diterima, atau CLI login dengan email lain | Lihat [2a](#2a-minta-akses-ke-project-firebase) |
+| HP tidak muncul di `flutter devices` | USB debugging mati, mode USB masih *Mengisi daya*, atau kabel hanya untuk cas | Lihat [bagian 1](#hp-tidak-muncul-di-flutter-devices) |
+| `adb : The term 'adb' is not recognized` (Windows) | `platform-tools` tidak ada di PATH | Pakai jalur lengkap `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe` |
+| Garis kuning-hitam bertuliskan `OVERFLOWED BY ... PIXELS` | Isi `Row` lebih lebar dari layar | Bungkus teks dengan `Expanded`/`Flexible`, atau pindahkan elemen ke baris baru |
 | Perubahan di `docs/` tidak ikut ter-commit | `.gitignore` memuat `docs/*` | `git add -f docs/nama_file.md` |
 | `flutter analyze` bersih tapi `flutter test` gagal | Test lama menyesuaikan perilaku lama | Perbaiki kodenya, bukan testnya — kecuali memang perilakunya sengaja diubah |
 
@@ -506,7 +584,7 @@ Kalau ada hasil, **jangan commit**. Hapus dulu.
 
 ## Lampiran A: memakai project Firebase sendiri
 
-Kalau Anda tidak punya akses ke `motocare-d902e`:
+Kalau Anda tidak punya akses ke `motocare-d902e` dan tidak bisa diundang ([2a](#2a-minta-akses-ke-project-firebase)):
 
 1. Buat project baru di [Firebase Console](https://console.firebase.google.com/) — pakai paket **Spark** (gratis, tanpa kartu kredit).
 2. **Authentication → Sign-in method →** aktifkan **Email/Password**.
