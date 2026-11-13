@@ -7,6 +7,7 @@ import '../../../../shared/theme/app_colors.dart';
 import '../../../../shared/theme/app_shapes.dart';
 import '../../../../shared/theme/app_spacing.dart';
 import '../../../../shared/theme/app_typography.dart';
+import '../../../../shared/widgets/app_pressable.dart';
 import '../../../../shared/widgets/app_progress_bar.dart';
 import '../../../../shared/widgets/app_status_badge.dart';
 import '../../../../shared/widgets/pending_sync_badge.dart';
@@ -55,128 +56,124 @@ class ComponentHealthCard extends StatelessWidget {
     final iconData = _getComponentIcon(componentType);
     final componentName = ComponentType.getLabel(componentType);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        borderRadius: AppShapes.roundedDefault,
-        border: Border.all(
-          color: AppColors.borderSlate,
-          width: 1,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A0F172A),
-            blurRadius: 4,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: AppShapes.roundedDefault,
-        child: InkWell(
+    return AppPressable(
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceContainerLowest,
           borderRadius: AppShapes.roundedDefault,
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Baris Atas: Ikon + Judul + Badge Status
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Lingkaran Ikon Komponen
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: health.backgroundColor,
-                        shape: BoxShape.circle,
+          border: Border.all(color: AppColors.borderSlate, width: 1),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0A0F172A),
+              blurRadius: 4,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: AppShapes.roundedDefault,
+          child: InkWell(
+            borderRadius: AppShapes.roundedDefault,
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Baris Atas: Ikon + Judul + Badge Status
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Lingkaran Ikon Komponen
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: health.backgroundColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(iconData, color: health.color, size: 22),
                       ),
-                      child: Icon(
-                        iconData,
-                        color: health.color,
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
+                      const SizedBox(width: AppSpacing.sm),
 
-                    // Nama Komponen & Interval
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            componentName,
-                            style: AppTypography.labelMd().copyWith(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15,
+                      // Nama Komponen & Interval
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              componentName,
+                              style: AppTypography.labelMd().copyWith(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Interval tiap ${_formatKm(intervalKm)} km',
-                            style: AppTypography.bodySm(
-                              color: AppColors.onSurfaceVariant,
+                            const SizedBox(height: 2),
+                            Text(
+                              'Interval tiap ${_formatKm(intervalKm)} km',
+                              style: AppTypography.bodySm(
+                                color: AppColors.onSurfaceVariant,
+                              ),
                             ),
-                          ),
-                          if (hasPendingWrites) ...[
-                            const SizedBox(height: 4),
-                            const PendingSyncBadge(),
+                            if (hasPendingWrites) ...[
+                              const SizedBox(height: 4),
+                              const PendingSyncBadge(),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
+                      const SizedBox(width: AppSpacing.xs),
 
-                    // Badge Status (Aman / Peringatan / Batas habis)
-                    AppStatusBadge.fromComponentStatus(health.status),
-                  ],
-                ),
+                      // Badge Status (Aman / Peringatan / Batas habis)
+                      AppStatusBadge.fromComponentStatus(health.status),
+                    ],
+                  ),
 
-                const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.md),
 
-                // Progress Bar Pemakaian
-                AppProgressBar(
-                  percentageUsed: health.usedPercentage / 100.0,
-                  customBarColor: health.color,
-                  height: 8.0,
-                ),
+                  // Progress Bar Pemakaian
+                  AppProgressBar(
+                    percentageUsed: health.usedPercentage / 100.0,
+                    customBarColor: health.color,
+                    height: 8.0,
+                  ),
 
-                const SizedBox(height: AppSpacing.xs),
+                  const SizedBox(height: AppSpacing.xs),
 
-                // Teks Metrik di Bawah Bar
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Persentase Terpakai
-                    Text(
-                      '${health.usedPercentage.round()}% terpakai',
-                      style: AppTypography.labelCaps(
-                        color: AppColors.onSurfaceVariant,
+                  // Teks Metrik di Bawah Bar
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Persentase Terpakai
+                      Text(
+                        '${health.usedPercentage.round()}% terpakai',
+                        style: AppTypography.labelCaps(
+                          color: AppColors.onSurfaceVariant,
+                        ),
                       ),
-                    ),
 
-                    // Sisa Jarak KM (atau Lewat X km jika melebihi interval)
-                    Text(
-                      _formatRemainingKmText(health.remainingKm),
-                      style: AppTypography.labelCaps(
-                        color: health.status == ComponentStatus.safe
-                            ? AppColors.onSurfaceVariant
-                            : health.color,
-                      ).copyWith(
-                        fontWeight: health.status == ComponentStatus.safe
-                            ? FontWeight.w600
-                            : FontWeight.w800,
+                      // Sisa Jarak KM (atau Lewat X km jika melebihi interval)
+                      Text(
+                        _formatRemainingKmText(health.remainingKm),
+                        style:
+                            AppTypography.labelCaps(
+                              color: health.status == ComponentStatus.safe
+                                  ? AppColors.onSurfaceVariant
+                                  : health.color,
+                            ).copyWith(
+                              fontWeight: health.status == ComponentStatus.safe
+                                  ? FontWeight.w600
+                                  : FontWeight.w800,
+                            ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

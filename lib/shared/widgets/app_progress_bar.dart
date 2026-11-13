@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_colors.dart';
+import '../theme/app_motion.dart';
 import '../theme/app_shapes.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
@@ -69,23 +71,26 @@ class AppProgressBar extends StatelessWidget {
             color: AppColors.surfaceContainerHigh,
             borderRadius: AppShapes.roundedFull,
           ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final fillWidth = constraints.maxWidth * clampedRatio;
-              return Align(
-                alignment: Alignment.centerLeft,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOutCubic,
-                  width: fillWidth,
-                  height: height,
+          // Bar terisi pelan dari 0 saat pertama tampil, lalu bergerak halus saat nilai berubah
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0, end: clampedRatio),
+            duration: AppMotion.isReduced(context)
+                ? Duration.zero
+                : AppMotion.fill,
+            curve: AppMotion.curve,
+            builder: (context, ratio, _) => Align(
+              alignment: Alignment.centerLeft,
+              child: FractionallySizedBox(
+                widthFactor: ratio,
+                heightFactor: 1,
+                child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: barColor,
                     borderRadius: AppShapes.roundedFull,
                   ),
                 ),
-              );
-            },
+              ),
+            ),
           ),
         ),
 
@@ -107,17 +112,18 @@ class AppProgressBar extends StatelessWidget {
               if (rightLabel != null)
                 Text(
                   rightLabel!,
-                  style: AppTypography.labelCaps(
-                    color: status == AppStatusType.critical
-                        ? AppColors.statusCriticalIndicator
-                        : (status == AppStatusType.warning
-                            ? AppColors.statusWarningIndicator
-                            : AppColors.onSurfaceVariant),
-                  ).copyWith(
-                    fontWeight: status != AppStatusType.safe
-                        ? FontWeight.w700
-                        : FontWeight.w600,
-                  ),
+                  style:
+                      AppTypography.labelCaps(
+                        color: status == AppStatusType.critical
+                            ? AppColors.statusCriticalIndicator
+                            : (status == AppStatusType.warning
+                                  ? AppColors.statusWarningIndicator
+                                  : AppColors.onSurfaceVariant),
+                      ).copyWith(
+                        fontWeight: status != AppStatusType.safe
+                            ? FontWeight.w700
+                            : FontWeight.w600,
+                      ),
                 )
               else
                 const SizedBox.shrink(),

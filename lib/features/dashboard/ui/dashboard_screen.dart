@@ -7,12 +7,14 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../../../core/save_status.dart';
 import '../../../core/vehicle_components.dart';
 import '../../../shared/theme/app_colors.dart';
+import '../../../shared/theme/app_motion.dart';
 import '../../../shared/theme/app_shapes.dart';
 import '../../../shared/theme/app_spacing.dart';
 import '../../../shared/theme/app_typography.dart';
 import '../../../shared/widgets/app_bottom_nav_bar.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_card.dart';
+import '../../../shared/widgets/app_entrance.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../vehicles/data/models/vehicle_component_model.dart';
 import '../../vehicles/data/models/vehicle_model.dart';
@@ -47,7 +49,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     super.initState();
     _pageController = PageController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(notificationSchedulerProvider).syncSelectedVehicleNotifications();
+      ref
+          .read(notificationSchedulerProvider)
+          .syncSelectedVehicleNotifications();
     });
   }
 
@@ -109,8 +113,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     if (confirmed == true) {
       try {
-        final status =
-            await ref.read(vehicleControllerProvider).deleteVehicle(vehicle.id);
+        final status = await ref
+            .read(vehicleControllerProvider)
+            .deleteVehicle(vehicle.id);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -123,9 +128,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         );
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal menghapus motor: $e')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Gagal menghapus motor: $e')));
       }
     }
   }
@@ -180,7 +184,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 const Divider(),
               ],
               ListTile(
-                leading: const Icon(Symbols.add_circle, color: AppColors.primary),
+                leading: const Icon(
+                  Symbols.add_circle,
+                  color: AppColors.primary,
+                ),
                 title: Text(
                   'Tambah Motor Lain',
                   style: AppTypography.bodyMd(color: AppColors.onSurface),
@@ -191,10 +198,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Symbols.logout, color: AppColors.onSurfaceVariant),
+                leading: const Icon(
+                  Symbols.logout,
+                  color: AppColors.onSurfaceVariant,
+                ),
                 title: Text(
                   'Keluar dari Akun',
-                  style: AppTypography.bodyMd(color: AppColors.onSurfaceVariant),
+                  style: AppTypography.bodyMd(
+                    color: AppColors.onSurfaceVariant,
+                  ),
                 ),
                 onTap: () async {
                   ctx.pop();
@@ -325,7 +337,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: appBarWidget,
-      body: bodyWidget,
+      // Efek memudar saat berpindah tab bawah
+      body: AnimatedSwitcher(
+        duration: AppMotion.isReduced(context)
+            ? Duration.zero
+            : AppMotion.fast * 2,
+        switchInCurve: AppMotion.curve,
+        switchOutCurve: AppMotion.curve,
+        child: KeyedSubtree(
+          key: ValueKey<int>(_currentNavIndex),
+          child: bodyWidget,
+        ),
+      ),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentNavIndex,
         onTap: (index) {
@@ -334,7 +357,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
     );
   }
-
 
   /// Empty state ketika belum ada motor yang terdaftar
   Widget _buildEmptyState(BuildContext context) {
@@ -394,7 +416,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     Vehicle? activeVehicle,
   ) {
     return ListView(
-
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       children: [
         // Banner Izin Notifikasi (F6) jika belum diizinkan
@@ -414,9 +435,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 onPressed: () => context.push('/vehicles/add'),
                 icon: const Icon(Symbols.add, size: 18),
                 label: const Text('Tambah Motor'),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                ),
+                style: TextButton.styleFrom(foregroundColor: AppColors.primary),
               ),
             ],
           ),
@@ -424,26 +443,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         const SizedBox(height: AppSpacing.xs),
 
         // Carousel Kartu Motor (PageView)
-        SizedBox(
-          height: 335,
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: vehicles.length,
-            onPageChanged: (index) => _onPageChanged(index, vehicles),
-            itemBuilder: (context, index) {
-              final vehicle = vehicles[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.xs,
-                ),
-                child: VehicleHeroCard(
-                  vehicle: vehicle,
-                  itemNumber: index + 1,
-                  totalItems: vehicles.length,
-                ),
-              );
-            },
+        AppEntrance(
+          index: 0,
+          child: SizedBox(
+            height: 335,
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: vehicles.length,
+              onPageChanged: (index) => _onPageChanged(index, vehicles),
+              itemBuilder: (context, index) {
+                final vehicle = vehicles[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.xs,
+                  ),
+                  child: VehicleHeroCard(
+                    vehicle: vehicle,
+                    itemNumber: index + 1,
+                    totalItems: vehicles.length,
+                  ),
+                );
+              },
+            ),
           ),
         ),
 
@@ -460,7 +482,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 width: isSelected ? 20 : 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : AppColors.outlineVariant,
+                  color: isSelected
+                      ? AppColors.primary
+                      : AppColors.outlineVariant,
                   borderRadius: AppShapes.roundedFull,
                 ),
               );
@@ -480,49 +504,52 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ],
 
         // Section Petunjuk Fitur
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-          child: AppCard(
-            backgroundColor: AppColors.surfaceContainerLow,
-            borderColor: AppColors.outlineVariant.withValues(alpha: 0.4),
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryFixed,
-                    shape: BoxShape.circle,
+        AppEntrance(
+          index: 5,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: AppCard(
+              backgroundColor: AppColors.surfaceContainerLow,
+              borderColor: AppColors.outlineVariant.withValues(alpha: 0.4),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryFixed,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Symbols.swipe,
+                      color: AppColors.primary,
+                      size: 22,
+                    ),
                   ),
-                  child: const Icon(
-                    Symbols.swipe,
-                    color: AppColors.primary,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Geser Kartu Motor',
-                        style: AppTypography.labelMd().copyWith(
-                          fontWeight: FontWeight.w700,
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Geser Kartu Motor',
+                          style: AppTypography.labelMd().copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Geser ke kiri atau kanan untuk beralih antar motor. Seluruh data dashboard akan berganti otomatis.',
-                        style: AppTypography.bodySm(
-                          color: AppColors.onSurfaceVariant,
+                        const SizedBox(height: 2),
+                        Text(
+                          'Geser ke kiri atau kanan untuk beralih antar motor. Seluruh data dashboard akan berganti otomatis.',
+                          style: AppTypography.bodySm(
+                            color: AppColors.onSurfaceVariant,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -544,8 +571,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     BuildContext context,
     Vehicle activeVehicle,
   ) {
-    final componentsAsync =
-        ref.watch(vehicleComponentsStreamProvider(activeVehicle.id));
+    final componentsAsync = ref.watch(
+      vehicleComponentsStreamProvider(activeVehicle.id),
+    );
     final components = componentsAsync.asData?.value ?? [];
 
     final orderedTypes = ComponentType.values; // [engine_oil, gear_oil, v_belt]
@@ -564,30 +592,37 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ),
         const SizedBox(height: AppSpacing.sm),
         Column(
-          children: orderedTypes.map((type) {
-            final comp = components.where((c) => c.type == type).firstOrNull ??
+          children: orderedTypes.indexed.map((entry) {
+            final (i, type) = entry;
+            final comp =
+                components.where((c) => c.type == type).firstOrNull ??
                 VehicleComponent(
                   type: type,
                   intervalKm: DefaultIntervals.forType(type),
                   lastServiceKm: activeVehicle.currentKm,
                   baselineKm: activeVehicle.currentKm,
                 );
-            return ComponentHealthCard(
-              componentType: comp.type,
-              intervalKm: comp.intervalKm,
-              lastServiceKm: comp.lastServiceKm,
-              currentKm: activeVehicle.currentKm,
-              hasPendingWrites: comp.hasPendingWrites,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => ServiceFormScreen(
-                      vehicleId: activeVehicle.id,
-                      initialComponentType: comp.type,
+            // Kartu komponen muncul bergantian setelah kartu motor
+            return AppEntrance(
+              key: ValueKey<String>('${activeVehicle.id}-${comp.type}'),
+              index: i + 1,
+              child: ComponentHealthCard(
+                componentType: comp.type,
+                intervalKm: comp.intervalKm,
+                lastServiceKm: comp.lastServiceKm,
+                currentKm: activeVehicle.currentKm,
+                hasPendingWrites: comp.hasPendingWrites,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => ServiceFormScreen(
+                        vehicleId: activeVehicle.id,
+                        initialComponentType: comp.type,
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             );
           }).toList(),
         ),

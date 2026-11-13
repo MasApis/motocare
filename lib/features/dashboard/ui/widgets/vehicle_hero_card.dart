@@ -6,9 +6,11 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import '../../../../core/odometer_calculator.dart';
 import '../../../../core/save_status.dart';
 import '../../../../shared/theme/app_colors.dart';
+import '../../../../shared/theme/app_motion.dart';
 import '../../../../shared/theme/app_shapes.dart';
 import '../../../../shared/theme/app_spacing.dart';
 import '../../../../shared/theme/app_typography.dart';
+import '../../../../shared/widgets/app_pressable.dart';
 import '../../../../shared/widgets/pending_sync_badge.dart';
 import '../../../odometer/providers/odometer_providers.dart';
 import '../../../odometer/ui/update_odometer_dialog.dart';
@@ -171,7 +173,10 @@ class VehicleHeroCard extends ConsumerWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceContainer,
                         borderRadius: AppShapes.roundedFull,
@@ -201,11 +206,20 @@ class VehicleHeroCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    Text(
-                      _formatKm(vehicle.currentKm),
-                      style: AppTypography.headlineLg().copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
+                    // Angka odometer menghitung naik saat tampil atau diperbarui
+                    TweenAnimationBuilder<int>(
+                      tween: IntTween(begin: 0, end: vehicle.currentKm),
+                      duration: AppMotion.isReduced(context)
+                          ? Duration.zero
+                          : AppMotion.fill,
+                      curve: AppMotion.curve,
+                      builder: (context, km, _) => Text(
+                        _formatKm(km),
+                        style: AppTypography.headlineLg().copyWith(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.xs),
@@ -235,9 +249,8 @@ class VehicleHeroCard extends ConsumerWidget {
                     ),
                     Text(
                       formatDailyAverageKm(dailyAvg),
-                      style: AppTypography.bodySm(
-                        color: AppColors.onSurface,
-                      ).copyWith(fontWeight: FontWeight.w700),
+                      style: AppTypography.bodySm(color: AppColors.onSurface)
+                          .copyWith(fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
@@ -247,34 +260,39 @@ class VehicleHeroCard extends ConsumerWidget {
           const SizedBox(height: AppSpacing.sm),
 
           // Prominent Update CTA Button sesuai desain
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                final status = await UpdateOdometerDialog.show(context, vehicle);
-                if (status != null && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        status == SaveStatus.queued
-                            ? 'Odometer "${vehicle.displayName}" tersimpan di HP. Akan dikirim otomatis saat internet tersedia.'
-                            : 'Angka odometer "${vehicle.displayName}" berhasil diperbarui.',
-                      ),
-                    ),
+          AppPressable(
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  final status = await UpdateOdometerDialog.show(
+                    context,
+                    vehicle,
                   );
-                }
-              },
-              icon: const Icon(Symbols.add_circle, size: 20),
-              label: const Text(
-                'Update KM Hari Ini',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.onPrimary,
-                shape: AppShapes.shapePill,
-                elevation: 1,
+                  if (status != null && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          status == SaveStatus.queued
+                              ? 'Odometer "${vehicle.displayName}" tersimpan di HP. Akan dikirim otomatis saat internet tersedia.'
+                              : 'Angka odometer "${vehicle.displayName}" berhasil diperbarui.',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Symbols.add_circle, size: 20),
+                label: const Text(
+                  'Update KM Hari Ini',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.onPrimary,
+                  shape: AppShapes.shapePill,
+                  elevation: 1,
+                ),
               ),
             ),
           ),
